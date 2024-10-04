@@ -7,8 +7,12 @@
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
+#include "DoubleHeroesComponent/CombatComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Net/UnrealNetwork.h"
+#include "Weapon/Weapon.h"
 
 
 // Sets default values
@@ -24,6 +28,12 @@ ABlueHeroCharacter::ABlueHeroCharacter()
 
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+
+	bUseControllerRotationYaw = false;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+
+	Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("Combat"));
+	Combat->SetIsReplicated(true);
 }
 
 // Called when the game starts or when spawned
@@ -31,20 +41,32 @@ void ABlueHeroCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//Add Input Mapping Context
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	if(APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		if(UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
-			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+			Subsystem->AddMappingContext(SlashContext, 0);
 		}
 	}
+
 }
 
 // Called every frame
 void ABlueHeroCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (OverlappingWeapon)
+	{
+		
+	}
+}
+
+void ABlueHeroCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(ABlueHeroCharacter, OverlappingWeapon, COND_OwnerOnly);//COND_OwnerOnly只在网络的所有者客户端上复制该变量
 }
 
 void ABlueHeroCharacter::MoveForward(float Value)
@@ -60,11 +82,21 @@ void ABlueHeroCharacter::MoveForward(float Value)
 	// if(ActionState != EActionState::EAS_Unoccupied) return;
 }
 
+void ABlueHeroCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
+{
+	
+}
+
 void ABlueHeroCharacter::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D
-	FVector2D MovementVector = Value.Get<FVector2D>();
+	/*FVector2D MovementVector = Value.Get<FVector2D>();
+	const FVector Forward = GetActorForwardVector();
+	AddMovementInput(Forward, MovementVector.Y);
+	const FVector Right = GetActorRightVector();
+	AddMovementInput(Right, MovementVector.X);*/
 
+	FVector2D MovementVector = Value.Get<FVector2D>();
 	if (Controller != nullptr)
 	{
 		// find out which way is forward
@@ -91,15 +123,27 @@ void ABlueHeroCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 		//Jumping
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-
 		//Moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABlueHeroCharacter::Move);
-
+		EnhancedInputComponent->BindAction(MovementAction, ETriggerEvent::Triggered, this, &ABlueHeroCharacter::Move);
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ABlueHeroCharacter::Look);
+		EnhancedInputComponent->BindAction(PunchAction, ETriggerEvent::Triggered, this, &ABlueHeroCharacter::Punch);
+		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &ABlueHeroCharacter::Dodge);
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ABlueHeroCharacter::Interact);
 
 	}
 
+}
+
+void ABlueHeroCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	if (Combat)
+	{
+		Combat->Character = this;
+	}
+	
 }
 
 void ABlueHeroCharacter::Look(const FInputActionValue& Value)
@@ -116,4 +160,36 @@ void ABlueHeroCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}*/
+}
+
+void ABlueHeroCharacter::SetOverlappingWeapon(AWeapon* Weapon)
+{
+	/*if (OverlappingWeapon)
+	{
+		OverlappingWeapon->ShowPickupWidget(false);
+	}*/
+	OverlappingWeapon = Weapon;
+	/*if (IsLocallyControlled())
+	{
+		if (OverlappingWeapon)
+		{
+			OverlappingWeapon->ShowPickupWidget(true);
+		}
+	}*/
+}
+
+void ABlueHeroCharacter::Punch()
+{
+}
+
+void ABlueHeroCharacter::Dodge()
+{
+}
+
+void ABlueHeroCharacter::Interact()
+{
+	if (Combat && HasAuthority())
+	{
+		Combat->EquipWeapon(OverlappingWeapon);
+	}
 }

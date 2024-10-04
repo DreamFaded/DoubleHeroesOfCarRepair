@@ -11,19 +11,11 @@ UCLASS()
 class DOUBLEHEROES_API ABlueHeroCharacter : public ACharacter
 {
 	GENERATED_BODY()
-
-	/** MappingContext */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputMappingContext* DefaultMappingContext;
 	
 	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* JumpAction;
-
-	/** Move Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* MoveAction;
-
+	
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
@@ -31,27 +23,41 @@ class DOUBLEHEROES_API ABlueHeroCharacter : public ACharacter
 public:
 	// Sets default values for this character's properties
 	ABlueHeroCharacter();
+	virtual void Tick(float DeltaTime) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void PostInitializeComponents() override;
+
 
 protected:
 	// APawn interface
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, Category = input)
 	class UInputMappingContext* SlashContext;
 
+	UPROPERTY(EditAnywhere, Category = input)
+	UInputAction* MovementAction;
+
+	UPROPERTY(EditAnywhere, Category = input)
+	UInputAction* PunchAction;
+
+
+	UPROPERTY(EditAnywhere, Category = input)
+	UInputAction* DodgeAction;
+
+	UPROPERTY(EditAnywhere, Category = input)
+	UInputAction* InteractAction;
+
+
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	void Punch();
+	void Dodge();
+	void Interact();
 
 	void MoveForward(float Value);
-
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	// virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 
 private:
@@ -60,4 +66,16 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class UCameraComponent* FollowCamera;
+
+	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
+	class AWeapon* OverlappingWeapon;
+
+	UFUNCTION()
+	void OnRep_OverlappingWeapon(AWeapon* LastWeapon);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UCombatComponent* Combat;
+
+public:
+	FORCEINLINE void SetOverlappingWeapon(AWeapon* Weapon);
 };
