@@ -2,6 +2,9 @@
 
 
 #include "MultiplayerSessionsSubsystem.h"
+
+#include "BlueHeroCharacter.h"
+#include "EnhancedInputSubsystems.h"
 #include "OnlineSubsystem.h"
 #include "Online/OnlineSessionNames.h"
 
@@ -187,12 +190,14 @@ void UMultiplayerSessionsSubsystem::OnCreateSessionComplete(FName SessionName, b
 		UWorld* World = GetWorld();
 		if (World)
 		{
-			FString Path = "/Game/ThirdPerson/Maps/ThirdPersonMap";
+			FString Path = "/Game/Maps/Lobby";
 			if (!GameMapPath.IsEmpty())
 			{
 				Path = FString::Printf(TEXT("%s?listen"), *GameMapPath);
 			}
+			
 			World->ServerTravel(Path);
+			// 设置旅行完成后的回调
 		}
 	}
 	else

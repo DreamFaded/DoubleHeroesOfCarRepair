@@ -14,7 +14,7 @@
 // Sets default values
 AWeapon::AWeapon()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
 
@@ -45,15 +45,17 @@ void AWeapon::BeginPlay()
 
 	if (GetLocalRole() == ROLE_Authority)
 	{
-		AreaSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);//只启用查询模式
-		AreaSphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);//当碰撞体与 “Pawn” 类型的对象发生重叠时，会产生重叠事件
-		AreaSphere->OnComponentBeginOverlap.AddDynamic(this, &AWeapon::OnSphereOverlap);// AWeapon 类中的一个成员函数 OnSphereOverlap，这个函数将在碰撞体开始重叠时被调用
-		AreaSphere->OnComponentEndOverlap.AddDynamic(this, &AWeapon::OnSphereEndOverlap);// 事件委托，当碰撞体结束与其他物体重叠时会被触发
+		AreaSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly); //只启用查询模式
+		AreaSphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap); //当碰撞体与 “Pawn” 类型的对象发生重叠时，会产生重叠事件
+		AreaSphere->OnComponentBeginOverlap.AddDynamic(this, &AWeapon::OnSphereOverlap);
+		// AWeapon 类中的一个成员函数 OnSphereOverlap，这个函数将在碰撞体开始重叠时被调用
+		AreaSphere->OnComponentEndOverlap.AddDynamic(this, &AWeapon::OnSphereEndOverlap); // 事件委托，当碰撞体结束与其他物体重叠时会被触发
 	}
-	
 }
 
-void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+                              UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+                              const FHitResult& SweepResult)
 {
 	ABlueHeroCharacter* BlueHeroCharacter = Cast<ABlueHeroCharacter>(OtherActor);
 
@@ -64,7 +66,7 @@ void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 }
 
 void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+                                 UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	ABlueHeroCharacter* BlueHeroCharacter = Cast<ABlueHeroCharacter>(OtherActor);
 
@@ -74,11 +76,36 @@ void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	}
 }
 
+void AWeapon::SetWeaponState(EWeaponState State)
+{
+	WeaponState = State;
+	switch (WeaponState)
+	{
+	case EWeaponState::EWS_Equipped:
+		AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		break;
+	}
+}
+
+void AWeapon::OnRep_WeaponState()
+{
+	switch (WeaponState)
+	{
+	case EWeaponState::EWS_Equipped:
+		// ShowPickupWidget(false);
+		break;
+	}
+}
+
 // Called every frame
 void AWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
+void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME(AWeapon, WeaponState);
+}

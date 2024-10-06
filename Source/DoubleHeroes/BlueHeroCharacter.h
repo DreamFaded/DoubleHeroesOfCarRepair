@@ -20,6 +20,8 @@ class DOUBLEHEROES_API ABlueHeroCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
 
+	
+
 public:
 	// Sets default values for this character's properties
 	ABlueHeroCharacter();
@@ -27,28 +29,31 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void PostInitializeComponents() override;
+	
+	void SetOverlappingWeapon(AWeapon* Weapon);
+	bool IsWeaponEquipped();
 
+	class UCombatComponent* Combat;
+	UPROPERTY(EditAnywhere, Category = input)
+	class UInputMappingContext* SlashContext;
 
 protected:
 	// APawn interface
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere, Category = input)
-	class UInputMappingContext* SlashContext;
+	
 
 	UPROPERTY(EditAnywhere, Category = input)
 	UInputAction* MovementAction;
-
 	UPROPERTY(EditAnywhere, Category = input)
 	UInputAction* PunchAction;
-
-
 	UPROPERTY(EditAnywhere, Category = input)
 	UInputAction* DodgeAction;
-
 	UPROPERTY(EditAnywhere, Category = input)
 	UInputAction* InteractAction;
+	UPROPERTY(EditAnywhere, Category = input)
+	UInputAction* CrouchAction;
 
 
 	void Move(const FInputActionValue& Value);
@@ -56,6 +61,7 @@ protected:
 	void Punch();
 	void Dodge();
 	void Interact();
+	void CrouchPressed();
 
 	void MoveForward(float Value);
 
@@ -73,9 +79,11 @@ private:
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(AWeapon* LastWeapon);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class UCombatComponent* Combat;
+	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 
-public:
-	FORCEINLINE void SetOverlappingWeapon(AWeapon* Weapon);
+	UFUNCTION(Server, Reliable)
+	void ServerEquipButtonPressed();
+	
+	
+
 };

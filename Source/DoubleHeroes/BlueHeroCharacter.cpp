@@ -20,7 +20,6 @@ ABlueHeroCharacter::ABlueHeroCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetMesh());
 	CameraBoom->TargetArmLength = 600.f;
@@ -32,8 +31,17 @@ ABlueHeroCharacter::ABlueHeroCharacter()
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
-	Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("Combat"));
-	Combat->SetIsReplicated(true);
+	Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
+	Combat->SetIsReplicated(true); // 如果需要网络复制
+
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
+}
+
+void ABlueHeroCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(ABlueHeroCharacter, OverlappingWeapon, COND_OwnerOnly); //COND_OwnerOnly只在网络的所有者客户端上复制该变量
 }
 
 // Called when the game starts or when spawned
@@ -41,14 +49,14 @@ void ABlueHeroCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if(APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
-		if(UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<
+			UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(SlashContext, 0);
 		}
 	}
-
 }
 
 // Called every frame
@@ -58,33 +66,24 @@ void ABlueHeroCharacter::Tick(float DeltaTime)
 
 	if (OverlappingWeapon)
 	{
-		
 	}
 }
 
-void ABlueHeroCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+/*void ABlueHeroCharacter::MoveForward(float Value)
 {
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME_CONDITION(ABlueHeroCharacter, OverlappingWeapon, COND_OwnerOnly);//COND_OwnerOnly只在网络的所有者客户端上复制该变量
-}
-
-void ABlueHeroCharacter::MoveForward(float Value)
-{
-	// if (bDisableGameplay) return;
-	/*if (Controller != nullptr && Value != 0.f)
+	if (bDisableGameplay) return;
+	if (Controller != nullptr && Value != 0.f)
 	{
 		const FRotator YawRotation(0.f, Controller->GetControlRotation().Yaw, 0.f);
 		const FVector Direction(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X));
 		AddMovementInput(Direction, Value);
-	}*/
+	}
 
-	// if(ActionState != EActionState::EAS_Unoccupied) return;
-}
+	if(ActionState != EActionState::EAS_Unoccupied) return;
+}*/
 
 void ABlueHeroCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
 {
-	
 }
 
 void ABlueHeroCharacter::Move(const FInputActionValue& Value)
@@ -95,10 +94,10 @@ void ABlueHeroCharacter::Move(const FInputActionValue& Value)
 	AddMovementInput(Forward, MovementVector.Y);
 	const FVector Right = GetActorRightVector();
 	AddMovementInput(Right, MovementVector.X);*/
-
 	FVector2D MovementVector = Value.Get<FVector2D>();
 	if (Controller != nullptr)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("MovementVector"));
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
@@ -118,8 +117,8 @@ void ABlueHeroCharacter::Move(const FInputActionValue& Value)
 void ABlueHeroCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	// Set up action bindings
-	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
-		
+	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+	{
 		//Jumping
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
@@ -129,10 +128,10 @@ void ABlueHeroCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ABlueHeroCharacter::Look);
 		EnhancedInputComponent->BindAction(PunchAction, ETriggerEvent::Triggered, this, &ABlueHeroCharacter::Punch);
 		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &ABlueHeroCharacter::Dodge);
-		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ABlueHeroCharacter::Interact);
-
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this,
+		                                   &ABlueHeroCharacter::Interact);
+		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &ABlueHeroCharacter::CrouchPressed);
 	}
-
 }
 
 void ABlueHeroCharacter::PostInitializeComponents()
@@ -143,7 +142,6 @@ void ABlueHeroCharacter::PostInitializeComponents()
 	{
 		Combat->Character = this;
 	}
-	
 }
 
 void ABlueHeroCharacter::Look(const FInputActionValue& Value)
@@ -178,6 +176,11 @@ void ABlueHeroCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 	}*/
 }
 
+bool ABlueHeroCharacter::IsWeaponEquipped()
+{
+	return (Combat && Combat->EquippedWeapon);
+}
+
 void ABlueHeroCharacter::Punch()
 {
 }
@@ -186,9 +189,38 @@ void ABlueHeroCharacter::Dodge()
 {
 }
 
+void ABlueHeroCharacter::CrouchPressed()
+{
+	if (bIsCrouched)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UnCrouch"));
+		UnCrouch();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Crouch"));
+		Crouch();
+	}
+}
+
 void ABlueHeroCharacter::Interact()
 {
-	if (Combat && HasAuthority())
+	if (Combat)
+	{
+		if (HasAuthority())
+		{
+			Combat->EquipWeapon(OverlappingWeapon);
+		}
+		else
+		{
+			ServerEquipButtonPressed();
+		}
+	}
+}
+
+void ABlueHeroCharacter::ServerEquipButtonPressed_Implementation()
+{
+	if (Combat)
 	{
 		Combat->EquipWeapon(OverlappingWeapon);
 	}

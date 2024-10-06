@@ -15,17 +15,29 @@ class DOUBLEHEROES_API UCombatComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UCombatComponent();
+	friend class UBlueHeroCharacter;
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	friend class UBlueHeroCharacter;
-
+	virtual  void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
 	void EquipWeapon(class AWeapon* WeaponToEquip);
+	UPROPERTY()
 	class ABlueHeroCharacter* Character;
+	
+	
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-private:
+	UFUNCTION()
+	void OnRep_EquippedWeapon();
+
+	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	class AWeapon* EquippedWeapon;
+
+private:
+	
+
+public:
 		
 };
