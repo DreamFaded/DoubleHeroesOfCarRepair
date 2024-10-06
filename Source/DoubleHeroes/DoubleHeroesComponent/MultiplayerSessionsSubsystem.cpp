@@ -3,7 +3,7 @@
 
 #include "MultiplayerSessionsSubsystem.h"
 
-#include "BlueHeroCharacter.h"
+#include "DoubleHeroes/Character/BlueHeroCharacter.h"
 #include "EnhancedInputSubsystems.h"
 #include "OnlineSubsystem.h"
 #include "Online/OnlineSessionNames.h"

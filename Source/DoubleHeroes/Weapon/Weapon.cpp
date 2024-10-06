@@ -7,7 +7,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Animation/AnimationAsset.h"
 #include "Components/SkeletalMeshComponent.h"
-#include "DoubleHeroes/BlueHeroCharacter.h"
+#include "DoubleHeroes/Character/BlueHeroCharacter.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Kismet/KismetMathLibrary.h"
 

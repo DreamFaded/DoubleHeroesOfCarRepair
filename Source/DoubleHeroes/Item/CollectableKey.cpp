@@ -3,7 +3,7 @@
 
 #include "CollectableKey.h"
 
-#include "CoopAdventureCharacter.h"
+#include "DoubleHeroes/Character/CoopAdventureCharacter.h"
 #include "Net/UnrealNetwork.h"
 
 

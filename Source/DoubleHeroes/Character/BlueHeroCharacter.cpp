@@ -7,12 +7,12 @@
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
-#include "DoubleHeroesComponent/CombatComponent.h"
+#include "DoubleHeroes/DoubleHeroesComponent/CombatComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Net/UnrealNetwork.h"
-#include "Weapon/Weapon.h"
+#include "DoubleHeroes/Weapon/Weapon.h"
 
 
 // Sets default values
@@ -27,6 +27,7 @@ ABlueHeroCharacter::ABlueHeroCharacter()
 
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+	FollowCamera->bUsePawnControlRotation = false;
 
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -193,12 +194,10 @@ void ABlueHeroCharacter::CrouchPressed()
 {
 	if (bIsCrouched)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UnCrouch"));
 		UnCrouch();
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Crouch"));
 		Crouch();
 	}
 }

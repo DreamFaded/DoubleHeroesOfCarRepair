@@ -3,8 +3,7 @@
 
 #include "CombatComponent.h"
 
-#include "Components/SphereComponent.h"
-#include "DoubleHeroes/BlueHeroCharacter.h"
+#include "DoubleHeroes/Character/BlueHeroCharacter.h"
 #include "DoubleHeroes/Weapon/Weapon.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -67,7 +66,7 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 		HandSocket->AttachActor(EquippedWeapon, Character->GetMesh());
 	}
 	EquippedWeapon->SetOwner(Character);
-	Character->GetCharacterMovement()->bOrientRotationToMovement = false;
-	Character->bUseControllerRotationYaw = true;
+	/*Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+	Character->bUseControllerRotationYaw = true;*/
 }
 

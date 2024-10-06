@@ -28,9 +28,9 @@ void UBlueHeroAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	Velocity.Z = 0.f;
 	Speed = Velocity.Size();
 	bIsInAir = BlueHeroCharacter->GetCharacterMovement()->IsFalling();
+	bIsAccelerating = BlueHeroCharacter->GetCharacterMovement()->GetCurrentAcceleration().Size() > 0.f ? true : false;
 	bWeaponEquipped = BlueHeroCharacter->IsWeaponEquipped();
 	bIsCrouched = BlueHeroCharacter->bIsCrouched;
-
 	//Offset Yaw for Strafing
 	/*FRotator AimRotation = BlueHeroCharacter->GetBaseAimRotation();
 	FRotator MovementRotation = UKismetMathLibrary::MakeRotFromX(BlueHeroCharacter->GetVelocity());

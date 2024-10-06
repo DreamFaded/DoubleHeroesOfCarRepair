@@ -3,7 +3,7 @@
 
 #include "WinArea.h"
 
-#include "CoopAdventureCharacter.h"
+#include "DoubleHeroes/Character/CoopAdventureCharacter.h"
 
 
 // Sets default values
