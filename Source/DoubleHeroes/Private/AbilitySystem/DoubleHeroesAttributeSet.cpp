@@ -1,0 +1,13 @@
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "AbilitySystem/DoubleHeroesAttributeSet.h"
+
+
+DoubleHeroesAttributeSet::DoubleHeroesAttributeSet()
+{
+}
+
+DoubleHeroesAttributeSet::~DoubleHeroesAttributeSet()
+{
+}
