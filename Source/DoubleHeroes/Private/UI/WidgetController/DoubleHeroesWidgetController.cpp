@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "UI/DoubleHeroesWidgetController.h"
+#include "UI/WidgetController//DoubleHeroesWidgetController.h"
 
 void UDoubleHeroesWidgetController::SetWidgetControllerParams(const FWidgetControllerParams& WCParams)
 {
@@ -9,4 +9,12 @@ void UDoubleHeroesWidgetController::SetWidgetControllerParams(const FWidgetContr
 	PlayerState = WCParams.PlayerState;
 	AbilitySystemComponent = WCParams.AbilitySystemComponent;
 	AttributeSet = WCParams.AttributeSet;
+}
+
+void UDoubleHeroesWidgetController::BroadcastInitialValues()
+{
+}
+
+void UDoubleHeroesWidgetController::BindCallbacksToDependencies()
+{
 }

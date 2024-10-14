@@ -3,11 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DoubleHeroesCharacterBase.h"
 #include "GameFramework/Character.h"
 #include "DoubleHeroesCharacter.generated.h"
 
 UCLASS()
-class DOUBLEHEROES_API ADoubleHeroesCharacter : public ACharacter
+class DOUBLEHEROES_API ADoubleHeroesCharacter : public ADoubleHeroesCharacterBase
 {
 	GENERATED_BODY()
 
@@ -15,14 +16,14 @@ public:
 	// Sets default values for this character's properties
 	ADoubleHeroesCharacter();
 
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void OnRep_PlayerState() override;
+
+private:
+	void InitAbilityActorInfo();
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+
 
 public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 };

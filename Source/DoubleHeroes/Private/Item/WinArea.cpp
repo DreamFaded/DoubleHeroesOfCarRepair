@@ -1,9 +1,9 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "WinArea.h"
+#include "Item/WinArea.h"
 
-#include "DoubleHeroes/Character/CoopAdventureCharacter.h"
+#include "Character/CoopAdventureCharacter.h"
 
 
 // Sets default values

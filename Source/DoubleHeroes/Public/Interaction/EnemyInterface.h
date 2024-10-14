@@ -7,7 +7,7 @@
 #include "EnemyInterface.generated.h"
 
 // This class does not need to be modified.
-UINTERFACE()
+UINTERFACE(MinimalAPI)
 class UEnemyInterface : public UInterface
 {
 	GENERATED_BODY()
@@ -22,4 +22,6 @@ class DOUBLEHEROES_API IEnemyInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+	virtual void HighlightActor() = 0;
+	virtual void UnHighlightActor() = 0;
 };

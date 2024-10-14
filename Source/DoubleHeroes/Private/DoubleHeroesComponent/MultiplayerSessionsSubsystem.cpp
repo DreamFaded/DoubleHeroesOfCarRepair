@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "MultiplayerSessionsSubsystem.h"
+#include "DoubleHeroesComponent/MultiplayerSessionsSubsystem.h"
 
-#include "DoubleHeroes/Character/BlueHeroCharacter.h"
+#include "Character/BlueHeroCharacter.h"
 #include "EnhancedInputSubsystems.h"
 #include "OnlineSubsystem.h"
 #include "Online/OnlineSessionNames.h"

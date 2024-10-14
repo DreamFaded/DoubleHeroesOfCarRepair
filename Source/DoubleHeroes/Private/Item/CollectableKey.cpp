@@ -1,9 +1,10 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CollectableKey.h"
+#include "Item/CollectableKey.h"
 
-#include "DoubleHeroes/Character/CoopAdventureCharacter.h"
+
+#include "Character/CoopAdventureCharacter.h"
 #include "Net/UnrealNetwork.h"
 
 

@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CollectableKeyHolder.h"
+#include "DoubleHeroes/Public/Item/CollectableKeyHolder.h"
 
 
 // Sets default values

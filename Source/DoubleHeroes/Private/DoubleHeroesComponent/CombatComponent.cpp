@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CombatComponent.h"
+#include "DoubleHeroesComponent/CombatComponent.h"
 
-#include "DoubleHeroes/Character/BlueHeroCharacter.h"
-#include "DoubleHeroes/Weapon/Weapon.h"
+#include "Character/BlueHeroCharacter.h"
+#include "Weapon/Weapon.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"

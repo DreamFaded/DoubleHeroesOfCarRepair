@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "BlueHeroAnimInstance.h"
+#include "Character/BlueHeroAnimInstance.h"
 
-#include "BlueHeroCharacter.h"
+#include "Character/BlueHeroCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 

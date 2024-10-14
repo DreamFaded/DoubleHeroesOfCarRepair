@@ -3,30 +3,39 @@
 
 #include "Character/DoubleHeroesEnemy.h"
 
+#include "AbilitySystemComponent.h"
+#include "AbilitySystem/DHAbilitySystemComponent.h"
+#include "AbilitySystem/DoubleHeroesAttributeSet.h"
+#include "DoubleHeroes/DoubleHeroes.h"
 
-// Sets default values
+
 ADoubleHeroesEnemy::ADoubleHeroesEnemy()
 {
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
+
+	AbilitySystemComponent = CreateDefaultSubobject<UDHAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
+	AttributeSet = CreateDefaultSubobject<UDoubleHeroesAttributeSet>(TEXT("AttributeSet"));
 }
 
-// Called when the game starts or when spawned
+void ADoubleHeroesEnemy::HighlightActor()
+{
+	GetMesh()->SetRenderCustomDepth(true);
+	GetMesh()->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED);
+	Weapon->SetRenderCustomDepth(true);
+	Weapon->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED);
+}
+
+void ADoubleHeroesEnemy::UnHighlightActor()
+{
+	GetMesh()->SetRenderCustomDepth(false);
+	Weapon->SetRenderCustomDepth(false);
+}
+
 void ADoubleHeroesEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-	
-}
 
-// Called every frame
-void ADoubleHeroesEnemy::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 }
-
-// Called to bind functionality to input
-void ADoubleHeroesEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-}
-

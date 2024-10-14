@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Transporter.h"
+#include "Item/Transporter.h"
 
-#include "CollectableKey.h"
-#include "PressurePlate.h"
+#include "Item/CollectableKey.h"
+#include "Item/PressurePlate.h"
 
 // Sets default values for this component's properties
 UTransporter::UTransporter()

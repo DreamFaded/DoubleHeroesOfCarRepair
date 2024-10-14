@@ -1,18 +1,18 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "BlueHeroCharacter.h"
+#include "Character/BlueHeroCharacter.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
-#include "DoubleHeroes/DoubleHeroesComponent/CombatComponent.h"
+#include "DoubleHeroesComponent/CombatComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Net/UnrealNetwork.h"
-#include "DoubleHeroes/Weapon/Weapon.h"
+#include "Weapon/Weapon.h"
 
 
 // Sets default values

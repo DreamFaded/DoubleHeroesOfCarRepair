@@ -3,26 +3,26 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DoubleHeroesCharacterBase.h"
 #include "GameFramework/Character.h"
+#include "Interaction/EnemyInterface.h"
 #include "DoubleHeroesEnemy.generated.h"
 
 UCLASS()
-class DOUBLEHEROES_API ADoubleHeroesEnemy : public ACharacter
+class DOUBLEHEROES_API ADoubleHeroesEnemy : public ADoubleHeroesCharacterBase, public IEnemyInterface
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	ADoubleHeroesEnemy();
 
+	//Enemy Interface
+	virtual void HighlightActor() override;
+	virtual void UnHighlightActor() override;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bHightlighted = false;
+
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 };

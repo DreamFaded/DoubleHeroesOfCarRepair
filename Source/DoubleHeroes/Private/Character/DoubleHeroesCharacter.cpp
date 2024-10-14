@@ -3,30 +3,55 @@
 
 #include "Character/DoubleHeroesCharacter.h"
 
+#include "AbilitySystemComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Player/DoubleHeroesPlayerController.h"
+#include "Player/DoubleHeroesPlayerState.h"
+#include "UI/HUD/DoubleHeroesHUD.h"
+
 
 // Sets default values
 ADoubleHeroesCharacter::ADoubleHeroesCharacter()
 {
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 400.0f, 0.0f);
+	GetCharacterMovement()->bConstrainToPlane = true;
+	GetCharacterMovement()->bSnapToPlaneAtStart = true;
+
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationRoll = false;
+	bUseControllerRotationYaw = false;
 }
 
-// Called when the game starts or when spawned
-void ADoubleHeroesCharacter::BeginPlay()
+void ADoubleHeroesCharacter::PossessedBy(AController* NewController)
 {
-	Super::BeginPlay();
-	
+	Super::PossessedBy(NewController);
+
+	//Init ability actor info for the Server
+	InitAbilityActorInfo();
 }
 
-// Called every frame
-void ADoubleHeroesCharacter::Tick(float DeltaTime)
+void ADoubleHeroesCharacter::OnRep_PlayerState()
 {
-	Super::Tick(DeltaTime);
+	Super::OnRep_PlayerState();
+
+	//Init ability actor info for the Client
+	InitAbilityActorInfo();
 }
 
-// Called to bind functionality to input
-void ADoubleHeroesCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void ADoubleHeroesCharacter::InitAbilityActorInfo()
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-}
+	ADoubleHeroesPlayerState* DoubleHeroesPlayerState = GetPlayerState<ADoubleHeroesPlayerState>();
+	check(DoubleHeroesPlayerState);
+	DoubleHeroesPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(DoubleHeroesPlayerState, this);
+	AbilitySystemComponent = DoubleHeroesPlayerState->GetAbilitySystemComponent();
+	AttributeSet = DoubleHeroesPlayerState->GetAttributeSet();
 
+	if (ADoubleHeroesPlayerController* DoubleHeroesPlayerController = Cast<ADoubleHeroesPlayerController>(GetController()))
+	{
+		if(ADoubleHeroesHUD* DoubleHeroesHUD = Cast<ADoubleHeroesHUD>(DoubleHeroesPlayerController->GetHUD()))
+		{
+			DoubleHeroesHUD->InitOverlay(DoubleHeroesPlayerController, DoubleHeroesPlayerState, AbilitySystemComponent, AttributeSet);
+		}
+	}
+}

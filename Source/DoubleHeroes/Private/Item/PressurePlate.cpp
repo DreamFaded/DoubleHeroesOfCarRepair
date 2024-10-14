@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PressurePlate.h"
+#include "DoubleHeroes/Public/Item/PressurePlate.h"
 
-#include "Transporter.h"
+#include "DoubleHeroes/Public/Item/Transporter.h"
 
 // Sets default values
 APressurePlate::APressurePlate()

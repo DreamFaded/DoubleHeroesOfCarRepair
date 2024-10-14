@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "CoopAdventureGameMode.h"
+#include "GameMode/CoopAdventureGameMode.h"
 #include "UObject/ConstructorHelpers.h"
 
 ACoopAdventureGameMode::ACoopAdventureGameMode()
