@@ -3,8 +3,10 @@
 
 #include "Actor/DoubleHeroesEffectActor.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
+#include "AbilitySystem/DHAbilitySystemComponent.h"
 #include "AbilitySystem/DoubleHeroesAttributeSet.h"
 
 
@@ -14,39 +16,92 @@ ADoubleHeroesEffectActor::ADoubleHeroesEffectActor()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
-	SetRootComponent(Mesh);
-
-	Sphere = CreateDefaultSubobject<USphereComponent>("Sphere");
-	Sphere->SetupAttachment(GetRootComponent());
+	SetRootComponent((CreateDefaultSubobject<USceneComponent>("SceneRoot")));
 }
 
-void ADoubleHeroesEffectActor::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-                                         UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
-                                         const FHitResult& SweepResult)
-{
-	//TODO: Change this to apply a Gameplay Effect. For now, using const_cast as a heck!
-	if (IAbilitySystemInterface* ASCInterface = Cast<IAbilitySystemInterface>(OtherActor))
-	{
-		const UDoubleHeroesAttributeSet* DoubleHeroesAttributeSet = Cast<UDoubleHeroesAttributeSet>(
-			ASCInterface->GetAbilitySystemComponent()->GetAttributeSet(UDoubleHeroesAttributeSet::StaticClass()));
-		UDoubleHeroesAttributeSet* MutableDoubleHeroesAttributeSet = const_cast<UDoubleHeroesAttributeSet*>(DoubleHeroesAttributeSet);
-		MutableDoubleHeroesAttributeSet->SetHealth(DoubleHeroesAttributeSet->GetHealth() + 25.f);
-		MutableDoubleHeroesAttributeSet->SetEndurance(DoubleHeroesAttributeSet->GetEndurance() - 25.f);
-		Destroy();
-	}
-}
-
-void ADoubleHeroesEffectActor::EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-                                          UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
-                                          const FHitResult& SweepResult)
-{
-}
 
 // Called when the game starts or when spawned
 void ADoubleHeroesEffectActor::BeginPlay()
 {
 	Super::BeginPlay();
+}
 
-	Sphere->OnComponentBeginOverlap.AddDynamic(this, &ADoubleHeroesEffectActor::OnOverlap);
+void ADoubleHeroesEffectActor::ApplyEffectToTarget(AActor* TargetActor,
+                                                   TSubclassOf<UGameplayEffect> GameplayEffectClass)
+{
+	// C++方式
+	/*IAbilitySystemInterface* ASCInterface = Cast<IAbilitySystemInterface>(Target);
+	if (ASCInterface)
+	{
+		ASCInterface->GetAbilitySystemComponent();
+	}*/
+	//蓝图方式
+	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+	// 使用蓝图库获取系统组件
+	if (TargetASC == nullptr) return;
+
+	check(GameplayEffectClass);
+	FGameplayEffectContextHandle EffectContextHandle = TargetASC->MakeEffectContext();
+	EffectContextHandle.AddSourceObject(this); // 设置当前对象为效果来源
+	// 根据游戏效果类生成效果规范。ActorLevel会根据CurveTable中的等级获取数值
+	const FGameplayEffectSpecHandle EffectSpecHandle = TargetASC->MakeOutgoingSpec(
+		GameplayEffectClass, ActorLevel, EffectContextHandle);
+	const FActiveGameplayEffectHandle ActiveEffectHandle = TargetASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get()); // 应用效果规范到目标自身
+
+	const bool bIsInfinite = EffectSpecHandle.Data.Get()->Def.Get()->DurationPolicy == EGameplayEffectDurationType::Infinite;
+	if (bIsInfinite && InfiniteEffectRemovalPolicy == EEffectRemovalPolicy::RemoveOnEndOverlap)
+	{
+		ActiveEffectHandles.Add(ActiveEffectHandle, TargetASC);
+	}
+}
+
+void ADoubleHeroesEffectActor::OnOverlap(AActor* TargetActor)
+{
+	if (InstantEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnOverlap)
+	{
+		ApplyEffectToTarget(TargetActor, InstantGameplayEffectClass);
+	}
+	if (DurationEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnOverlap)
+	{
+		ApplyEffectToTarget(TargetActor, DurationGameplayEffectClass);
+	}
+	if (InfiniteEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnOverlap)
+	{
+		ApplyEffectToTarget(TargetActor, InfiniteGameplayEffectClass);
+	}
+}
+
+void ADoubleHeroesEffectActor::OnEndOverlap(AActor* TargetActor)
+{
+	if (InstantEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnEndOverlap)
+	{
+		ApplyEffectToTarget(TargetActor, InstantGameplayEffectClass);
+	}
+	if (DurationEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnEndOverlap)
+	{
+		ApplyEffectToTarget(TargetActor, DurationGameplayEffectClass);
+	}
+	if (InfiniteEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnEndOverlap)
+	{
+		ApplyEffectToTarget(TargetActor, InfiniteGameplayEffectClass);
+	}
+	if (InfiniteEffectRemovalPolicy == EEffectRemovalPolicy::RemoveOnEndOverlap)
+	{
+		UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+		if(!IsValid(TargetASC)) return;
+
+		TArray<FActiveGameplayEffectHandle> HandlesToRemove; 
+		for (TTuple<FActiveGameplayEffectHandle, UAbilitySystemComponent*> HandlePair : ActiveEffectHandles)
+		{
+			if (TargetASC == HandlePair.Value)
+			{
+				TargetASC->RemoveActiveGameplayEffect(HandlePair.Key, 1);//不设置1，则会移除所有，不会挨个移除
+				HandlesToRemove.Add(HandlePair.Key);
+			}
+		}
+		for (FActiveGameplayEffectHandle& Handle : HandlesToRemove)
+		{
+			ActiveEffectHandles.FindAndRemoveChecked(Handle);
+		}
+	}
 }

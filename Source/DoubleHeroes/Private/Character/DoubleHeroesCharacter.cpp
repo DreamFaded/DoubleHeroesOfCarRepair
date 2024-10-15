@@ -4,6 +4,7 @@
 #include "Character/DoubleHeroesCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/DHAbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/DoubleHeroesPlayerController.h"
 #include "Player/DoubleHeroesPlayerState.h"
@@ -44,6 +45,7 @@ void ADoubleHeroesCharacter::InitAbilityActorInfo()
 	ADoubleHeroesPlayerState* DoubleHeroesPlayerState = GetPlayerState<ADoubleHeroesPlayerState>();
 	check(DoubleHeroesPlayerState);
 	DoubleHeroesPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(DoubleHeroesPlayerState, this);
+	Cast<UDHAbilitySystemComponent>(DoubleHeroesPlayerState->GetAbilitySystemComponent())->AbilityActorInfoSet();
 	AbilitySystemComponent = DoubleHeroesPlayerState->GetAbilitySystemComponent();
 	AttributeSet = DoubleHeroesPlayerState->GetAttributeSet();
 

@@ -3,6 +3,7 @@
 
 #include "UI/WidgetController/OverlayWidgetController.h"
 
+#include "AbilitySystem/DHAbilitySystemComponent.h"
 #include "AbilitySystem/DoubleHeroesAttributeSet.h"
 
 void UOverlayWidgetController::BroadcastInitialValues()
@@ -20,16 +21,33 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 	const UDoubleHeroesAttributeSet* DoubleHeroesAttributeSet = CastChecked<UDoubleHeroesAttributeSet>(AttributeSet);
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(DoubleHeroesAttributeSet->GetHealthAttribute()).
-							AddUObject(this, &UOverlayWidgetController::HealthChanged);
+	                        AddUObject(this, &UOverlayWidgetController::HealthChanged);
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(DoubleHeroesAttributeSet->GetMaxHealthAttribute()).
-							AddUObject(this, &UOverlayWidgetController::MaxHealthChanged);
+	                        AddUObject(this, &UOverlayWidgetController::MaxHealthChanged);
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(DoubleHeroesAttributeSet->GetEnduranceAttribute()).
-							AddUObject(this, &UOverlayWidgetController::EnduranceChanged);
+	                        AddUObject(this, &UOverlayWidgetController::EnduranceChanged);
 
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(DoubleHeroesAttributeSet->GetMaxEnduranceAttribute()).
-							AddUObject(this, &UOverlayWidgetController::MaxEnduranceChanged);
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
+		                        DoubleHeroesAttributeSet->GetMaxEnduranceAttribute()).
+	                        AddUObject(this, &UOverlayWidgetController::MaxEnduranceChanged);
+
+	Cast<UDHAbilitySystemComponent>(AbilitySystemComponent)->EffectAssetTags.AddLambda(
+		[this](const FGameplayTagContainer& AssetTags)
+		{
+			for (const FGameplayTag& Tag : AssetTags)
+			{
+				//For example, say that Tag = Message.HealthPotion
+				//"Message.HealthPotion".MatchesTag("Meage") will return true, "Message".MatchesTag("Message.HealthPotion") will return false
+				FGameplayTag MessageTag = FGameplayTag::RequestGameplayTag(FName("Message"));
+				if (Tag.MatchesTag(MessageTag))
+				{
+					const FUIWidgetRow* Row = GetDataTableRowByTag<FUIWidgetRow>(MessageWidgetDataTable, Tag);
+					MessageWidgetRowDelegate.Broadcast(*Row);
+				}
+			}
+		});
 }
 
 void UOverlayWidgetController::HealthChanged(const FOnAttributeChangeData& Data)
@@ -51,4 +69,3 @@ void UOverlayWidgetController::MaxEnduranceChanged(const FOnAttributeChangeData&
 {
 	OnMaxEnduranceChanged.Broadcast(Data.NewValue);
 }
-

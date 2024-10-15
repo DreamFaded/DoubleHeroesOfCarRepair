@@ -37,5 +37,12 @@ void ADoubleHeroesEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
+	InitAbilityActorInfo();
+}
+
+void ADoubleHeroesEnemy::InitAbilityActorInfo()
+{
+
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	Cast<UDHAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 }

@@ -27,3 +27,7 @@ void ADoubleHeroesCharacterBase::BeginPlay()
 
 	
 }
+
+void ADoubleHeroesCharacterBase::InitAbilityActorInfo()
+{
+}
