@@ -80,6 +80,15 @@ void UDoubleHeroesAttributeSet::PostGameplayEffectExecute(const FGameplayEffectM
 	FEffectProperties Props;
 	SetEffectProperties(Data, Props);
 
+	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+	{
+		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
+	}
+	if (Data.EvaluatedData.Attribute == GetEnduranceAttribute())
+	{
+		SetEndurance(FMath::Clamp(GetEndurance(), 0.f, GetMaxEndurance()));
+	}
+
 }
 
 void UDoubleHeroesAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) const
