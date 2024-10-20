@@ -33,6 +33,11 @@ void ADoubleHeroesEnemy::UnHighlightActor()
 	Weapon->SetRenderCustomDepth(false);
 }
 
+int32 ADoubleHeroesEnemy::GetPlayerLevel()
+{
+	return Level;
+}
+
 void ADoubleHeroesEnemy::BeginPlay()
 {
 	Super::BeginPlay();

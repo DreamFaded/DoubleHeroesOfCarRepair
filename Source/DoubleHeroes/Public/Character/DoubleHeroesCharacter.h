@@ -4,8 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "DoubleHeroesCharacterBase.h"
-#include "GameFramework/Character.h"
 #include "DoubleHeroesCharacter.generated.h"
+
+class UAbilitySystemComponent;
+class UAttributeSet;
+class UGameplayEffect;
 
 UCLASS()
 class DOUBLEHEROES_API ADoubleHeroesCharacter : public ADoubleHeroesCharacterBase
@@ -18,6 +21,9 @@ public:
 
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
+
+	//Combat Interface
+	virtual int32 GetPlayerLevel() override;
 
 private:
 	virtual void InitAbilityActorInfo() override;

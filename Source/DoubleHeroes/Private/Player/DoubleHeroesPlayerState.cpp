@@ -5,6 +5,7 @@
 
 #include "AbilitySystem/DHAbilitySystemComponent.h"
 #include "..\..\Public\AbilitySystem\DoubleHeroesAttributeSet.h"
+#include "Net/UnrealNetwork.h"
 
 ADoubleHeroesPlayerState::ADoubleHeroesPlayerState()
 {
@@ -17,7 +18,18 @@ ADoubleHeroesPlayerState::ADoubleHeroesPlayerState()
 	NetUpdateFrequency = 100.0f;
 }
 
+void ADoubleHeroesPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ADoubleHeroesPlayerState, AbilitySystemComponent);
+}
+
 UAbilitySystemComponent* ADoubleHeroesPlayerState::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
+}
+
+void ADoubleHeroesPlayerState::OnRep_Level(int32 OldLevel)
+{
 }

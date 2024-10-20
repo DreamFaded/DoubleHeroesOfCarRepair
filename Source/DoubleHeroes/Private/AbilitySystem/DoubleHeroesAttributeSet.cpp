@@ -8,20 +8,37 @@
 
 UDoubleHeroesAttributeSet::UDoubleHeroesAttributeSet()
 {
-	InitHealth(50.f);
-	InitMaxHealth(100.f);
-	InitEndurance(50.f);
-	InitMaxEndurance(100.f);
+	/*InitHealth(50.f);
+	InitMaxHealth(100.f);*/
+	/*InitEndurance(50.f);
+	InitMaxEndurance(100.f);*/
 }
 
 void UDoubleHeroesAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION_NOTIFY(UDoubleHeroesAttributeSet, Health, COND_None, REPNOTIFY_Always);
+	//Primary Attributes
+	DOREPLIFETIME_CONDITION_NOTIFY(UDoubleHeroesAttributeSet, Strength, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UDoubleHeroesAttributeSet, Intelligence, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UDoubleHeroesAttributeSet, Resilience, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UDoubleHeroesAttributeSet, Vigor, COND_None, REPNOTIFY_Always);
+
+	//Secondary Attributes
+	DOREPLIFETIME_CONDITION_NOTIFY(UDoubleHeroesAttributeSet, Armor, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UDoubleHeroesAttributeSet, ArmorPenetration, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UDoubleHeroesAttributeSet, BlockChance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UDoubleHeroesAttributeSet, CriticalHitChance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UDoubleHeroesAttributeSet, CriticalHitDamage, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UDoubleHeroesAttributeSet, CriticalHitResistance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UDoubleHeroesAttributeSet, HealthRegeneration, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UDoubleHeroesAttributeSet, EnduranceRegeneration, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UDoubleHeroesAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UDoubleHeroesAttributeSet, Endurance, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UDoubleHeroesAttributeSet, MaxEndurance, COND_None, REPNOTIFY_Always);
+
+	//Vital Attributes
+	DOREPLIFETIME_CONDITION_NOTIFY(UDoubleHeroesAttributeSet, Health, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UDoubleHeroesAttributeSet, Endurance, COND_None, REPNOTIFY_Always);
 }
 
 void UDoubleHeroesAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -96,19 +113,81 @@ void UDoubleHeroesAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHe
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UDoubleHeroesAttributeSet, Health, OldHealth);
 }
 
-void UDoubleHeroesAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth) const
-{
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UDoubleHeroesAttributeSet, MaxHealth, OldMaxHealth);
-}
-
 void UDoubleHeroesAttributeSet::OnRep_Endurance(const FGameplayAttributeData& OldEndurance) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UDoubleHeroesAttributeSet, Endurance, OldEndurance);
+}
+
+void UDoubleHeroesAttributeSet::OnRep_Strength(const FGameplayAttributeData& OldStrength) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UDoubleHeroesAttributeSet, Strength, OldStrength);
+}
+
+void UDoubleHeroesAttributeSet::OnRep_Intelligence(const FGameplayAttributeData& OldIntelligence) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UDoubleHeroesAttributeSet, Intelligence, OldIntelligence);
+}
+
+void UDoubleHeroesAttributeSet::OnRep_Resilience(const FGameplayAttributeData& OldResilience) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UDoubleHeroesAttributeSet, Resilience, OldResilience);
+}
+
+void UDoubleHeroesAttributeSet::OnRep_Vigor(const FGameplayAttributeData& OldVigor) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UDoubleHeroesAttributeSet, Vigor, OldVigor);
+}
+
+void UDoubleHeroesAttributeSet::OnRep_Armor(const FGameplayAttributeData& OldArmor) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UDoubleHeroesAttributeSet, Armor, OldArmor);
+}
+
+void UDoubleHeroesAttributeSet::OnRep_ArmorPenetration(const FGameplayAttributeData& OldArmorPenetration) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UDoubleHeroesAttributeSet, ArmorPenetration, OldArmorPenetration);
+}
+
+void UDoubleHeroesAttributeSet::OnRep_BlockChance(const FGameplayAttributeData& OldBlockChance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UDoubleHeroesAttributeSet, BlockChance, OldBlockChance);
+}
+
+void UDoubleHeroesAttributeSet::OnRep_CriticalHitChance(const FGameplayAttributeData& OldCriticalHitChance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UDoubleHeroesAttributeSet, CriticalHitChance, OldCriticalHitChance);
+}
+
+void UDoubleHeroesAttributeSet::OnRep_CriticalHitDamage(const FGameplayAttributeData& OldCriticalHitDamage) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UDoubleHeroesAttributeSet, CriticalHitDamage, OldCriticalHitDamage);
+}
+
+void UDoubleHeroesAttributeSet::OnRep_CriticalHitResistance(const FGameplayAttributeData& OldCriticalHitResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UDoubleHeroesAttributeSet, CriticalHitResistance, OldCriticalHitResistance)
+}
+
+void UDoubleHeroesAttributeSet::OnRep_HealthRegeneration(const FGameplayAttributeData& OldHealthRegeneration) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UDoubleHeroesAttributeSet, HealthRegeneration, OldHealthRegeneration);
+}
+
+void UDoubleHeroesAttributeSet::OnRep_EnduranceRegeneration(
+	const FGameplayAttributeData& OldEnduranceRegeneration) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UDoubleHeroesAttributeSet, EnduranceRegeneration, OldEnduranceRegeneration);
+}
+
+void UDoubleHeroesAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UDoubleHeroesAttributeSet, MaxHealth, OldMaxHealth);
 }
 
 void UDoubleHeroesAttributeSet::OnRep_MaxEndurance(const FGameplayAttributeData& OldMaxEndurance) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UDoubleHeroesAttributeSet, MaxEndurance, OldMaxEndurance);
 }
+
 
 
