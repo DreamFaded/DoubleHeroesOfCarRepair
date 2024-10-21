@@ -11,6 +11,7 @@
 
 class UAbilitySystemComponent;
 class UAttributeSet;
+class UGameplayAbility;
 
 UCLASS(Abstract)
 class DOUBLEHEROES_API ADoubleHeroesCharacterBase : public ACharacter, public IAbilitySystemInterface, public ICombatInterface
@@ -51,6 +52,13 @@ protected:
 	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const;
 	void InitializeDefaultAttribute() const;
 
+	void AddCharacterAbilities();
+
 	/*void InitializePrimaryAttributes() const;
 	void InitializeSecondaryAttributes() const;*/
+
+private:
+
+	UPROPERTY(EditAnywhere, Category = "Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
 };

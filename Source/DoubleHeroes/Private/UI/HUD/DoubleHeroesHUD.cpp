@@ -17,8 +17,22 @@ UOverlayWidgetController* ADoubleHeroesHUD::GetOverlayWidgetController(const FWi
 	return OverlayWidgetController;
 }
 
+UAttributeMenuWidgetController* ADoubleHeroesHUD::GetAttributeMenuWidgetController(
+	const FWidgetControllerParams& WCParams)
+{
+	if(AttributeMenuWidgetController == nullptr)
+	{
+		AttributeMenuWidgetController = NewObject<UAttributeMenuWidgetController>(this, AttributeMenuWidgetControllerClass);
+		AttributeMenuWidgetController->SetWidgetControllerParams(WCParams);
+		AttributeMenuWidgetController->BindCallbacksToDependencies();
+		
+		return AttributeMenuWidgetController;
+	}
+	return AttributeMenuWidgetController;
+}
+
 void ADoubleHeroesHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC,
-	UAttributeSet* AS)
+                                   UAttributeSet* AS)
 {
 	checkf(OverlayWidgetClass, TEXT("Overlay Widget Class uninitialized, please fill out BP_DoubleHeroesHUD"));
 	checkf(OverlayWidgetControllerClass, TEXT("Overlay Widget Controller Class uninitialized, please fill out BP_DoubleHeroesHUD"))

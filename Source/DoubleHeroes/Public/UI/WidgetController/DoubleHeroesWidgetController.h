@@ -8,6 +8,8 @@
 
 class UAttributeSet;
 class UAbilitySystemComponent;
+class UDoubleHeroesAttributeSet;
+class UAttributeInfo;
 
 
 USTRUCT(BlueprintType)
@@ -46,6 +48,7 @@ class DOUBLEHEROES_API UDoubleHeroesWidgetController : public UObject
 public:
 	UFUNCTION(BlueprintCallable)
 	void SetWidgetControllerParams(const FWidgetControllerParams& WCParams);
+	UFUNCTION(BlueprintCallable)
 	virtual void BroadcastInitialValues();
 	virtual void BindCallbacksToDependencies();
 

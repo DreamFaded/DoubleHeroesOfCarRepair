@@ -5,10 +5,10 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Engine/DataTable.h"
-#include "UI/DoubleHeroesUserWidget.h"
-#include "UI/WidgetController//DoubleHeroesWidgetController.h"
+#include "UI/WidgetController/DoubleHeroesWidgetController.h"
 #include "OverlayWidgetController.generated.h"
 
+class UDoubleHeroesUserWidget;
 
 USTRUCT(BlueprintType)
 struct FUIWidgetRow : public FTableRowBase

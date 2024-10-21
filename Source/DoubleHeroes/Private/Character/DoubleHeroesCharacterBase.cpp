@@ -4,6 +4,8 @@
 #include "Character/DoubleHeroesCharacterBase.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/DHAbilitySystemComponent.h"
+#include "AbilitySystem/DoubleHeroesAbilitySystemLibrary.h"
 
 
 // Sets default values
@@ -50,6 +52,14 @@ void ADoubleHeroesCharacterBase::InitializeDefaultAttribute() const
 	ApplyEffectToSelf(DefaultSecondaryAttributes, 1.f);
 	ApplyEffectToSelf(DefaultVitalAttributes, 1.f);
 	
+}
+
+void ADoubleHeroesCharacterBase::AddCharacterAbilities()
+{
+	UDHAbilitySystemComponent* DoubleHeroesASC = CastChecked<UDHAbilitySystemComponent>(AbilitySystemComponent);
+	if(!HasAuthority()) return;
+
+	DoubleHeroesASC->AddCharacterAbilities(StartupAbilities);
 }
 
 /*

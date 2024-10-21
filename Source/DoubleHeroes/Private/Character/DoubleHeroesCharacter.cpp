@@ -30,6 +30,7 @@ void ADoubleHeroesCharacter::PossessedBy(AController* NewController)
 
 	//Init ability actor info for the Server
 	InitAbilityActorInfo();
+	AddCharacterAbilities();
 }
 
 void ADoubleHeroesCharacter::OnRep_PlayerState()

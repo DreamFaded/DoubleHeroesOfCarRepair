@@ -3,10 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystem/DHAbilitySystemComponent.h"
 #include "GameFramework/PlayerController.h"
+#include "Input/DoubleHeroesInputConfig.h"
 #include "Interaction/EnemyInterface.h"
 #include "DoubleHeroesPlayerController.generated.h"
 
+class USplineComponent;
+class UInputMappingContext;
+class UDoubleHeroesInputConfig;
+struct FInputActionValue;
+class UInputAction;
 /**
  * 
  */
@@ -42,5 +49,30 @@ private:
 
 	IEnemyInterface* LastActor;
 	IEnemyInterface* ThisActor;
+
+	void AbilityInputTagPressed(FGameplayTag InputTag);
+	void AbilityInputTagReleased(FGameplayTag InputTag);
+	void AbilityInputTagHeld(FGameplayTag InputTag);
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UDoubleHeroesInputConfig> InputConfig;
+
+	UPROPERTY()
+	TObjectPtr<UDHAbilitySystemComponent> DHAbilitySystemComponent;
+
+	UDHAbilitySystemComponent* GetASC();
+
+	
+	FVector CachedDestination = FVector::ZeroVector;
+	float FollowTime = 0.f;
+	float ShortPressThreshold = 0.5f;
+	bool bAutoRunning = false;
+	bool bTargeting = false;
+
+	UPROPERTY(EditDefaultsOnly)
+	float AutoRunAcceptanceRadius = 50.f;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USplineComponent> Spline;
 };
 
