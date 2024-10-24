@@ -3,6 +3,7 @@
 
 #include "DoubleHeroesAssetManager.h"
 
+#include "AbilitySystemGlobals.h"
 #include "DoubleHeroesGameplayTags.h"
 
 
@@ -19,4 +20,7 @@ void UDoubleHeroesAssetManager::StartInitialLoading()
 	Super::StartInitialLoading();
 
 	FDoubleHeroesGameplayTags::InitializeNativeGameplayTags();
+
+	//This is required to use Target Data
+	UAbilitySystemGlobals::Get().InitGlobalData();
 }

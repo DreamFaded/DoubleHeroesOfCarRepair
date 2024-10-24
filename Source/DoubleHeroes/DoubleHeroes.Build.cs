@@ -10,7 +10,7 @@ public class DoubleHeroes : ModuleRules
 	
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "OnlineSubsystem", "OnlineSubsystemSteam", "GameplayAbilities", "UMG" });
 
-		PrivateDependencyModuleNames.AddRange(new string[] {"GameplayTags", "GameplayTasks", "NavigationSystem" });
+		PrivateDependencyModuleNames.AddRange(new string[] {"GameplayTags", "GameplayTasks", "NavigationSystem", "Niagara" });
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });

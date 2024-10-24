@@ -42,14 +42,32 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> LookAction;
 
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<UInputAction> RunAction;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<UInputAction> DodgeAction;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<UInputAction> ShiftAction;
+
 	void Move(const FInputActionValue& InputActionValue);
+	void Run(const FInputActionValue& InputActionValue);
+	void Walk(const FInputActionValue& InputActionValue);
 	void Look(const FInputActionValue& InputActionValue);
+	void Dodge(const FInputActionValue& InputActionValue);
 	void AutoRun();
+
+	bool bShiftKeyDown = false;
+	void ShiftPressed() { bShiftKeyDown = true; };
+	void ShiftReleased() { bShiftKeyDown = false; };
 
 	void CursorTrace();
 
 	IEnemyInterface* LastActor;
 	IEnemyInterface* ThisActor;
+	FHitResult CursorHit;
+	bool bIsRunning = false;
 
 	void AbilityInputTagPressed(FGameplayTag InputTag);
 	void AbilityInputTagReleased(FGameplayTag InputTag);

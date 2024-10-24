@@ -11,7 +11,10 @@
 #include "InputActionValue.h"
 #include "NavigationPath.h"
 #include "NavigationSystem.h"
+#include "Character/DoubleHeroesCharacter.h"
 #include "Components/SplineComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PawnMovementComponent.h"
 #include "Input/DoubleHeroesInputComponent.h"
 #include "Interaction/EnemyInterface.h"
 #include "Net/UnrealNetwork.h"
@@ -51,14 +54,18 @@ void ADoubleHeroesPlayerController::AutoRun()
 
 void ADoubleHeroesPlayerController::CursorTrace()
 {
-	FHitResult CursorHit;
 	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
 	if (!CursorHit.bBlockingHit) return;
 
 	LastActor = ThisActor;
 	ThisActor = Cast<IEnemyInterface>(CursorHit.GetActor());
 
-	/* A.LastActor is null && ThisActor iss null
+	if (LastActor != ThisActor)
+	{
+		if(LastActor) LastActor->UnHighlightActor();
+		if(ThisActor) ThisActor->HighlightActor();
+	}
+	/* A.LastActor is null && ThisActor is null
 	 * do nothing
 	 * B.LastActor is null && ThisActor is not null
 	 *  Highlight ThisActor
@@ -70,7 +77,7 @@ void ADoubleHeroesPlayerController::CursorTrace()
 	 *  do nothing
 	 */
 
-	if (LastActor == nullptr)
+	/*if (LastActor == nullptr)
 	{
 		if (ThisActor != nullptr)
 		{
@@ -95,7 +102,7 @@ void ADoubleHeroesPlayerController::CursorTrace()
 				ThisActor->HighlightActor();
 			}
 		}
-	}
+	}*/
 }
 
 void ADoubleHeroesPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
@@ -114,21 +121,19 @@ void ADoubleHeroesPlayerController::AbilityInputTagReleased(FGameplayTag InputTa
 	{
 		if (GetASC())
 		{
-			GetASC()->AbilityInputTagHeld(InputTag);
+			GetASC()->AbilityInputTagReleased(InputTag);
 		}
 		return;
 	}
 
-	if (bTargeting)
+	if (GetASC())
 	{
-		if (GetASC())
-		{
-			GetASC()->AbilityInputTagHeld(InputTag);
-		}
+		GetASC()->AbilityInputTagReleased(InputTag);
 	}
-	else
+
+	if (!bTargeting || !bShiftKeyDown)
 	{
-		APawn* ControlledPawn = GetPawn();
+		const APawn* ControlledPawn = GetPawn();
 		if (FollowTime <= ShortPressThreshold && ControlledPawn)
 		{
 			if (UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(
@@ -138,8 +143,9 @@ void ADoubleHeroesPlayerController::AbilityInputTagReleased(FGameplayTag InputTa
 				for (const FVector& PointLoc : NavPath->PathPoints)
 				{
 					Spline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
-					DrawDebugSphere(GetWorld(), PointLoc, 8.f, 8, FColor::Green, false, 5.f);
+					// DrawDebugSphere(GetWorld(), PointLoc, 8.f, 8, FColor::Green, false, 5.f);
 				}
+				// 防止点击到NavMeshBoundsVolume以外的地方时因为数组越界崩溃
 				if (NavPath->PathPoints.Num() > 0)
 				{
 					CachedDestination = NavPath->PathPoints[NavPath->PathPoints.Num() - 1];
@@ -168,7 +174,7 @@ void ADoubleHeroesPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 		return;
 	}
 
-	if (bTargeting)
+	if (bTargeting || bShiftKeyDown)
 	{
 		if (GetASC())
 		{
@@ -179,10 +185,9 @@ void ADoubleHeroesPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 	{
 		FollowTime += GetWorld()->GetDeltaSeconds();
 
-		FHitResult Hit;
-		if (GetHitResultUnderCursor(ECC_Visibility, false, Hit))
+		if (CursorHit.bBlockingHit)
 		{
-			CachedDestination = Hit.ImpactPoint;
+			CachedDestination = CursorHit.ImpactPoint;
 		}
 
 		if (APawn* ControlledPawn = GetPawn())
@@ -220,7 +225,7 @@ void ADoubleHeroesPlayerController::BeginPlay()
 
 	FInputModeGameAndUI InputModeData;
 	//鼠标不锁定到窗口
-	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+	// InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 	//不隐藏光标
 	InputModeData.SetHideCursorDuringCapture(false);
 	SetInputMode(InputModeData);
@@ -239,8 +244,19 @@ void ADoubleHeroesPlayerController::SetupInputComponent()
 	UDoubleHeroesInputComponent* DoubleHeroesInputComponent = CastChecked<UDoubleHeroesInputComponent>(InputComponent);
 	DoubleHeroesInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this,
 	                                       &ADoubleHeroesPlayerController::Move);
+	DoubleHeroesInputComponent->BindAction(RunAction, ETriggerEvent::Triggered, this,
+	&ADoubleHeroesPlayerController::Run);
+	DoubleHeroesInputComponent->BindAction(RunAction, ETriggerEvent::Completed, this,
+	&ADoubleHeroesPlayerController::Walk);
+	
 	DoubleHeroesInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this,
 	                                       &ADoubleHeroesPlayerController::Look);
+	DoubleHeroesInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this,
+	&ADoubleHeroesPlayerController::Dodge);
+	DoubleHeroesInputComponent->BindAction(ShiftAction, ETriggerEvent::Started, this,
+	&ADoubleHeroesPlayerController::ShiftPressed);
+	DoubleHeroesInputComponent->BindAction(ShiftAction, ETriggerEvent::Completed, this,
+	&ADoubleHeroesPlayerController::ShiftReleased);
 	DoubleHeroesInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed,
 	                                               &ThisClass::AbilityInputTagReleased,
 	                                               &ThisClass::AbilityInputTagHeld);
@@ -260,6 +276,30 @@ void ADoubleHeroesPlayerController::Move(const FInputActionValue& InputActionVal
 		ControlledPawn->AddMovementInput(ForwardDirection, MovementVector.Y);
 		ControlledPawn->AddMovementInput(RightDirection, MovementVector.X);
 	}
+	
+}
+
+void ADoubleHeroesPlayerController::Run(const FInputActionValue& InputActionValue)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Run"));
+	if (APawn* ControlledPawn = GetPawn<APawn>())
+	{
+		//设置玩家移动速度为3200
+		bIsRunning = true;
+		Cast<ADoubleHeroesCharacter>(ControlledPawn)->GetCharacterMovement()->MaxWalkSpeed = 1200.0f;
+
+	}
+}
+
+void ADoubleHeroesPlayerController::Walk(const FInputActionValue& InputActionValue)
+{
+	if (APawn* ControlledPawn = GetPawn<APawn>())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Walk"));
+		bIsRunning = false;
+		Cast<ADoubleHeroesCharacter>(ControlledPawn)->GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+
+	}
 }
 
 void ADoubleHeroesPlayerController::Look(const FInputActionValue& InputActionValue)
@@ -273,3 +313,9 @@ void ADoubleHeroesPlayerController::Look(const FInputActionValue& InputActionVal
 		ControlledPawn->AddControllerPitchInput(LookAxisVector.Y);
 	}
 }
+
+void ADoubleHeroesPlayerController::Dodge(const FInputActionValue& InputActionValue)
+{
+}
+
+

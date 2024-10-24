@@ -6,7 +6,9 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/DHAbilitySystemComponent.h"
 #include "AbilitySystem/DoubleHeroesAttributeSet.h"
+#include "Components/WidgetComponent.h"
 #include "DoubleHeroes/DoubleHeroes.h"
+#include "UI/DoubleHeroesUserWidget.h"
 
 
 ADoubleHeroesEnemy::ADoubleHeroesEnemy()
@@ -17,6 +19,9 @@ ADoubleHeroesEnemy::ADoubleHeroesEnemy()
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 	AttributeSet = CreateDefaultSubobject<UDoubleHeroesAttributeSet>(TEXT("AttributeSet"));
+
+	HealthBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBar"));
+	HealthBar->SetupAttachment(GetRootComponent());
 }
 
 void ADoubleHeroesEnemy::HighlightActor()
@@ -43,6 +48,29 @@ void ADoubleHeroesEnemy::BeginPlay()
 	Super::BeginPlay();
 
 	InitAbilityActorInfo();
+
+	if(UDoubleHeroesUserWidget* DoubleHeroesUserWidget = Cast<UDoubleHeroesUserWidget>(HealthBar->GetUserWidgetObject()))
+	{
+		DoubleHeroesUserWidget->SetWidgetController(this);
+	}
+	
+	if(const UDoubleHeroesAttributeSet* DoubleHeroesAS = Cast<UDoubleHeroesAttributeSet>(AttributeSet))
+	{
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(DoubleHeroesAS->GetHealthAttribute()).AddLambda(
+			[this](const FOnAttributeChangeData& Data)
+			{
+				OnHealthChanged.Broadcast(Data.NewValue);
+			}
+			);
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(DoubleHeroesAS->GetMaxHealthAttribute()).AddLambda(
+			[this](const FOnAttributeChangeData& Data)
+			{
+				OnHealthChanged.Broadcast(Data.NewValue);
+			}
+			);
+		OnHealthChanged.Broadcast(DoubleHeroesAS->GetHealth());
+		OnMaxHealthChanged.Broadcast(DoubleHeroesAS->GetMaxHealth());
+	}
 }
 
 void ADoubleHeroesEnemy::InitAbilityActorInfo()
@@ -50,4 +78,6 @@ void ADoubleHeroesEnemy::InitAbilityActorInfo()
 
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	Cast<UDHAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
+
+	InitializeDefaultAttribute();
 }

@@ -6,6 +6,8 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/DHAbilitySystemComponent.h"
 #include "AbilitySystem/DoubleHeroesAbilitySystemLibrary.h"
+#include "Components/CapsuleComponent.h"
+#include "DoubleHeroes/DoubleHeroes.h"
 
 
 // Sets default values
@@ -13,6 +15,12 @@ ADoubleHeroesCharacterBase::ADoubleHeroesCharacterBase()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Projectile, ECR_Overlap);
+	GetMesh()->SetGenerateOverlapEvents(true);
 
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon");
 	Weapon->SetupAttachment(GetMesh(), FName("WeaponHandSocket"));
@@ -30,6 +38,12 @@ void ADoubleHeroesCharacterBase::BeginPlay()
 	Super::BeginPlay();
 
 	
+}
+
+FVector ADoubleHeroesCharacterBase::GetCombatSocketLocation()
+{
+	check(Weapon);
+	return Weapon->GetSocketLocation(WeaponTipSocketName);
 }
 
 void ADoubleHeroesCharacterBase::InitAbilityActorInfo()
