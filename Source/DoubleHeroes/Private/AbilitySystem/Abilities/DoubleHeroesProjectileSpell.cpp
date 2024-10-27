@@ -5,6 +5,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "DoubleHeroesGameplayTags.h"
 #include "Actor/DoubleHeroesProjectile.h"
 #include "Interaction/CombatInterface.h"
 
@@ -47,7 +48,13 @@ void UDoubleHeroesProjectileSpell::SpawnProjectile(const FVector& ProjectileTarg
 		// TODO: Give the Projectile a Gameplay Effect Spec for causing Damage
 		const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
 		const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), SourceASC->MakeEffectContext());
+
+		const FDoubleHeroesGameplayTags GameplayTags = FDoubleHeroesGameplayTags::Get();
+		const float ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel());
+		
+		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Damage, ScaledDamage);
 		Projectile->DamageEffectSpecHandle = SpecHandle;
+		
 		Projectile->FinishSpawning(SpawnTransform);
 	}
 }

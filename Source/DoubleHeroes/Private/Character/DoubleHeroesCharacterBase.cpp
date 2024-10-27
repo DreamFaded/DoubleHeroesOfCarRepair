@@ -32,6 +32,11 @@ UAbilitySystemComponent* ADoubleHeroesCharacterBase::GetAbilitySystemComponent()
 	return AbilitySystemComponent;
 }
 
+UAnimMontage* ADoubleHeroesCharacterBase::GetHitReactMontage_Implementation()
+{
+	return HitReactMontage;
+}
+
 // Called when the game starts or when spawned
 void ADoubleHeroesCharacterBase::BeginPlay()
 {
@@ -60,7 +65,7 @@ void ADoubleHeroesCharacterBase::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> 
 	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), GetAbilitySystemComponent());
 }
 
-void ADoubleHeroesCharacterBase::InitializeDefaultAttribute() const
+void ADoubleHeroesCharacterBase::InitializeDefaultAttributes() const
 {
 	ApplyEffectToSelf(DefaultPrimaryAttributes, 1.f);
 	ApplyEffectToSelf(DefaultSecondaryAttributes, 1.f);

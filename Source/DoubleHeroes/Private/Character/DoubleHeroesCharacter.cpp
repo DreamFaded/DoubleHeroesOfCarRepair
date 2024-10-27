@@ -41,7 +41,7 @@ void ADoubleHeroesCharacter::OnRep_PlayerState()
 	InitAbilityActorInfo();
 }
 
-int32 ADoubleHeroesCharacter::GetPlayerLevel()
+int32 ADoubleHeroesCharacter::GetPlayerLevel_Implementation()
 {
 	const ADoubleHeroesPlayerState* DoubleHeroesPlayerState = GetPlayerState<ADoubleHeroesPlayerState>();
 	check(DoubleHeroesPlayerState);
@@ -64,5 +64,5 @@ void ADoubleHeroesCharacter::InitAbilityActorInfo()
 			DoubleHeroesHUD->InitOverlay(DoubleHeroesPlayerController, DoubleHeroesPlayerState, AbilitySystemComponent, AttributeSet);
 		}
 	}
-	InitializeDefaultAttribute();
+	InitializeDefaultAttributes();
 }

@@ -140,6 +140,11 @@ public:
 	FGameplayAttributeData MaxEndurance;
 	ATTRIBUTE_ACCESSORS(UDoubleHeroesAttributeSet, MaxEndurance);
 
+	//Meta Attributes
+	UPROPERTY(BlueprintReadOnly, Category = "Meta Attributes")
+	FGameplayAttributeData IncomingDamage;
+	ATTRIBUTE_ACCESSORS(UDoubleHeroesAttributeSet, IncomingDamage);
+	
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldHealth) const;
 
