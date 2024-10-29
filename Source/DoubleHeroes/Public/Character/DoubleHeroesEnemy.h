@@ -24,10 +24,12 @@ public:
 	virtual void HighlightActor() override;
 	virtual void UnHighlightActor() override;
 
+	//Combat Interface
+	virtual int32 GetPlayerLevel_Implementation() override;
+	virtual void Die() override;
+
 	UPROPERTY(BlueprintReadOnly)
 	bool bHightlighted = false;
-
-	virtual int32 GetPlayerLevel_Implementation() override;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChangedSignature OnHealthChanged;
@@ -41,6 +43,9 @@ public:
 	bool bHitReacting = false;
 
 	float BaseWalkSpeed = 250.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Caombat")
+	float LifeSpan = 5.f;
 
 protected:
 	virtual void BeginPlay() override;

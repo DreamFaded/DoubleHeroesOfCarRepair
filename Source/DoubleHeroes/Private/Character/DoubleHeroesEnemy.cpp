@@ -46,6 +46,24 @@ int32 ADoubleHeroesEnemy::GetPlayerLevel_Implementation()
 	return Level;
 }
 
+void ADoubleHeroesEnemy::Die()
+{
+	SetLifeSpan(5.f);
+	if (IsValid(DissolveMaterialInstance))
+	{
+		UMaterialInstanceDynamic* DynamicMatInst = UMaterialInstanceDynamic::Create(DissolveMaterialInstance, this);
+		GetMesh()->SetMaterial(0, DynamicMatInst);
+		StartDissolveTimeline(DynamicMatInst);
+	}
+	if (IsValid(WeaponDissolveMaterialInstance))
+	{
+		UMaterialInstanceDynamic* DynamicMatInst = UMaterialInstanceDynamic::Create(WeaponDissolveMaterialInstance, this);
+		Weapon->SetMaterial(0, DynamicMatInst);
+		StartWeaponDissolveTimeline(DynamicMatInst);
+	}
+	Super::Die();
+}
+
 void ADoubleHeroesEnemy::BeginPlay()
 {
 	Super::BeginPlay();
