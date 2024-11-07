@@ -31,14 +31,14 @@ void ADoubleHeroesEnemy::HighlightActor()
 {
 	GetMesh()->SetRenderCustomDepth(true);
 	GetMesh()->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED);
-	Weapon->SetRenderCustomDepth(true);
-	Weapon->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED);
+	// Weapon->SetRenderCustomDepth(true);
+	// Weapon->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED);
 }
 
 void ADoubleHeroesEnemy::UnHighlightActor()
 {
 	GetMesh()->SetRenderCustomDepth(false);
-	Weapon->SetRenderCustomDepth(false);
+	// Weapon->SetRenderCustomDepth(false);
 }
 
 int32 ADoubleHeroesEnemy::GetPlayerLevel_Implementation()
@@ -48,6 +48,7 @@ int32 ADoubleHeroesEnemy::GetPlayerLevel_Implementation()
 
 void ADoubleHeroesEnemy::Die()
 {
+	//应用溶解材质
 	SetLifeSpan(5.f);
 	if (IsValid(DissolveMaterialInstance))
 	{
@@ -58,7 +59,7 @@ void ADoubleHeroesEnemy::Die()
 	if (IsValid(WeaponDissolveMaterialInstance))
 	{
 		UMaterialInstanceDynamic* DynamicMatInst = UMaterialInstanceDynamic::Create(WeaponDissolveMaterialInstance, this);
-		Weapon->SetMaterial(0, DynamicMatInst);
+		// Weapon->SetMaterial(0, DynamicMatInst);
 		StartWeaponDissolveTimeline(DynamicMatInst);
 	}
 	Super::Die();

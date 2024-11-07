@@ -61,7 +61,7 @@ void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 
 	if (BlueHeroCharacter)
 	{
-		BlueHeroCharacter->SetOverlappingWeapon(this);
+		// BlueHeroCharacter->SetOverlappingWeapon(this);
 	}
 }
 
@@ -72,7 +72,7 @@ void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 
 	if (BlueHeroCharacter)
 	{
-		BlueHeroCharacter->SetOverlappingWeapon(nullptr);
+		// BlueHeroCharacter->SetOverlappingWeapon(nullptr);
 	}
 }
 

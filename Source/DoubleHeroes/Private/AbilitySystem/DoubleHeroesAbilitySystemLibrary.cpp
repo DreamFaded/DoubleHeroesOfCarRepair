@@ -4,6 +4,7 @@
 #include "AbilitySystem/DoubleHeroesAbilitySystemLibrary.h"
 
 #include "AbilitySystemComponent.h"
+#include "..\..\Public\DoubleHeroesAbilityTypes.h"
 #include "Character/DoubleHeroesCharacter.h"
 #include "Game/DoubleHeroesGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
@@ -46,13 +47,10 @@ UAttributeMenuWidgetController* UDoubleHeroesAbilitySystemLibrary::GetAttributeM
 
 void UDoubleHeroesAbilitySystemLibrary::InitializeDefaultAttributes(const UObject* WorldContextObject, ECharacterClass CharacterClass, float Level, UAbilitySystemComponent* ASC)
 {
-	ADoubleHeroesGameModeBase* DoubleHeroesGameMode = Cast<ADoubleHeroesGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
-	if(DoubleHeroesGameMode == nullptr) return;
-
 	AActor* AvatarActor = ASC->GetAvatarActor();
 
-	UCharacterClassInfo* CharacterClassInfo = DoubleHeroesGameMode->CharacterClassInfo;
-	FCharacterClassDefaultInfo ClassDefaultInfo = DoubleHeroesGameMode->CharacterClassInfo->GetClassDefaultInfo(CharacterClass);
+	UCharacterClassInfo* CharacterClassInfo = GetCharacterClassInfo(WorldContextObject);
+	FCharacterClassDefaultInfo ClassDefaultInfo = CharacterClassInfo->GetClassDefaultInfo(CharacterClass);
 
 	FGameplayEffectContextHandle PrimaryAttributesContextHandle = ASC->MakeEffectContext();
 	PrimaryAttributesContextHandle.AddSourceObject(AvatarActor);
@@ -76,14 +74,55 @@ void UDoubleHeroesAbilitySystemLibrary::InitializeDefaultAttributes(const UObjec
 void UDoubleHeroesAbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContextObject,
 	UAbilitySystemComponent* ASC)
 {
-	ADoubleHeroesGameModeBase* DoubleHeroesGameMode = Cast<ADoubleHeroesGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
-	if(DoubleHeroesGameMode == nullptr) return;
-
-	UCharacterClassInfo* CharacterClassInfo = DoubleHeroesGameMode->CharacterClassInfo;
+	UCharacterClassInfo* CharacterClassInfo = GetCharacterClassInfo(WorldContextObject);
 	for (TSubclassOf<UGameplayAbility> AbilityClass : CharacterClassInfo->CommonAbilities)
 	{
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
 		ASC->GiveAbility(AbilitySpec);
+	}
+}
+
+UCharacterClassInfo* UDoubleHeroesAbilitySystemLibrary::GetCharacterClassInfo(const UObject* WorldContextObject)
+{
+	ADoubleHeroesGameModeBase* DoubleHeroesGameMode = Cast<ADoubleHeroesGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if(DoubleHeroesGameMode == nullptr) return nullptr;
+
+	return DoubleHeroesGameMode->CharacterClassInfo;
+}
+
+bool UDoubleHeroesAbilitySystemLibrary::IsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if(const FDoubleHeroesGameplayEffectContext* DoubleHeroesEffectContext = static_cast<const FDoubleHeroesGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return DoubleHeroesEffectContext->IsBlockedHit();
+	}
+	return false;
+}
+
+bool UDoubleHeroesAbilitySystemLibrary::IsCriticalHit(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FDoubleHeroesGameplayEffectContext* DoubleHeroesEffectContext = static_cast<const FDoubleHeroesGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return DoubleHeroesEffectContext->IsCriticalHit();
+	}
+	return false;
+}
+
+void UDoubleHeroesAbilitySystemLibrary::SetIsBlockedHit(FGameplayEffectContextHandle& EffectContextHandle,
+	bool bInIsBlockedHit)
+{
+	if (FDoubleHeroesGameplayEffectContext* DoubleHeroesEffectContext = static_cast<FDoubleHeroesGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		DoubleHeroesEffectContext->SetIsBlockedHit(bInIsBlockedHit);
+	}
+}
+
+void UDoubleHeroesAbilitySystemLibrary::SetIsCriticalHit(FGameplayEffectContextHandle& EffectContextHandle,
+	bool bInIsCriticalHit)
+{
+	if (FDoubleHeroesGameplayEffectContext* DoubleHeroesEffectContext = static_cast<FDoubleHeroesGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		DoubleHeroesEffectContext->SetIsCriticalHit(bInIsCriticalHit);
 	}
 }
 

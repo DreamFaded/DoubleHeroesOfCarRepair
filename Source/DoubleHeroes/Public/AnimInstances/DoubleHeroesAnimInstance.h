@@ -3,20 +3,37 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Animation/AnimInstance.h"
-#include "BlueHeroAnimInstance.generated.h"
+#include "DoubleHeroesBaseAnimInstance.h"
+#include "DoubleHeroesAnimInstance.generated.h"
 
+class UCharacterMovementComponent;
+class ADoubleHeroesBaseCharacter;
 /**
  * 
  */
 UCLASS()
-class DOUBLEHEROES_API UBlueHeroAnimInstance : public UAnimInstance
+class DOUBLEHEROES_API UDoubleHeroesAnimInstance : public UDoubleHeroesBaseAnimInstance
 {
 	GENERATED_BODY()
 
 public:
 	virtual void NativeInitializeAnimation() override;
+	virtual void NativeThreadSafeUpdateAnimation(float DeltaSeconds);
 	virtual void NativeUpdateAnimation(float DeltaTime) override;
+
+protected:
+
+	UPROPERTY()
+	ADoubleHeroesBaseCharacter* OwningCharacter;
+
+	UPROPERTY()
+	UCharacterMovementComponent* OwningMovementComponent;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "AnimData||LocomotionData")
+	float GroundSpeed;
+	
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "AnimData||LocomotionData")
+	bool bHasAcceleration;
 
 private:
 	UPROPERTY(BlueprintReadOnly, Category = Character, meta = (AllowPrivateAccess = "true"))

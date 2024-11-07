@@ -22,9 +22,9 @@ ADoubleHeroesCharacterBase::ADoubleHeroesCharacterBase()
 	GetMesh()->SetCollisionResponseToChannel(ECC_Projectile, ECR_Overlap);
 	GetMesh()->SetGenerateOverlapEvents(true);
 
-	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon");
+	/*Weapon = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon");
 	Weapon->SetupAttachment(GetMesh(), FName("WeaponHandSocket"));
-	Weapon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Weapon->SetCollisionEnabled(ECollisionEnabled::NoCollision);*/
 }
 
 UAbilitySystemComponent* ADoubleHeroesCharacterBase::GetAbilitySystemComponent() const
@@ -39,15 +39,15 @@ UAnimMontage* ADoubleHeroesCharacterBase::GetHitReactMontage_Implementation()
 
 void ADoubleHeroesCharacterBase::Die()
 {
-	Weapon->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
+	// Weapon->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
 	MulticastHandleDeath();
 }
 
 void ADoubleHeroesCharacterBase::MulticastHandleDeath_Implementation()
 {
-	Weapon->SetSimulatePhysics(true);
-	Weapon->SetEnableGravity(true);
-	Weapon->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	// Weapon->SetSimulatePhysics(true);
+	// Weapon->SetEnableGravity(true);
+	// Weapon->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 
 	GetMesh()->SetSimulatePhysics(true);
 	GetMesh()->SetEnableGravity(true);
@@ -64,11 +64,11 @@ void ADoubleHeroesCharacterBase::BeginPlay()
 	Super::BeginPlay();
 }
 
-FVector ADoubleHeroesCharacterBase::GetCombatSocketLocation()
-{
-	check(Weapon);
-	return Weapon->GetSocketLocation(WeaponTipSocketName);
-}
+// FVector ADoubleHeroesCharacterBase::GetCombatSocketLocation()
+// {
+	// check(Weapon);
+	// return Weapon->GetSocketLocation(WeaponTipSocketName);
+// }
 
 void ADoubleHeroesCharacterBase::InitAbilityActorInfo()
 {
@@ -97,7 +97,7 @@ void ADoubleHeroesCharacterBase::AddCharacterAbilities()
 	UDHAbilitySystemComponent* DoubleHeroesASC = CastChecked<UDHAbilitySystemComponent>(AbilitySystemComponent);
 	if(!HasAuthority()) return;
 
-	DoubleHeroesASC->AddCharacterAbilities(StartupAbilities);
+	// DoubleHeroesASC->AddCharacterAbilities(StartupAbilities);
 }
 
 void ADoubleHeroesCharacterBase::Dissolve()

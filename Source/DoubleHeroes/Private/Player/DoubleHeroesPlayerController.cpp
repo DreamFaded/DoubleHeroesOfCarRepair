@@ -18,6 +18,7 @@
 #include "Input/DoubleHeroesInputComponent.h"
 #include "Interaction/EnemyInterface.h"
 #include "Net/UnrealNetwork.h"
+#include "UI/Widget/DamageTextComponent.h"
 
 ADoubleHeroesPlayerController::ADoubleHeroesPlayerController()
 {
@@ -31,6 +32,18 @@ void ADoubleHeroesPlayerController::PlayerTick(float DeltaTime)
 	Super::PlayerTick(DeltaTime);
 	CursorTrace();
 	AutoRun();
+}
+
+void ADoubleHeroesPlayerController::ShowDamageNumber_Implementation(float DamageAmount, ACharacter* TargetCharacter, bool bBlockedHit, bool bCriticalHit)
+{
+	if (IsValid(TargetCharacter) && DamageTextComponentClass)
+	{
+		UDamageTextComponent* DamageText = NewObject<UDamageTextComponent>(TargetCharacter, DamageTextComponentClass);
+		DamageText->RegisterComponent();
+		DamageText->AttachToComponent(TargetCharacter->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+		DamageText->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+		DamageText->SetDamageText(DamageAmount, bBlockedHit, bCriticalHit);
+	}
 }
 
 void ADoubleHeroesPlayerController::AutoRun()
@@ -235,13 +248,7 @@ void ADoubleHeroesPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	/*UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
-
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this,
-	                                   &ADoubleHeroesPlayerController::Move);
-	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this,
-	                                   &ADoubleHeroesPlayerController::Look);*/
-	UDoubleHeroesInputComponent* DoubleHeroesInputComponent = CastChecked<UDoubleHeroesInputComponent>(InputComponent);
+	/*UDoubleHeroesInputComponent* DoubleHeroesInputComponent = CastChecked<UDoubleHeroesInputComponent>(InputComponent);
 	DoubleHeroesInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this,
 	                                       &ADoubleHeroesPlayerController::Move);
 	DoubleHeroesInputComponent->BindAction(RunAction, ETriggerEvent::Triggered, this,
@@ -251,17 +258,13 @@ void ADoubleHeroesPlayerController::SetupInputComponent()
 	
 	DoubleHeroesInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this,
 	                                       &ADoubleHeroesPlayerController::Look);
-	DoubleHeroesInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this,
-	&ADoubleHeroesPlayerController::Dodge);
 	DoubleHeroesInputComponent->BindAction(ShiftAction, ETriggerEvent::Started, this,
 	&ADoubleHeroesPlayerController::ShiftPressed);
 	DoubleHeroesInputComponent->BindAction(ShiftAction, ETriggerEvent::Completed, this,
-	&ADoubleHeroesPlayerController::ShiftReleased);
-	DoubleHeroesInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed,
-	                                               &ThisClass::AbilityInputTagReleased,
-	                                               &ThisClass::AbilityInputTagHeld);
+	&ADoubleHeroesPlayerController::ShiftReleased);*/
 }
 
+/*
 void ADoubleHeroesPlayerController::Move(const FInputActionValue& InputActionValue)
 {
 	const FVector2D MovementVector = InputActionValue.Get<FVector2D>();
@@ -312,10 +315,6 @@ void ADoubleHeroesPlayerController::Look(const FInputActionValue& InputActionVal
 		ControlledPawn->AddControllerYawInput(LookAxisVector.X);
 		ControlledPawn->AddControllerPitchInput(LookAxisVector.Y);
 	}
-}
-
-void ADoubleHeroesPlayerController::Dodge(const FInputActionValue& InputActionValue)
-{
-}
+}*/
 
 

@@ -2,3 +2,10 @@
 
 
 #include "AbilitySystem/DoubleHeroesAbilitySystemGlobals.h"
+
+#include "DoubleHeroesAbilityTypes.h"
+
+FGameplayEffectContext* UDoubleHeroesAbilitySystemGlobals::AllocGameplayEffectContext() const
+{
+	return new FDoubleHeroesGameplayEffectContext();
+}

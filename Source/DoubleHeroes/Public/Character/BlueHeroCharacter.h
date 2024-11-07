@@ -3,12 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DoubleHeroesBaseCharacter.h"
+#include "DoubleHeroesCharacterBase.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
 #include "BlueHeroCharacter.generated.h"
 
+class UHeroCombatComponent;
+class UDataAsset_InputConfig;
+
 UCLASS()
-class DOUBLEHEROES_API ABlueHeroCharacter : public ACharacter
+class DOUBLEHEROES_API ABlueHeroCharacter : public ADoubleHeroesBaseCharacter
 {
 	GENERATED_BODY()
 	
@@ -25,45 +30,48 @@ class DOUBLEHEROES_API ABlueHeroCharacter : public ACharacter
 public:
 	// Sets default values for this character's properties
 	ABlueHeroCharacter();
+	FORCEINLINE UHeroCombatComponent* GetHeroCombatComponent() const { return HeroCombatComponent; } 
 	virtual void Tick(float DeltaTime) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void PostInitializeComponents() override;
 	
-	void SetOverlappingWeapon(AWeapon* Weapon);
-	bool IsWeaponEquipped();
+	// void SetOverlappingWeapon(AWeapon* Weapon);
+	// bool IsWeaponEquipped();
 
-	class UCombatComponent* Combat;
+	// class UCombatComponent* Combat;
 	UPROPERTY(EditAnywhere, Category = input)
 	class UInputMappingContext* SlashContext;
 
 protected:
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// APawn interface
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	
 
-	UPROPERTY(EditAnywhere, Category = input)
-	UInputAction* MovementAction;
-	UPROPERTY(EditAnywhere, Category = input)
-	UInputAction* PunchAction;
-	UPROPERTY(EditAnywhere, Category = input)
-	UInputAction* DodgeAction;
-	UPROPERTY(EditAnywhere, Category = input)
-	UInputAction* InteractAction;
-	UPROPERTY(EditAnywhere, Category = input)
-	UInputAction* CrouchAction;
+	// UPROPERTY(EditAnywhere, Category = input)
+	// UInputAction* MovementAction;
+	// UPROPERTY(EditAnywhere, Category = input)
+	// UInputAction* PunchAction;
+	// UPROPERTY(EditAnywhere, Category = input)
+	// UInputAction* DodgeAction;
+	// UPROPERTY(EditAnywhere, Category = input)
+	// UInputAction* InteractAction;
+	// UPROPERTY(EditAnywhere, Category = input)
+	// UInputAction* CrouchAction;
 
 
-	void Move(const FInputActionValue& Value);
-	void Look(const FInputActionValue& Value);
+	void Input_Move(const FInputActionValue& InputActionValue);
+	void Input_Look(const FInputActionValue& InputActionValue);
+	void Input_AbilityInputPressed(FGameplayTag InInputTag);
+	void Input_AbilityInputReleased(FGameplayTag InInputTag);
 	void Punch();
 	void Dodge();
 	void Interact();
 	void CrouchPressed();
 
-	void MoveForward(float Value);
 
 
 private:
@@ -73,8 +81,14 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class UCameraComponent* FollowCamera;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	UHeroCombatComponent* HeroCombatComponent;
+
 	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
 	class AWeapon* OverlappingWeapon;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CharacterData", meta = (AllowPrivateAccess = "true"))
+	UDataAsset_InputConfig* InputConfigDataAsset;
 
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(AWeapon* LastWeapon);

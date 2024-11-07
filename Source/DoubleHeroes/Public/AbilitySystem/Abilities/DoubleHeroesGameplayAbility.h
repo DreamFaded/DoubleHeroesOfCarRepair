@@ -6,6 +6,15 @@
 #include "Abilities/GameplayAbility.h"
 #include "DoubleHeroesGameplayAbility.generated.h"
 
+class UDHAbilitySystemComponent;
+class UPawnCombatComponent;
+
+UENUM(BlueprintType)
+enum class EDoubleHeroesAbilityActivationPolicy : uint8
+{
+	OnTriggered,
+	OnGiven
+};
 /**
  * 
  */
@@ -15,8 +24,17 @@ class DOUBLEHEROES_API UDoubleHeroesGameplayAbility : public UGameplayAbility
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly, Category="Input")
-	FGameplayTag StartupInputTag;
+	virtual void OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
+	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
+	
+	UPROPERTY(EditDefaultsOnly, Category="DoubleHeroesAbility")
+	EDoubleHeroesAbilityActivationPolicy AbilityActivationPolicy = EDoubleHeroesAbilityActivationPolicy::OnTriggered;
+
+	UFUNCTION(BlueprintPure, Category = "DoubleHeroes|Ability")
+	UPawnCombatComponent* GetPawnCombatComponentFromActorInfo() const;
+
+	UFUNCTION(BlueprintPure, Category="DoubleHeroesAbility")
+	UDHAbilitySystemComponent* GetDHAbilitySystemComponentFromActorInfo() const;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
 	FScalableFloat Damage;

@@ -5,6 +5,16 @@
 
 #include "GameplayTagsManager.h"
 
+namespace DoubleHeroesGameplayTags
+{
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_Move, "InputTag.Move");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_Look, "InputTag.Look");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_EquipPipe, "InputTag.EquipPipe");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_UnEquipPipe, "InputTag.UnEquipPipe");
+
+	//Player Tags
+	UE_DEFINE_GAMEPLAY_TAG(Player_Weapon_FireBowl, "Player.Weapon.FireBowl");
+}
 
 FDoubleHeroesGameplayTags FDoubleHeroesGameplayTags::GameplayTags;
 

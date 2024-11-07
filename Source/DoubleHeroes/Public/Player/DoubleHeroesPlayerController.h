@@ -10,6 +10,7 @@
 #include "DoubleHeroesPlayerController.generated.h"
 
 class USplineComponent;
+class UDamageTextComponent;
 class UInputMappingContext;
 class UDoubleHeroesInputConfig;
 struct FInputActionValue;
@@ -26,6 +27,9 @@ public:
 	ADoubleHeroesPlayerController();
 
 	virtual void PlayerTick(float DeltaTime) override;
+
+	UFUNCTION(Client, Reliable)
+	void ShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter, bool bBlockedHit, bool bCriticalHit);
 
 protected:
 	virtual void BeginPlay() override;
@@ -51,11 +55,10 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> ShiftAction;
 
-	void Move(const FInputActionValue& InputActionValue);
+	/*void Move(const FInputActionValue& InputActionValue);
 	void Run(const FInputActionValue& InputActionValue);
 	void Walk(const FInputActionValue& InputActionValue);
-	void Look(const FInputActionValue& InputActionValue);
-	void Dodge(const FInputActionValue& InputActionValue);
+	void Look(const FInputActionValue& InputActionValue);*/
 	void AutoRun();
 
 	bool bShiftKeyDown = false;
@@ -93,5 +96,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USplineComponent> Spline;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UDamageTextComponent> DamageTextComponentClass;
 };
 

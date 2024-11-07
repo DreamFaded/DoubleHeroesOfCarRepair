@@ -4,7 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "NativeGameplayTags.h"
 
+
+namespace DoubleHeroesGameplayTags
+{
+	DOUBLEHEROES_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Move)
+	DOUBLEHEROES_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Look)
+	DOUBLEHEROES_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_EquipPipe);
+	DOUBLEHEROES_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_UnEquipPipe);
+
+	//Player Tags
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Player_Weapon_FireBowl);
+}
 /**
  * DoubleHeroesGameplayTags
  *
@@ -40,6 +52,9 @@ public:
 	FGameplayTag InputTag_4;
 
 	FGameplayTag Damage;
+
+	TMap<FGameplayTag, FGameplayTag> DamageTypesToResistances;
+	TMap<FGameplayTag, FGameplayTag> DamageTypesToDebuffs;
 
 	FGameplayTag Effects_HitReact;
 	

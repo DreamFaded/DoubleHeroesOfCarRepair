@@ -3,9 +3,9 @@
 
 #include "UI/WidgetController/AttributeMenuWidgetController.h"
 #include "Data/AttributeInfo.h"
-#include "DoubleHeroesGameplayTags.h"
 #include "AbilitySystem/DoubleHeroesAttributeSet.h"
 
+//获取标签名和参数并回调
 void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 {
 	UDoubleHeroesAttributeSet* AS = CastChecked<UDoubleHeroesAttributeSet>(AttributeSet);
@@ -13,7 +13,7 @@ void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 	for(auto& Pair : AS->TagsToAttributes)
 	{
 			AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Pair.Value()).AddLambda(
-			[this, Pair, AS](const FOnAttributeChangeData& Data)
+			[this, Pair](const FOnAttributeChangeData& Data)
 			{
 				BroadcastAttributeInfo(Pair.Key, Pair.Value());
 			}

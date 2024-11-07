@@ -8,38 +8,36 @@
 
 void UOverlayWidgetController::BroadcastInitialValues()
 {
-	const UDoubleHeroesAttributeSet* DoubleHeroesAttributeSet = CastChecked<UDoubleHeroesAttributeSet>(AttributeSet);
 	//传参到蓝图
-	OnHealthChanged.Broadcast(DoubleHeroesAttributeSet->GetHealth());
-	OnMaxHealthChanged.Broadcast(DoubleHeroesAttributeSet->GetMaxHealth());
-	OnEnduranceChanged.Broadcast(DoubleHeroesAttributeSet->GetEndurance());
-	OnMaxEnduranceChanged.Broadcast(DoubleHeroesAttributeSet->GetMaxEndurance());
+	OnHealthChanged.Broadcast(GetDoubleHeroesAS()->GetHealth());
+	OnMaxHealthChanged.Broadcast(GetDoubleHeroesAS()->GetMaxHealth());
+	OnEnduranceChanged.Broadcast(GetDoubleHeroesAS()->GetEndurance());
+	OnMaxEnduranceChanged.Broadcast(GetDoubleHeroesAS()->GetMaxEndurance());
 }
 
 void UOverlayWidgetController::BindCallbacksToDependencies()
 {
-	const UDoubleHeroesAttributeSet* DoubleHeroesAttributeSet = CastChecked<UDoubleHeroesAttributeSet>(AttributeSet);
 
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(DoubleHeroesAttributeSet->GetHealthAttribute()).
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(GetDoubleHeroesAS()->GetHealthAttribute()).
 	                        AddLambda([this](const FOnAttributeChangeData& Data)
 	                        {
 		                        OnHealthChanged.Broadcast(Data.NewValue);
 	                        });
 
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(DoubleHeroesAttributeSet->GetMaxHealthAttribute()).
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(GetDoubleHeroesAS()->GetMaxHealthAttribute()).
 	                        AddLambda([this](const FOnAttributeChangeData& Data)
 	                        {
 		                        OnMaxHealthChanged.Broadcast(Data.NewValue);
 	                        });
 
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(DoubleHeroesAttributeSet->GetEnduranceAttribute()).
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(GetDoubleHeroesAS()->GetEnduranceAttribute()).
 	                        AddLambda([this](const FOnAttributeChangeData& Data)
 	                        {
 		                        OnEnduranceChanged.Broadcast(Data.NewValue);
 	                        });
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		                        DoubleHeroesAttributeSet->GetMaxEnduranceAttribute()).
+		                        GetDoubleHeroesAS()->GetMaxEnduranceAttribute()).
 	                        AddLambda([this](const FOnAttributeChangeData& Data)
 	                        {
 		                        OnMaxEnduranceChanged.Broadcast(Data.NewValue);

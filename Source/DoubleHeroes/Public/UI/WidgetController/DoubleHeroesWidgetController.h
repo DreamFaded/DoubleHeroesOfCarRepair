@@ -7,6 +7,7 @@
 #include "DoubleHeroesWidgetController.generated.h"
 
 class UAttributeSet;
+class UDHAbilitySystemComponent;
 class UAbilitySystemComponent;
 class UDoubleHeroesAttributeSet;
 class UAttributeInfo;
@@ -64,4 +65,12 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "WidgetController")
 	TObjectPtr<UAttributeSet> AttributeSet;
+
+	// UPROPERTY(BlueprintReadOnly, Category="WidgetController")
+	// TObjectPtr<UDHAbilitySystemComponent> DHAbilitySystemComponent;
+
+	UPROPERTY(BlueprintReadOnly, Category="WidgetController")
+	TObjectPtr<UDoubleHeroesAttributeSet> DoubleHeroesAttributeSet;
+
+	UDoubleHeroesAttributeSet* GetDoubleHeroesAS();
 };

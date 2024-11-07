@@ -3,14 +3,19 @@
 
 #include "Character/BlueHeroCharacter.h"
 
+#include "DoubleHeroesGameplayTags.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "AbilitySystem/DHAbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/HeroCombatComponent.h"
 #include "Components/InputComponent.h"
+#include "DataAsset/DataAsset_StartUpDataBase.h"
 #include "DoubleHeroesComponent/CombatComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Input/DoubleHeroesInputComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Weapon/Weapon.h"
 
@@ -32,10 +37,13 @@ ABlueHeroCharacter::ABlueHeroCharacter()
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
-	Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
-	Combat->SetIsReplicated(true); // 如果需要网络复制
+	//Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
+	//Combat->SetIsReplicated(true); // 如果需要网络复制
 
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
+
+	HeroCombatComponent = CreateDefaultSubobject<UHeroCombatComponent>(TEXT("HeroCombatComponent"));
+	HeroCombatComponent->SetIsReplicated(true); // 如果需要网络复制
 }
 
 void ABlueHeroCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -87,100 +95,115 @@ void ABlueHeroCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
 {
 }
 
-void ABlueHeroCharacter::Move(const FInputActionValue& Value)
+void ABlueHeroCharacter::PossessedBy(AController* NewController)
 {
-	// input is a Vector2D
-	/*FVector2D MovementVector = Value.Get<FVector2D>();
-	const FVector Forward = GetActorForwardVector();
-	AddMovementInput(Forward, MovementVector.Y);
-	const FVector Right = GetActorRightVector();
-	AddMovementInput(Right, MovementVector.X);*/
-	FVector2D MovementVector = Value.Get<FVector2D>();
-	if (Controller != nullptr)
+	Super::PossessedBy(NewController);
+
+	if (!CharacterStartUpData.IsNull())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("MovementVector"));
-		// find out which way is forward
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		// get forward vector
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-
-		// get right vector 
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
-		// add movement 
-		AddMovementInput(ForwardDirection, MovementVector.Y);
-		AddMovementInput(RightDirection, MovementVector.X);
+		if (UDataAsset_StartUpDataBase* LoadedData = CharacterStartUpData.LoadSynchronous())
+		{
+			LoadedData->GiveToAbilitySystemComponent(DHAbilitySystemComponent);
+		}
 	}
 }
 
 void ABlueHeroCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
+	ULocalPlayer* LocalPlayer = GetController<APlayerController>()->GetLocalPlayer();
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer);
+	check(Subsystem);
+	Subsystem->AddMappingContext(InputConfigDataAsset->DefaultMappingContext, 0);
+	UDoubleHeroesInputComponent* DoubleHeroesInputComponent = CastChecked<UDoubleHeroesInputComponent>(PlayerInputComponent);
+	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_Move, ETriggerEvent::Triggered, this, &ThisClass::Input_Move);
+	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_Look, ETriggerEvent::Triggered, this, &ThisClass::Input_Look);
+	DoubleHeroesInputComponent->BindAbilityInputAction(InputConfigDataAsset, this, &ThisClass::Input_AbilityInputPressed, &ThisClass::Input_AbilityInputPressed);
+	
 	// Set up action bindings
-	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+	/*if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		//Jumping
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-		//Moving
-		EnhancedInputComponent->BindAction(MovementAction, ETriggerEvent::Triggered, this, &ABlueHeroCharacter::Move);
-		//Looking
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ABlueHeroCharacter::Look);
 		EnhancedInputComponent->BindAction(PunchAction, ETriggerEvent::Triggered, this, &ABlueHeroCharacter::Punch);
 		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &ABlueHeroCharacter::Dodge);
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this,
 		                                   &ABlueHeroCharacter::Interact);
 		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &ABlueHeroCharacter::CrouchPressed);
+	}*/
+}
+
+void ABlueHeroCharacter::Input_Move(const FInputActionValue& InputActionValue)
+{
+	// find out which way is forward
+	const FVector2D MovementVector = InputActionValue.Get<FVector2D>();
+	const FRotator MovementRotation(0.f, Controller->GetControlRotation().Yaw, 0.f);
+	if (MovementVector.Y != 0.f)
+	{
+		const FVector ForwardDirection = MovementRotation.RotateVector(FVector::ForwardVector);
+		AddMovementInput(ForwardDirection, MovementVector.Y);
 	}
+
+	if (MovementVector.X != 0.f)
+	{
+		const FVector RightDirection = MovementRotation.RotateVector(FVector::RightVector);
+		AddMovementInput(RightDirection, MovementVector.X);
+	}
+}
+
+void ABlueHeroCharacter::Input_Look(const FInputActionValue& InputActionValue)
+{
+	const FVector2D LookAxisVector = InputActionValue.Get<FVector2D>();
+	if (LookAxisVector.X != 0.f)
+	{
+		AddControllerYawInput(LookAxisVector.X);
+	}
+	if (LookAxisVector.Y != 0.f)
+	{
+		AddControllerPitchInput(LookAxisVector.Y);
+	}
+}
+
+void ABlueHeroCharacter::Input_AbilityInputPressed(FGameplayTag InInputTag)
+{
+	DHAbilitySystemComponent->OnAbilityInputPressed(InInputTag);
+}
+
+void ABlueHeroCharacter::Input_AbilityInputReleased(FGameplayTag InInputTag)
+{
+	DHAbilitySystemComponent->OnAbilityInputReleased(InInputTag);
 }
 
 void ABlueHeroCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	if (Combat)
-	{
-		Combat->Character = this;
-	}
+	// if (Combat)
+	// {
+	// 	Combat->Character = this;
+	// }
 }
 
-void ABlueHeroCharacter::Look(const FInputActionValue& Value)
+/*void ABlueHeroCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 {
-	// input is a Vector2D
-	FVector2D LookAxisVector = Value.Get<FVector2D>();
-
-	AddControllerYawInput(LookAxisVector.X);
-	AddControllerPitchInput(LookAxisVector.Y);
-
-	/*if (Controller != nullptr)
-	{
-		// add yaw and pitch input to controller
-		AddControllerYawInput(LookAxisVector.X);
-		AddControllerPitchInput(LookAxisVector.Y);
-	}*/
-}
-
-void ABlueHeroCharacter::SetOverlappingWeapon(AWeapon* Weapon)
-{
-	/*if (OverlappingWeapon)
+	if (OverlappingWeapon)
 	{
 		OverlappingWeapon->ShowPickupWidget(false);
-	}*/
+	}
 	OverlappingWeapon = Weapon;
-	/*if (IsLocallyControlled())
+	if (IsLocallyControlled())
 	{
 		if (OverlappingWeapon)
 		{
 			OverlappingWeapon->ShowPickupWidget(true);
 		}
-	}*/
-}
+	}
+}*/
 
-bool ABlueHeroCharacter::IsWeaponEquipped()
-{
-	return (Combat && Combat->EquippedWeapon);
-}
+// bool ABlueHeroCharacter::IsWeaponEquipped()
+// {
+// 	return (Combat && Combat->EquippedWeapon);
+// }
 
 void ABlueHeroCharacter::Punch()
 {
@@ -204,23 +227,23 @@ void ABlueHeroCharacter::CrouchPressed()
 
 void ABlueHeroCharacter::Interact()
 {
-	if (Combat)
-	{
-		if (HasAuthority())
-		{
-			Combat->EquipWeapon(OverlappingWeapon);
-		}
-		else
-		{
-			ServerEquipButtonPressed();
-		}
-	}
+	// if (Combat)
+	// {
+	// 	if (HasAuthority())
+	// 	{
+	// 		Combat->EquipWeapon(OverlappingWeapon);
+	// 	}
+	// 	else
+	// 	{
+	// 		ServerEquipButtonPressed();
+	// 	}
+	// }
 }
 
 void ABlueHeroCharacter::ServerEquipButtonPressed_Implementation()
 {
-	if (Combat)
-	{
-		Combat->EquipWeapon(OverlappingWeapon);
-	}
+	// if (Combat)
+	// {
+	// 	Combat->EquipWeapon(OverlappingWeapon);
+	// }
 }

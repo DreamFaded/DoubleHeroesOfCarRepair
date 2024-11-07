@@ -4,8 +4,12 @@
 #include "Character/DoubleHeroesCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "DoubleHeroesGameplayTags.h"
+#include "EnhancedInputSubsystems.h"
 #include "AbilitySystem/DHAbilitySystemComponent.h"
+#include "DataAsset/Input/DataAsset_InputConfig.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Input/DoubleHeroesInputComponent.h"
 #include "Player/DoubleHeroesPlayerController.h"
 #include "Player/DoubleHeroesPlayerState.h"
 #include "UI/HUD/DoubleHeroesHUD.h"
@@ -48,6 +52,18 @@ int32 ADoubleHeroesCharacter::GetPlayerLevel_Implementation()
 	return DoubleHeroesPlayerState->GetPlayerLevel();
 }
 
+void ADoubleHeroesCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	ULocalPlayer* LocalPlayer = GetController<APlayerController>()->GetLocalPlayer();
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer);
+	check(Subsystem);
+	Subsystem->AddMappingContext(InputConfigDataAsset->DefaultMappingContext,0);
+	UDoubleHeroesInputComponent* DoubleHeroesInputComponent = CastChecked<UDoubleHeroesInputComponent>(PlayerInputComponent);
+	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_Move, ETriggerEvent::Triggered, this, &ThisClass::Input_Move);
+	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_Look, ETriggerEvent::Triggered, this, &ThisClass::Input_Look);
+
+}
+
 void ADoubleHeroesCharacter::InitAbilityActorInfo()
 {
 	ADoubleHeroesPlayerState* DoubleHeroesPlayerState = GetPlayerState<ADoubleHeroesPlayerState>();
@@ -65,4 +81,34 @@ void ADoubleHeroesCharacter::InitAbilityActorInfo()
 		}
 	}
 	InitializeDefaultAttributes();
+}
+
+void ADoubleHeroesCharacter::Input_Move(const FInputActionValue& InputActionValue)
+{
+	const FVector2D MovementVector = InputActionValue.Get<FVector2D>();
+	const FRotator MovementRotation(0.f, Controller->GetControlRotation().Yaw, 0.f);
+	if (MovementVector.Y != 0.f)
+	{
+		const FVector ForwardDirection = MovementRotation.RotateVector(FVector::ForwardVector);
+		AddMovementInput(ForwardDirection, MovementVector.Y);
+	}
+
+	if (MovementVector.X != 0.f)
+	{
+		const FVector RightDirection = MovementRotation.RotateVector(FVector::RightVector);
+		AddMovementInput(RightDirection, MovementVector.X);
+	}
+}
+
+void ADoubleHeroesCharacter::Input_Look(const FInputActionValue& InputActionValue)
+{
+	const FVector2D LookAxisVector = InputActionValue.Get<FVector2D>();
+	if (LookAxisVector.X != 0.f)
+	{
+	AddControllerYawInput(LookAxisVector.X);
+	}
+	if (LookAxisVector.Y != 0.f)
+	{
+	AddControllerPitchInput(LookAxisVector.Y);
+	}
 }

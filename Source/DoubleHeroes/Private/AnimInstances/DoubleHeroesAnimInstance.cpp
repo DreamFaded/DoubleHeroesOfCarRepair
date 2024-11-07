@@ -1,24 +1,39 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Character/BlueHeroAnimInstance.h"
+#include "..\..\Public\AnimInstances\DoubleHeroesAnimInstance.h"
 
 #include "Character/BlueHeroCharacter.h"
+#include "Character/DoubleHeroesBaseCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Kismet/KismetMathLibrary.h"
 
-void UBlueHeroAnimInstance::NativeInitializeAnimation()
+void UDoubleHeroesAnimInstance::NativeInitializeAnimation()
 {
-	Super::NativeInitializeAnimation();
+	OwningCharacter = Cast<ADoubleHeroesBaseCharacter>(TryGetPawnOwner());
+
+	if(OwningCharacter)
+	{
+		OwningMovementComponent = OwningCharacter->GetCharacterMovement();
+	}
 
 	BlueHeroCharacter = Cast<ABlueHeroCharacter>(TryGetPawnOwner());
 }
 
-void UBlueHeroAnimInstance::NativeUpdateAnimation(float DeltaTime)
+void UDoubleHeroesAnimInstance::NativeThreadSafeUpdateAnimation(float DeltaSeconds)
+{
+	if(!OwningCharacter||!OwningMovementComponent)
+	{
+		return;
+	}
+	GroundSpeed = OwningCharacter->GetVelocity().Size2D();
+	bHasAcceleration = OwningMovementComponent->GetCurrentAcceleration().SizeSquared2D() > 0.f;
+}
+
+void UDoubleHeroesAnimInstance::NativeUpdateAnimation(float DeltaTime)
 {
 	Super::NativeUpdateAnimation(DeltaTime);
 
-	if (BlueHeroCharacter == nullptr)
+	/*if (BlueHeroCharacter == nullptr)
 	{
 		BlueHeroCharacter = Cast<ABlueHeroCharacter>(TryGetPawnOwner());
 	}
@@ -32,7 +47,7 @@ void UBlueHeroAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	bWeaponEquipped = BlueHeroCharacter->IsWeaponEquipped();
 	bIsCrouched = BlueHeroCharacter->bIsCrouched;
 	//Offset Yaw for Strafing
-	/*FRotator AimRotation = BlueHeroCharacter->GetBaseAimRotation();
+	FRotator AimRotation = BlueHeroCharacter->GetBaseAimRotation();
 	FRotator MovementRotation = UKismetMathLibrary::MakeRotFromX(BlueHeroCharacter->GetVelocity());
 	FRotator DeltaRot = UKismetMathLibrary::NormalizedDeltaRotator(MovementRotation, AimRotation);
 	DeltaRotation = FMath::RInterpTo(DeltaRotation, DeltaRot, DeltaTime, 6.f);

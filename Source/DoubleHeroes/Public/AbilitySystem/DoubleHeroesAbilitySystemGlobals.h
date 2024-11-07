@@ -13,4 +13,6 @@ UCLASS()
 class DOUBLEHEROES_API UDoubleHeroesAbilitySystemGlobals : public UAbilitySystemGlobals
 {
 	GENERATED_BODY()
+
+	virtual FGameplayEffectContext* AllocGameplayEffectContext() const override;
 };

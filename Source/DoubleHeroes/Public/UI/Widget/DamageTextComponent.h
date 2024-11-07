@@ -3,14 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/Object.h"
+#include "Components/WidgetComponent.h"
 #include "DamageTextComponent.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DOUBLEHEROES_API UDamageTextComponent : public UObject
+class DOUBLEHEROES_API UDamageTextComponent : public UWidgetComponent
 {
 	GENERATED_BODY()
+
+public:
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void SetDamageText(float Damage, bool bBlockedHit, bool bCriticalHit);
 };

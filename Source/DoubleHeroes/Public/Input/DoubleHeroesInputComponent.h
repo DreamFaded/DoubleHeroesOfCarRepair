@@ -3,51 +3,47 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "DoubleHeroesInputConfig.h"
 #include "EnhancedInputComponent.h"
+#include "DataAsset/Input/DataAsset_InputConfig.h"
 #include "DoubleHeroesInputComponent.generated.h"
 
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS()
 class DOUBLEHEROES_API UDoubleHeroesInputComponent : public UEnhancedInputComponent
 {
 	GENERATED_BODY()
-
-public:
 	
-
-protected:
-
 public:
+	template <class UserObject, typename CallbackFunc>
+	void BindNativeInputAction(const UDataAsset_InputConfig* InInputConfig, const FGameplayTag& InInputTag,
+	                            ETriggerEvent TriggerEvent, UserObject* ContextObject, CallbackFunc Func);
 
-	template<class UserClass, typename PressedFuncType, typename ReleasedFuncType, typename HeldFuncType>
-	void BindAbilityActions(const UDoubleHeroesInputConfig* InputConfig, UserClass* Object, PressedFuncType PressedFunc,
-							 ReleasedFuncType ReleasedFunc, HeldFuncType HeldFunc);
+	template <class UserObject, typename CallbackFunc>
+	void BindAbilityInputAction(const UDataAsset_InputConfig* InInputConfig, UserObject* ContextObject, CallbackFunc InputPressedFunc, CallbackFunc InputReleasedFunc);
 };
 
-template<class UserClass, typename PressedFuncType, typename ReleasedFuncType, typename HeldFuncType>
-	void UDoubleHeroesInputComponent::BindAbilityActions(const UDoubleHeroesInputConfig* InputConfig, UserClass* Object, PressedFuncType PressedFunc,
-							 ReleasedFuncType ReleasedFunc, HeldFuncType HeldFunc)
+template <class UserObject, typename CallbackFunc>
+inline void UDoubleHeroesInputComponent::BindNativeInputAction(const UDataAsset_InputConfig* InInputConfig, const FGameplayTag& InInputTag,
+								ETriggerEvent TriggerEvent, UserObject* ContextObject, CallbackFunc Func)
 {
-	check(InputConfig);
+	checkf(InInputConfig, TEXT("Input config data asset is null, call not proceed with binding"));
 
-	for (const FDoubleHeroesInputAction& Action : InputConfig->AbilityInputActions)
+	if (UInputAction* FoundAction = InInputConfig->FindNativeInputActionByTag(InInputTag))
 	{
-		if (Action.InputAction && Action.InputTag.IsValid())
-		{
-			if (PressedFunc)
-			{
-				BindAction(Action.InputAction, ETriggerEvent::Started, Object, PressedFunc, Action.InputTag);
-			}
+		BindAction(FoundAction, TriggerEvent, ContextObject, Func);
+	}
+}
 
-			if (ReleasedFunc)
-			{
-				BindAction(Action.InputAction, ETriggerEvent::Completed, Object, ReleasedFunc, Action.InputTag);
-			}
-			if (HeldFunc)
-			{
-				BindAction(Action.InputAction, ETriggerEvent::Triggered, Object, HeldFunc, Action.InputTag);
-			}
-		}
+template <class UserObject, typename CallbackFunc>
+void UDoubleHeroesInputComponent::BindAbilityInputAction(const UDataAsset_InputConfig* InInputConfig,
+	UserObject* ContextObject, CallbackFunc InputPressedFunc, CallbackFunc InputReleasedFunc)
+{
+	checkf(InInputConfig, TEXT("Input config data asset is null, can not proced with binding"));
+	for (const FDoubleHeroesInputActionConfig& AbilityInputActionConfig : InInputConfig->AbilityInputActions)
+	{
+		if(!AbilityInputActionConfig.IsValid()) continue;
+
+		BindAction(AbilityInputActionConfig.InputAction, ETriggerEvent::Started, ContextObject, InputPressedFunc, AbilityInputActionConfig.InputTag);
+		BindAction(AbilityInputActionConfig.InputAction, ETriggerEvent::Completed, ContextObject, InputReleasedFunc, AbilityInputActionConfig.InputTag);
 	}
 }

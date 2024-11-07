@@ -11,7 +11,26 @@ void UDHAbilitySystemComponent::AbilityActorInfoSet()
 	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &UDHAbilitySystemComponent::ClientEffectApplied);
 }
 
-void UDHAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities)
+void UDHAbilitySystemComponent::OnAbilityInputPressed(const FGameplayTag& InInputTag)
+{
+	if (!InInputTag.IsValid())
+	{
+		return;
+	}
+
+	for(const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		if(!AbilitySpec.DynamicAbilityTags.HasTagExact(InInputTag)) continue;
+
+		TryActivateAbility(AbilitySpec.Handle);
+	}
+}
+
+void UDHAbilitySystemComponent::OnAbilityInputReleased(const FGameplayTag& InInputTag)
+{
+}
+
+/*void UDHAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities)
 {
 	for (TSubclassOf<UGameplayAbility> AbilityClass : StartupAbilities)
 	{
@@ -25,7 +44,7 @@ void UDHAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<U
 		}
 		// GiveAbilityAndActivateOnce(AbilitySpec);
 	}
-}
+}*/
 
 void UDHAbilitySystemComponent::AbilityInputTagHeld(const FGameplayTag& InputTag)
 {
