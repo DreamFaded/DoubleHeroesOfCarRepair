@@ -7,21 +7,14 @@
 #include "HeroCombatComponent.generated.h"
 
 
+class ADoubleHeroesWeapon;
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class DOUBLEHEROES_API UHeroCombatComponent : public UPawnCombatComponent
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this component's properties
-	UHeroCombatComponent();
-
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-public:
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-	                           FActorComponentTickFunction* ThisTickFunction) override;
+	UFUNCTION(BlueprintCallable, Category = "DoubleHeroes|Combat")
+	ADoubleHeroesWeapon* GetHeroCarriedWeaponByTag(FGameplayTag InWeaponTag) const;
 };

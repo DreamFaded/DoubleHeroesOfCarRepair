@@ -14,6 +14,9 @@ namespace DoubleHeroesGameplayTags
 
 	//Player Tags
 	UE_DEFINE_GAMEPLAY_TAG(Player_Weapon_FireBowl, "Player.Weapon.FireBowl");
+	
+	UE_DEFINE_GAMEPLAY_TAG(Player_Event_Equip_FireBowl, "Player.Event.Equip.FireBowl");
+	UE_DEFINE_GAMEPLAY_TAG(Player_Event_UnEquip_FireBowl, "Player.Event.UnEquip.FireBowl");
 }
 
 FDoubleHeroesGameplayTags FDoubleHeroesGameplayTags::GameplayTags;

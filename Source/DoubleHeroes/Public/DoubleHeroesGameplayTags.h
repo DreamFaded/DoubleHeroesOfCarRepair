@@ -16,6 +16,9 @@ namespace DoubleHeroesGameplayTags
 
 	//Player Tags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Player_Weapon_FireBowl);
+	
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Player_Event_Equip_FireBowl);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Player_Event_UnEquip_FireBowl);
 }
 /**
  * DoubleHeroesGameplayTags
