@@ -11,9 +11,13 @@ namespace DoubleHeroesGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Look, "InputTag.Look");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_EquipPipe, "InputTag.EquipPipe");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_UnequipPipe, "InputTag.UnequipPipe");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_LightAttack_FireBowl, "InputTag.LightAttack.FireBowl");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_HeavyAttack_FireBowl, "InputTag.HeavyAttack.FireBowl");
 	//Player Tags
 	UE_DEFINE_GAMEPLAY_TAG(Player_Ability_Equip_FireBowl, "Player.Ability.Equip.FireBowl");
 	UE_DEFINE_GAMEPLAY_TAG(Player_Ability_Unequip_FireBowl, "Player.Ability.Unequip.FireBowl");
+	UE_DEFINE_GAMEPLAY_TAG(Player_Ability_Attack_Light_FireBowl, "Player.Ability.Attack.Light.FireBowl");
+	UE_DEFINE_GAMEPLAY_TAG(Player_Ability_Attack_Heavy_FireBowl, "Player.Ability.Attack.Heavy.FireBowl");
 	
 	UE_DEFINE_GAMEPLAY_TAG(Player_Weapon_FireBowl, "Player.Weapon.FireBowl");
 	
