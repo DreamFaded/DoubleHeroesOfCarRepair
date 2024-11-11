@@ -5,11 +5,7 @@
 
 #include "AbilitySystem/DHAbilitySystemComponent.h"
 #include "AbilitySystem/Abilities/DoubleHeroesGameplayAbility.h"
-
-bool FBlueHeroAbilitySet::IsValid() const
-{
-	return InputTag.IsValid() && AbilityToGrant;
-}
+#include "DoubleHeroesTypes/DoubleHeroesStructTypes.h"
 
 void UDataAsset_HeroStartUpData::GiveToAbilitySystemComponent(UDHAbilitySystemComponent* InASCToGive, int32 ApplyLevel)
 {

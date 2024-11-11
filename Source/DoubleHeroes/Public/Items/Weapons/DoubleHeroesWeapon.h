@@ -8,6 +8,8 @@
 #include "DoubleHeroesWeapon.generated.h"
 
 
+struct FGameplayAbilitySpecHandle;
+
 UCLASS()
 class DOUBLEHEROES_API ADoubleHeroesWeapon : public ADoubleHeroesWeaponBase
 {
@@ -17,4 +19,13 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WeaponData")
 	FDoubleHeroesWeaponData HeroesWeaponData;
+
+	UFUNCTION(BlueprintCallable)
+	void AssignGrantedAbilitySpecHandles(const TArray<FGameplayAbilitySpecHandle>& InSpecHandles);
+
+	UFUNCTION(BlueprintPure)
+	TArray<FGameplayAbilitySpecHandle> GetGrantedAbilitySpecHandles() const;
+
+private:
+	TArray<FGameplayAbilitySpecHandle> GrantedAbilitySpecHandles;
 };

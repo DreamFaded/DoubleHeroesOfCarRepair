@@ -4,23 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "DataAsset_StartUpDataBase.h"
-#include "GameplayTagContainer.h"
+#include "DoubleHeroesTypes/DoubleHeroesStructTypes.h"
 #include "DataAsset_HeroStartUpData.generated.h"
-
-
-USTRUCT(BlueprintType)
-struct FBlueHeroAbilitySet
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "InputTag"))
-	FGameplayTag InputTag;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<UDoubleHeroesGameplayAbility> AbilityToGrant;
-
-	bool IsValid() const;
-};
 /**
  * 
  */

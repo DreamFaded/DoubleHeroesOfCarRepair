@@ -3,4 +3,10 @@
 
 #include "DoubleHeroesTypes/DoubleHeroesStructTypes.h"
 
+#include "AbilitySystem/Abilities/DoubleHeroesGameplayAbility.h"
 
+
+bool FBlueHeroAbilitySet::IsValid() const
+{
+	return InputTag.IsValid() && AbilityToGrant;
+}

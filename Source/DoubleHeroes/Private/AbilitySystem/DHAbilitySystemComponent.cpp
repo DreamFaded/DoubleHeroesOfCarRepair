@@ -5,6 +5,7 @@
 
 #include "DoubleHeroesGameplayTags.h"
 #include "AbilitySystem/Abilities/DoubleHeroesGameplayAbility.h"
+#include "DoubleHeroesTypes/DoubleHeroesStructTypes.h"
 
 void UDHAbilitySystemComponent::AbilityActorInfoSet()
 {
@@ -76,9 +77,48 @@ void UDHAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& Inpu
 	}
 }
 
+void UDHAbilitySystemComponent::GrantHeroWeaponAbilities(const TArray<FBlueHeroAbilitySet>& InDefaultWeaponAbilities,
+	int32 ApplyLevel,  TArray<FGameplayAbilitySpecHandle>& OutGrantedAbilitySpecHandles)
+{
+	if (InDefaultWeaponAbilities.IsEmpty())
+	{
+		return;
+	}
+
+	for (const FBlueHeroAbilitySet& AbilitySet : InDefaultWeaponAbilities)
+	{
+		if(!AbilitySet.IsValid()) continue;
+		FGameplayAbilitySpec AbilitySpec(AbilitySet.AbilityToGrant);
+		AbilitySpec.SourceObject = GetAvatarActor();
+		AbilitySpec.Level = ApplyLevel;
+		AbilitySpec.DynamicAbilityTags.AddTag(AbilitySet.InputTag);
+		OutGrantedAbilitySpecHandles.AddUnique(GiveAbility(AbilitySpec));
+	}
+}
+
+void UDHAbilitySystemComponent::RemovedGrantedHeroWeaponAbilities(
+	TArray<FGameplayAbilitySpecHandle>& InSpecHandlesToRemove)
+{
+	if (InSpecHandlesToRemove.IsEmpty())
+	{
+		return;
+	}
+
+	for (const FGameplayAbilitySpecHandle& SpecHandle : InSpecHandlesToRemove)
+	{
+		if (SpecHandle.IsValid())
+		{
+			ClearAbility(SpecHandle);
+		}
+	}
+
+	InSpecHandlesToRemove.Empty();
+}
+
+
 void UDHAbilitySystemComponent::ClientEffectApplied_Implementation(UAbilitySystemComponent* AbilitySystemComponent,
-                                              const FGameplayEffectSpec& EffectSpec,
-                                              FActiveGameplayEffectHandle ActiveEffectHandle)
+                                                                   const FGameplayEffectSpec& EffectSpec,
+                                                                   FActiveGameplayEffectHandle ActiveEffectHandle)
 {
 	FGameplayTagContainer TagContainer;
 	EffectSpec.GetAllAssetTags(TagContainer);
