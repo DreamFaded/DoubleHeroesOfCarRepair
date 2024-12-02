@@ -35,9 +35,10 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "AnimData||LocomotionData")
 	bool bHasAcceleration;
 
+	UPROPERTY(BlueprintReadOnly, Category = "AnimData||LocomotionData")
+	bool bSprinting;
+
 private:
-	UPROPERTY(BlueprintReadOnly, Category = Character, meta = (AllowPrivateAccess = "true"))
-	class ABlueHeroCharacter* BlueHeroCharacter;
 
 	UPROPERTY(BlueprintReadOnly, Category = Character, meta = (AllowPrivateAccess = "true"))
 	float Speed;

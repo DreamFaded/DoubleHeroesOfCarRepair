@@ -70,7 +70,7 @@ void ADoubleHeroesEnemy::BeginPlay()
 	Super::BeginPlay();
 	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 	InitAbilityActorInfo();
-	UDoubleHeroesAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
+	// UDoubleHeroesAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
 
 	if (UDoubleHeroesUserWidget* DoubleHeroesUserWidget = Cast<UDoubleHeroesUserWidget>(
 		HealthBar->GetUserWidgetObject()))

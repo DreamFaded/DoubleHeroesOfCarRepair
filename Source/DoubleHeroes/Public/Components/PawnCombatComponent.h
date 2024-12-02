@@ -29,6 +29,22 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "DoubleHeroes|Combat")
 	ADoubleHeroesWeaponBase* GetCharacterCurrentEquippedWeapon() const;
 
+	UFUNCTION(Category = "DoubleHeroes|Combat")
+	void EquipWeapon(AWeapon* WeaponToEquip);
+
+	UPROPERTY()
+	class ADoubleHeroesBaseCharacter* Character;
+
+	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
+	class AWeapon* EquippedWeapon;
+
+	UFUNCTION()
+	void OnRep_EquippedWeapon();
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 private:
 	TMap<FGameplayTag, ADoubleHeroesWeaponBase*> CharacterCarriedWeaponMap;
+
+	
 };

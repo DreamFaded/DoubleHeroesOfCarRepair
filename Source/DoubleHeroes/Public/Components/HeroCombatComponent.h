@@ -15,6 +15,10 @@ class DOUBLEHEROES_API UHeroCombatComponent : public UPawnCombatComponent
 	GENERATED_BODY()
 
 public:
+	
 	UFUNCTION(BlueprintCallable, Category = "DoubleHeroes|Combat")
 	ADoubleHeroesWeapon* GetHeroCarriedWeaponByTag(FGameplayTag InWeaponTag) const;
+
+
+	
 };

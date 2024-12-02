@@ -24,6 +24,26 @@ class DOUBLEHEROES_API ADoubleHeroesPlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
+	
+	FVector2D MovementVector = FVector2D();
+
+	FRotator MovementRotation = FRotator();
+
+	FKey PressedKey = EKeys::Invalid;
+
+	FKey LastPressedKey = EKeys::Invalid;
+
+	double DoubleClickThreshold = 0.3;
+	double CurrentTime = 0.0;
+	double LastTime = 0.0;
+	FVector Velocity = FVector::ZeroVector;
+	bool bKeyA = false;
+	bool bKeyS = false;
+	bool bKeyW = false;
+	bool bKeyD = false;
+
+	ADoubleHeroesBaseCharacter* BaseCharacter;
+	
 	ADoubleHeroesPlayerController();
 
 	virtual void PlayerTick(float DeltaTime) override;
@@ -34,36 +54,56 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	virtual void SetupInputComponent() override;
+	// virtual void SetupInputComponent() override;
+	
+	void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent);
+	void Input_Move(const FInputActionValue& InputActionValue);
+	void Input_ReleaseW(const FInputActionValue& InputActionValue);
+	void Input_ReleaseA(const FInputActionValue& InputActionValue);
+	void Input_ReleaseS(const FInputActionValue& InputActionValue);
+	void Input_ReleaseD(const FInputActionValue& InputActionValue);
+	void Input_SaveClick(const FInputActionValue& InputActionValue);
+	void Input_Look(const FInputActionValue& InputActionValue);
+	void Input_StartRun();
+	void Input_StopRun();
+	void Input_TogglePackage(const FInputActionValue& InputActionValue);
+	void Input_AbilityInputPressed(FGameplayTag InInputTag);
 
 private:
-	UPROPERTY(EditAnywhere, Category = "Input")
-	TObjectPtr<UInputMappingContext> DoubleHeroesContext;
 
-	UPROPERTY(EditAnywhere, Category = "Input")
-	TObjectPtr<UInputAction> MoveAction;
+	UPROPERTY()
+	APawn* ControlledPawn;
+	
+	// UPROPERTY(EditAnywhere, Category = "Input")
+	// TObjectPtr<UInputMappingContext> DoubleHeroesContext;
+	//
+	// UPROPERTY(EditAnywhere, Category = "Input")
+	// TObjectPtr<UInputAction> MoveAction;
+	//
+	// UPROPERTY(EditAnywhere, Category = "Input")
+	// TObjectPtr<UInputAction> LookAction;
+	//
+	// UPROPERTY(EditAnywhere, Category = "Input")
+	// TObjectPtr<UInputAction> RunAction;
+	//
+	// UPROPERTY(EditAnywhere, Category = "Input")
+	// TObjectPtr<UInputAction> DodgeAction;
+	//
+	// UPROPERTY(EditAnywhere, Category = "Input")
+	// TObjectPtr<UInputAction> ShiftAction;
 
-	UPROPERTY(EditAnywhere, Category = "Input")
-	TObjectPtr<UInputAction> LookAction;
-
-	UPROPERTY(EditAnywhere, Category = "Input")
-	TObjectPtr<UInputAction> RunAction;
-
-	UPROPERTY(EditAnywhere, Category = "Input")
-	TObjectPtr<UInputAction> DodgeAction;
-
-	UPROPERTY(EditAnywhere, Category = "Input")
-	TObjectPtr<UInputAction> ShiftAction;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CharacterData", meta = (AllowPrivateAccess = "true"))
+	UDataAsset_InputConfig* InputConfigDataAsset;
 
 	/*void Move(const FInputActionValue& InputActionValue);
 	void Run(const FInputActionValue& InputActionValue);
 	void Walk(const FInputActionValue& InputActionValue);
 	void Look(const FInputActionValue& InputActionValue);*/
-	void AutoRun();
+	// void AutoRun();
 
 	bool bShiftKeyDown = false;
-	void ShiftPressed() { bShiftKeyDown = true; };
-	void ShiftReleased() { bShiftKeyDown = false; };
+	void ShiftPressed() { bShiftKeyDown = true; }
+	void ShiftReleased() { bShiftKeyDown = false; }
 
 	void CursorTrace();
 
@@ -73,11 +113,11 @@ private:
 	bool bIsRunning = false;
 
 	void AbilityInputTagPressed(FGameplayTag InputTag);
-	void AbilityInputTagReleased(FGameplayTag InputTag);
-	void AbilityInputTagHeld(FGameplayTag InputTag);
+	// void AbilityInputTagReleased(FGameplayTag InputTag);
+	// void AbilityInputTagHeld(FGameplayTag InputTag);
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	TObjectPtr<UDoubleHeroesInputConfig> InputConfig;
+	// UPROPERTY(EditDefaultsOnly, Category = "Input")
+	// TObjectPtr<UDoubleHeroesInputConfig> InputConfig;
 
 	UPROPERTY()
 	TObjectPtr<UDHAbilitySystemComponent> DHAbilitySystemComponent;

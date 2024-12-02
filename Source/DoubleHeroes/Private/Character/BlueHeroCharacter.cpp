@@ -50,7 +50,7 @@ void ABlueHeroCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(ABlueHeroCharacter, OverlappingWeapon, COND_OwnerOnly); //COND_OwnerOnly只在网络的所有者客户端上复制该变量
+	// DOREPLIFETIME_CONDITION(ABlueHeroCharacter, OverlappingWeapon, COND_OwnerOnly); //COND_OwnerOnly只在网络的所有者客户端上复制该变量
 }
 
 // Called when the game starts or when spawned
@@ -58,14 +58,14 @@ void ABlueHeroCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<
-			UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			Subsystem->AddMappingContext(SlashContext, 0);
-		}
-	}
+	// if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	// {
+	// 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<
+	// 		UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+	// 	{
+	// 		Subsystem->AddMappingContext(SlashContext, 0);
+	// 	}
+	// }
 }
 
 // Called every frame
@@ -91,9 +91,9 @@ void ABlueHeroCharacter::Tick(float DeltaTime)
 	if(ActionState != EActionState::EAS_Unoccupied) return;
 }*/
 
-void ABlueHeroCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
-{
-}
+// void ABlueHeroCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
+// {
+// }
 
 void ABlueHeroCharacter::PossessedBy(AController* NewController)
 {
@@ -108,61 +108,68 @@ void ABlueHeroCharacter::PossessedBy(AController* NewController)
 	}
 }
 
-void ABlueHeroCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
-{
-	ULocalPlayer* LocalPlayer = GetController<APlayerController>()->GetLocalPlayer();
-	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer);
-	check(Subsystem);
-	Subsystem->AddMappingContext(InputConfigDataAsset->DefaultMappingContext, 0);
-	UDoubleHeroesInputComponent* DoubleHeroesInputComponent = CastChecked<UDoubleHeroesInputComponent>(PlayerInputComponent);
-	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_Move, ETriggerEvent::Triggered, this, &ThisClass::Input_Move);
-	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_Look, ETriggerEvent::Triggered, this, &ThisClass::Input_Look);
-	DoubleHeroesInputComponent->BindAbilityInputAction(InputConfigDataAsset, this, &ThisClass::Input_AbilityInputPressed, &ThisClass::Input_AbilityInputPressed);
-	
-	// Set up action bindings
-	/*if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
-	{
-		//Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-		EnhancedInputComponent->BindAction(PunchAction, ETriggerEvent::Triggered, this, &ABlueHeroCharacter::Punch);
-		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &ABlueHeroCharacter::Dodge);
-		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this,
-		                                   &ABlueHeroCharacter::Interact);
-		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &ABlueHeroCharacter::CrouchPressed);
-	}*/
-}
+// void ABlueHeroCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
+// {
+// 	ULocalPlayer* LocalPlayer = GetController<APlayerController>()->GetLocalPlayer();
+// 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer);
+// 	check(Subsystem);
+// 	Subsystem->AddMappingContext(InputConfigDataAsset->DefaultMappingContext, 0);
+// 	UDoubleHeroesInputComponent* DoubleHeroesInputComponent = CastChecked<UDoubleHeroesInputComponent>(PlayerInputComponent);
+// 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_Move, ETriggerEvent::Triggered, this, &ThisClass::Input_Move);
+// 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_Look, ETriggerEvent::Triggered, this, &ThisClass::Input_Look);
+// 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_Run, ETriggerEvent::Triggered, this, &ThisClass::Input_Look);
+// 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_TogglePackage, ETriggerEvent::Triggered, this, &ThisClass::Input_TogglePackage);
+// 	DoubleHeroesInputComponent->BindAbilityInputAction(InputConfigDataAsset, this, &ThisClass::Input_AbilityInputPressed, &ThisClass::Input_AbilityInputPressed);
+//
+// }
 
-void ABlueHeroCharacter::Input_Move(const FInputActionValue& InputActionValue)
-{
-	// find out which way is forward
-	const FVector2D MovementVector = InputActionValue.Get<FVector2D>();
-	const FRotator MovementRotation(0.f, Controller->GetControlRotation().Yaw, 0.f);
-	if (MovementVector.Y != 0.f)
-	{
-		const FVector ForwardDirection = MovementRotation.RotateVector(FVector::ForwardVector);
-		AddMovementInput(ForwardDirection, MovementVector.Y);
-	}
+// void ABlueHeroCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
+// {
+// 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+// 	{
+// 		//Jumping
+// 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+// 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+// 		EnhancedInputComponent->BindAction(PunchAction, ETriggerEvent::Triggered, this, &ABlueHeroCharacter::Punch);
+// 		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &ABlueHeroCharacter::Dodge);
+// 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this,
+// 										   &ABlueHeroCharacter::Interact);
+// 		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &ABlueHeroCharacter::CrouchPressed);
+// 	}
+// }
 
-	if (MovementVector.X != 0.f)
-	{
-		const FVector RightDirection = MovementRotation.RotateVector(FVector::RightVector);
-		AddMovementInput(RightDirection, MovementVector.X);
-	}
-}
+// void ABlueHeroCharacter::Input_Move(const FInputActionValue& InputActionValue)
+// {
+// 	// find out which way is forward
+// 	const FVector2D MovementVector = InputActionValue.Get<FVector2D>();
+// 	const FRotator MovementRotation(0.f, Controller->GetControlRotation().Yaw, 0.f);
+// 	if (MovementVector.Y != 0.f)
+// 	{
+// 		const FVector ForwardDirection = MovementRotation.RotateVector(FVector::ForwardVector);
+// 		AddMovementInput(ForwardDirection, MovementVector.Y);
+// 	}
+//
+// 	if (MovementVector.X != 0.f)
+// 	{
+// 		const FVector RightDirection = MovementRotation.RotateVector(FVector::RightVector);
+// 		AddMovementInput(RightDirection, MovementVector.X);
+// 	}
+// }
 
-void ABlueHeroCharacter::Input_Look(const FInputActionValue& InputActionValue)
-{
-	const FVector2D LookAxisVector = InputActionValue.Get<FVector2D>();
-	if (LookAxisVector.X != 0.f)
-	{
-		AddControllerYawInput(LookAxisVector.X);
-	}
-	if (LookAxisVector.Y != 0.f)
-	{
-		AddControllerPitchInput(LookAxisVector.Y);
-	}
-}
+// void ABlueHeroCharacter::Input_Look(const FInputActionValue& InputActionValue)
+// {
+// 	const FVector2D LookAxisVector = InputActionValue.Get<FVector2D>();
+// 	if (LookAxisVector.X != 0.f)
+// 	{
+// 		AddControllerYawInput(LookAxisVector.X);
+// 	}
+// 	if (LookAxisVector.Y != 0.f)
+// 	{
+// 		AddControllerPitchInput(LookAxisVector.Y);
+// 	}
+// }
+
+
 
 void ABlueHeroCharacter::Input_AbilityInputPressed(FGameplayTag InInputTag)
 {
@@ -184,26 +191,26 @@ void ABlueHeroCharacter::PostInitializeComponents()
 	// }
 }
 
-/*void ABlueHeroCharacter::SetOverlappingWeapon(AWeapon* Weapon)
-{
-	if (OverlappingWeapon)
-	{
-		OverlappingWeapon->ShowPickupWidget(false);
-	}
-	OverlappingWeapon = Weapon;
-	if (IsLocallyControlled())
-	{
-		if (OverlappingWeapon)
-		{
-			OverlappingWeapon->ShowPickupWidget(true);
-		}
-	}
-}*/
-
-// bool ABlueHeroCharacter::IsWeaponEquipped()
+// void ABlueHeroCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 // {
-// 	return (Combat && Combat->EquippedWeapon);
+// 	if (OverlappingWeapon)
+// 	{
+// 		// OverlappingWeapon->ShowPickupWidget(false);
+// 	}
+// 	OverlappingWeapon = Weapon;
+// 	if (IsLocallyControlled())
+// 	{
+// 		if (OverlappingWeapon)
+// 		{
+// 			// OverlappingWeapon->ShowPickupWidget(true);
+// 		}
+// 	}
 // }
+
+bool ABlueHeroCharacter::IsWeaponEquipped()
+{
+	return (HeroCombatComponent && HeroCombatComponent->EquippedWeapon);
+}
 
 void ABlueHeroCharacter::Punch()
 {
@@ -238,12 +245,20 @@ void ABlueHeroCharacter::Interact()
 	// 		ServerEquipButtonPressed();
 	// 	}
 	// }
+
+	if (HeroCombatComponent)
+	{
+		if (HasAuthority())
+		{
+			HeroCombatComponent->EquipWeapon(OverlappingWeapon);
+		}
+	}
 }
 
 void ABlueHeroCharacter::ServerEquipButtonPressed_Implementation()
 {
-	// if (Combat)
-	// {
-	// 	Combat->EquipWeapon(OverlappingWeapon);
-	// }
+	if (HeroCombatComponent)
+	{
+		HeroCombatComponent->EquipWeapon(OverlappingWeapon);
+	}
 }

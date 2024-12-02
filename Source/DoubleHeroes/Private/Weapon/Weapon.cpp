@@ -57,22 +57,22 @@ void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
                               UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
                               const FHitResult& SweepResult)
 {
-	ABlueHeroCharacter* BlueHeroCharacter = Cast<ABlueHeroCharacter>(OtherActor);
+	ADoubleHeroesBaseCharacter* BaseCharacter = Cast<ADoubleHeroesBaseCharacter>(OtherActor);
 
-	if (BlueHeroCharacter)
+	if (BaseCharacter)
 	{
-		// BlueHeroCharacter->SetOverlappingWeapon(this);
+		BaseCharacter->SetOverlappingWeapon(this);
 	}
 }
 
 void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                  UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	ABlueHeroCharacter* BlueHeroCharacter = Cast<ABlueHeroCharacter>(OtherActor);
+	ADoubleHeroesBaseCharacter* BaseCharacter = Cast<ADoubleHeroesBaseCharacter>(OtherActor);
 
-	if (BlueHeroCharacter)
+	if (BaseCharacter)
 	{
-		// BlueHeroCharacter->SetOverlappingWeapon(nullptr);
+		// BaseCharacter->SetOverlappingWeapon(nullptr);
 	}
 }
 

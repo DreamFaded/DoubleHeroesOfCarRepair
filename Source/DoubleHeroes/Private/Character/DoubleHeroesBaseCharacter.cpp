@@ -3,8 +3,11 @@
 
 #include "Character/DoubleHeroesBaseCharacter.h"
 
+#include "InputActionValue.h"
 #include "AbilitySystem/DHAbilitySystemComponent.h"
 #include "AbilitySystem/DoubleHeroesAttributeSet.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Net/UnrealNetwork.h"
 
 
 // Sets default values
@@ -13,6 +16,8 @@ ADoubleHeroesBaseCharacter::ADoubleHeroesBaseCharacter()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 	PrimaryActorTick.bStartWithTickEnabled = false;
+
+	PackageComponent = CreateDefaultSubobject<UPackageComponent>(TEXT("PackageComponent"));
 
 	GetMesh()->bReceivesDecals = false;
 
@@ -26,6 +31,14 @@ UAbilitySystemComponent* ADoubleHeroesBaseCharacter::GetAbilitySystemComponent()
 	return GetDHAbilitySystemComponent();
 }
 
+void ADoubleHeroesBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME_CONDITION(ThisClass, OverlappingWeapon, COND_OwnerOnly); //COND_OwnerOnly只在网络的所有者客户端上复制该变量
+	// DOREPLIFETIME(ADoubleHeroesBaseCharacter, DHAbilitySystemComponent);
+}
+
+
 void ADoubleHeroesBaseCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
@@ -36,5 +49,76 @@ void ADoubleHeroesBaseCharacter::PossessedBy(AController* NewController)
 
 		ensureMsgf(!CharacterStartUpData.IsNull(),TEXT("Forgot to assign start up to %s"), *GetName());
 	}
+}
+
+void ADoubleHeroesBaseCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
+{
+}
+
+bool ADoubleHeroesBaseCharacter::IsRunning()
+{
+	return bRunning;
+}
+
+void ADoubleHeroesBaseCharacter::SetOverlappingWeapon(AWeapon* Weapon)
+{
+	if (OverlappingWeapon)
+	{
+		// OverlappingWeapon->ShowPickupWidget(false);
+	}
+	OverlappingWeapon = Weapon;
+	if (IsLocallyControlled())
+	{
+		if (OverlappingWeapon)
+		{
+			// OverlappingWeapon->ShowPickupWidget(true);
+		}
+	}
+}
+
+void ADoubleHeroesBaseCharacter::Input_Move(const FInputActionValue& InputActionValue)
+{
+
+	
+	// find out which way is forward
+	MovementVector = InputActionValue.Get<FVector2D>();
+	MovementRotation = FRotator(0.f, GetControlRotation().Yaw, 0.f);
+	
+	if (MovementVector.Y != 0.f)
+	{
+		const FVector ForwardDirection = MovementRotation.RotateVector(FVector::ForwardVector);
+		AddMovementInput(ForwardDirection, MovementVector.Y);
+	
+	}
+	else if (MovementVector.X != 0.f)
+	{
+		const FVector RightDirection = MovementRotation.RotateVector(FVector::RightVector);
+		AddMovementInput(RightDirection, MovementVector.X);
+	}
+}
+
+void ADoubleHeroesBaseCharacter::Input_Look(const FInputActionValue& InputActionValue)
+{
+	const FVector2D LookAxisVector = InputActionValue.Get<FVector2D>();
+	if (LookAxisVector.X != 0.f)
+	{
+		AddControllerYawInput(LookAxisVector.X);
+	}
+	if (LookAxisVector.Y != 0.f)
+	{
+		AddControllerPitchInput(LookAxisVector.Y);
+	}
+}
+
+void ADoubleHeroesBaseCharacter::Input_StartRun()
+{
+	bRunning = true;
+	GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
+}
+
+void ADoubleHeroesBaseCharacter::Input_StopRun()
+{
+	bRunning = false;
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
 

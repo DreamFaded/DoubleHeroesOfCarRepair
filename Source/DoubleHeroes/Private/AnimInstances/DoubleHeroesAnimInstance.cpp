@@ -16,7 +16,6 @@ void UDoubleHeroesAnimInstance::NativeInitializeAnimation()
 		OwningMovementComponent = OwningCharacter->GetCharacterMovement();
 	}
 
-	BlueHeroCharacter = Cast<ABlueHeroCharacter>(TryGetPawnOwner());
 }
 
 void UDoubleHeroesAnimInstance::NativeThreadSafeUpdateAnimation(float DeltaSeconds)
@@ -27,6 +26,7 @@ void UDoubleHeroesAnimInstance::NativeThreadSafeUpdateAnimation(float DeltaSecon
 	}
 	GroundSpeed = OwningCharacter->GetVelocity().Size2D();
 	bHasAcceleration = OwningMovementComponent->GetCurrentAcceleration().SizeSquared2D() > 0.f;
+	bSprinting = OwningCharacter->IsRunning();
 }
 
 void UDoubleHeroesAnimInstance::NativeUpdateAnimation(float DeltaTime)

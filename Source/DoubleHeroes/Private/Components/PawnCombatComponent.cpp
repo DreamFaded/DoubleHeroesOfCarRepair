@@ -2,13 +2,22 @@
 
 
 #include "Components/PawnCombatComponent.h"
+
+#include "Character/DoubleHeroesBaseCharacter.h"
 #include "DoubleHeroesComponent/DoubleHeroesDebugHelper.h"
+#include "Engine/SkeletalMeshSocket.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Items/Weapons/DoubleHeroesWeaponBase.h"
+#include "Weapon/Weapon.h"
 
 void UPawnCombatComponent::RegisterSpawnedWeapon(FGameplayTag InWeaponTagToRegister,
                                                  ADoubleHeroesWeaponBase* InWeaponToRegister, bool bRegisterAsEquippedWeapon)
 {
-	checkf(!CharacterCarriedWeaponMap.Contains(InWeaponTagToRegister), TEXT("A named name %s has already been added as carried weapon"), *InWeaponTagToRegister.ToString());
+	if(CharacterCarriedWeaponMap.Contains(InWeaponTagToRegister))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Weapon with tag %s is already registered. Skipping registration."), *InWeaponTagToRegister.ToString());
+		return;
+	}
 	check(InWeaponToRegister);
 
 	CharacterCarriedWeaponMap.Emplace(InWeaponTagToRegister, InWeaponToRegister);
@@ -41,4 +50,32 @@ ADoubleHeroesWeaponBase* UPawnCombatComponent::GetCharacterCurrentEquippedWeapon
 	}
 
 	return GetCharacterCarriedWeaponByTag(CurrentEquippedWeaponTag);
+}
+
+void UPawnCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
+{
+	if(Character == nullptr || WeaponToEquip == nullptr) return;
+	
+	EquippedWeapon = WeaponToEquip;
+	EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
+	const USkeletalMeshSocket* HandSocket = Character->GetMesh()->GetSocketByName(FName("RightHandSocket"));
+	if (HandSocket)
+	{
+		HandSocket->AttachActor(EquippedWeapon, Character->GetMesh());
+	}
+	EquippedWeapon->SetOwner(Character);
+}
+
+void UPawnCombatComponent::OnRep_EquippedWeapon()
+{
+	if (EquippedWeapon && Character)
+	{
+		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+		Character->bUseControllerRotationYaw = true;
+	}
+}
+
+void UPawnCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }

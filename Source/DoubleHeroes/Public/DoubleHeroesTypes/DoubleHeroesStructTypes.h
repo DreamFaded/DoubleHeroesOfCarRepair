@@ -6,6 +6,7 @@
 #include "GameplayTagContainer.h"
 #include "DoubleHeroesStructTypes.generated.h"
 
+class UDoubleHeroesGameplayAbility;
 class UInputMappingContext;
 class UBlueHeroLinkedAnimLayer;
 

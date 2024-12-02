@@ -8,7 +8,14 @@
 namespace DoubleHeroesGameplayTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Move, "InputTag.Move");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_StopMove, "InputTag.StopMove");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_MoveForward, "InputTag.MoveForward");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_MoveBackward, "InputTag.MoveBackward");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_MoveLeft, "InputTag.MoveLeft");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_MoveRight, "InputTag.MoveRight");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Look, "InputTag.Look");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_Run, "InputTag.Run");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_TogglePackage, "InputTag.TogglePackage");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_EquipPipe, "InputTag.EquipPipe");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_UnequipPipe, "InputTag.UnequipPipe");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_LightAttack_FireBowl, "InputTag.LightAttack.FireBowl");
