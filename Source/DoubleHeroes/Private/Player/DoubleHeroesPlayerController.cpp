@@ -246,6 +246,7 @@ void ADoubleHeroesPlayerController::BeginPlay()
 	// SetInputMode(InputModeData);
 	ControlledPawn = GetPawn<APawn>();
 	BaseCharacter = Cast<ADoubleHeroesBaseCharacter>(GetPawn());
+	DHAbilitySystemComponent = GetASC();
 	SetupPlayerInputComponent(InputComponent);
 }
 
