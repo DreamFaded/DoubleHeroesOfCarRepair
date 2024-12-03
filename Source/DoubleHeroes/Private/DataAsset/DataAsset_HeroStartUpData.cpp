@@ -7,11 +7,16 @@
 #include "AbilitySystem/Abilities/DoubleHeroesGameplayAbility.h"
 #include "DoubleHeroesTypes/DoubleHeroesStructTypes.h"
 
+bool FDoubleHeroesHeroAbilitySet::IsValid() const
+{
+	return InputTag.IsValid() && AbilityToGrant;
+}
+
 void UDataAsset_HeroStartUpData::GiveToAbilitySystemComponent(UDHAbilitySystemComponent* InASCToGive, int32 ApplyLevel)
 {
 	Super::GiveToAbilitySystemComponent(InASCToGive, ApplyLevel);
 
-	for (const FBlueHeroAbilitySet& AbilitySet : HeroStartUpAbilitySets)
+	for (const FDoubleHeroesHeroAbilitySet& AbilitySet : HeroStartUpAbilitySets)
 	{
 		if (!AbilitySet.IsValid()) continue;
 		

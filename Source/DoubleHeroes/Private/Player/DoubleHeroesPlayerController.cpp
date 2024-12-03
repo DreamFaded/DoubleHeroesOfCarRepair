@@ -278,16 +278,16 @@ void ADoubleHeroesPlayerController::SetupPlayerInputComponent(class UInputCompon
 	UDoubleHeroesInputComponent* DoubleHeroesInputComponent = CastChecked<UDoubleHeroesInputComponent>(PlayerInputComponent);
 	// DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_Move, ETriggerEvent::Triggered, this, &ThisClass::Input_Move);
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveForward, ETriggerEvent::Triggered, this, &ThisClass::Input_Move);
-	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveForward, ETriggerEvent::Started, this, &ThisClass::Input_SaveClick);
+	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveForward, ETriggerEvent::Started, this, &ThisClass::Input_PressW);
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveForward, ETriggerEvent::Completed, this, &ThisClass::Input_ReleaseW);
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveLeft, ETriggerEvent::Triggered, this, &ThisClass::Input_Move);
-	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveLeft, ETriggerEvent::Started, this, &ThisClass::Input_SaveClick);
+	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveLeft, ETriggerEvent::Started, this, &ThisClass::Input_PressA);
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveLeft, ETriggerEvent::Completed, this, &ThisClass::Input_ReleaseA);
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveBackward, ETriggerEvent::Triggered, this, &ThisClass::Input_Move);
-	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveBackward, ETriggerEvent::Started, this, &ThisClass::Input_SaveClick);
+	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveBackward, ETriggerEvent::Started, this, &ThisClass::Input_PressS);
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveBackward, ETriggerEvent::Completed, this, &ThisClass::Input_ReleaseS);
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveRight, ETriggerEvent::Triggered, this, &ThisClass::Input_Move);
-	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveRight, ETriggerEvent::Started, this, &ThisClass::Input_SaveClick);
+	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveRight, ETriggerEvent::Started, this, &ThisClass::Input_PressD);
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveRight, ETriggerEvent::Completed, this, &ThisClass::Input_ReleaseD);
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_Look, ETriggerEvent::Triggered, this, &ThisClass::Input_Look);
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_TogglePackage, ETriggerEvent::Triggered, this, &ThisClass::Input_TogglePackage);
@@ -320,6 +320,34 @@ void ADoubleHeroesPlayerController::Input_Move(const FInputActionValue& InputAct
 	BaseCharacter->Input_Move(InputActionValue);
 }
 
+void ADoubleHeroesPlayerController::Input_PressW(const FInputActionValue& InputActionValue)
+{
+	PressedKey = EKeys::W;
+	bKeyW = true;
+	Input_SaveClick(InputActionValue);
+}
+
+void ADoubleHeroesPlayerController::Input_PressA(const FInputActionValue& InputActionValue)
+{
+	PressedKey = EKeys::A;
+	bKeyA = true;
+	Input_SaveClick(InputActionValue);
+}
+
+void ADoubleHeroesPlayerController::Input_PressS(const FInputActionValue& InputActionValue)
+{
+	PressedKey = EKeys::S;
+	bKeyS = true;
+	Input_SaveClick(InputActionValue);
+}
+
+void ADoubleHeroesPlayerController::Input_PressD(const FInputActionValue& InputActionValue)
+{
+	PressedKey = EKeys::D;
+	bKeyD = true;
+	Input_SaveClick(InputActionValue);
+}
+
 void ADoubleHeroesPlayerController::Input_ReleaseW(const FInputActionValue& InputActionValue)
 {
 	bKeyW = false;
@@ -344,26 +372,6 @@ void ADoubleHeroesPlayerController::Input_SaveClick(const FInputActionValue& Inp
 {
 	MovementVector = InputActionValue.Get<FVector2D>();
 	CurrentTime = FPlatformTime::Seconds();
-	if (MovementVector.Y > 0.0f)
-	{
-		PressedKey = EKeys::W;
-		bKeyW = true;
-	}
-	else if (MovementVector.Y < 0.0f)
-	{
-		PressedKey = EKeys::S;
-		bKeyS = true;
-	}
-	else if (MovementVector.X > 0.0f)
-	{
-		PressedKey = EKeys::D;
-		bKeyD = true;
-	}
-	else
-	{
-		PressedKey = EKeys::A;
-		bKeyA = true;
-	}
 	if ((PressedKey == LastPressedKey) && (CurrentTime - LastTime < DoubleClickThreshold))
 	{
 		Input_StartRun();

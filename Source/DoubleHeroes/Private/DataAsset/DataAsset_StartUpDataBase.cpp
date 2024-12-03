@@ -22,17 +22,23 @@ void UDataAsset_StartUpDataBase::GrantAbilities(
 {
 	if (InAbilitiesToGive.IsEmpty())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("No abilities to grant"));
 		return;
 	}
 
 	for (const TSubclassOf<UDoubleHeroesGameplayAbility>& Ability : InAbilitiesToGive)
 	{
-		if(!Ability) continue;
+		if(!Ability)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Invalid ability class"));
+			continue;
+		}
 
 		FGameplayAbilitySpec AbilitySpec(Ability);
 		AbilitySpec.SourceObject = InASCToGive->GetAvatarActor();
 		AbilitySpec.Level = ApplyLevel;
 
 		InASCToGive->GiveAbility(AbilitySpec);
+		UE_LOG(LogTemp, Log, TEXT("Ability granted: %s"), *Ability->GetName());
 	}
 }

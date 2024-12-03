@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Weapon.generated.h"
 
+class UPackageComponent;
+
 UENUM(BlueprintType)
 enum class EWeaponState : uint8
 {
@@ -22,6 +24,9 @@ class DOUBLEHEROES_API AWeapon : public AActor
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(ReplicatedUsing = OnRep_WeaponState, VisibleAnywhere, Category = "Weapon Properties", BlueprintReadOnly)
+	EWeaponState WeaponState;
+	
 	// Sets default values for this actor's properties
 	AWeapon();
 
@@ -29,10 +34,12 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	UPROPERTY(ReplicatedUsing = OnRep_WeaponState, VisibleAnywhere, Category = "Weapon Properties", BlueprintReadOnly)
-	EWeaponState WeaponState;
+
+	UPackageComponent* GetPackageComponent() const {return PackageComponent;}
 
 protected:
+	UPROPERTY(VisibleAnywhere)
+	UPackageComponent* PackageComponent;
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 

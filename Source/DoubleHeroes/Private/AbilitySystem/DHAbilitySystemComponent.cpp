@@ -18,7 +18,7 @@ void UDHAbilitySystemComponent::OnAbilityInputPressed(const FGameplayTag& InInpu
 	{
 		return;
 	}
-
+	TArray<FGameplayAbilitySpec> A  = GetActivatableAbilities();
 	for(const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
 		if(!AbilitySpec.DynamicAbilityTags.HasTagExact(InInputTag)) continue;

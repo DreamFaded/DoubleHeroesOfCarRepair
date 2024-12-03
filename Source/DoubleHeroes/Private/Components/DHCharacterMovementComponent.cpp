@@ -19,7 +19,7 @@ float UDHCharacterMovementComponent::GetMaxSpeed() const
 {
 	//引擎的所有移动速度都是从这个方法里拿得的，所以这里重写
 	float Speed = Super::GetMaxSpeed();
-	if (ADoubleHeroesBaseCharacter* CharacterBase = Cast<ABlueHeroCharacter>(GetOwner()))
+	if (ADoubleHeroesBaseCharacter* CharacterBase = Cast<ADoubleHeroesBaseCharacter>(GetOwner()))
 	{
 		if (CharacterBase->IsRunning())
 		{

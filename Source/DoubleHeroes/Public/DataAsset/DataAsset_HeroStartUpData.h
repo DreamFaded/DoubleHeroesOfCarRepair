@@ -6,6 +6,20 @@
 #include "DataAsset_StartUpDataBase.h"
 #include "DoubleHeroesTypes/DoubleHeroesStructTypes.h"
 #include "DataAsset_HeroStartUpData.generated.h"
+
+USTRUCT(BlueprintType)
+struct FDoubleHeroesHeroAbilitySet
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "InputTag"))
+	FGameplayTag InputTag;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UDoubleHeroesGameplayAbility> AbilityToGrant;
+
+	bool IsValid() const;
+};
 /**
  * 
  */
@@ -20,5 +34,5 @@ public:
 private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "StartUpData", meta = (TitleProperty = "InputTag"))
-	TArray<FBlueHeroAbilitySet> HeroStartUpAbilitySets;
+	TArray<FDoubleHeroesHeroAbilitySet> HeroStartUpAbilitySets;
 };

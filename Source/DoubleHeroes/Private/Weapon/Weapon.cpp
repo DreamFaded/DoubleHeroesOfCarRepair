@@ -9,6 +9,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Character/BlueHeroCharacter.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "Item/SceneItemActor.h"
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
@@ -61,6 +62,13 @@ void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 
 	if (BaseCharacter)
 	{
+		if (ASceneItemActor* SceneItemActor = Cast<ASceneItemActor>(OtherActor))
+		{
+			if(PackageComponent)
+			{
+				PackageComponent->AddNearItem(SceneItemActor);
+			}
+		}
 		BaseCharacter->SetOverlappingWeapon(this);
 	}
 }
@@ -72,6 +80,13 @@ void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 
 	if (BaseCharacter)
 	{
+		if (ASceneItemActor* SceneItemActor = Cast<ASceneItemActor>(OtherActor))
+		{
+			if(PackageComponent)
+			{
+				PackageComponent->RemoveNearItem(SceneItemActor);
+			}
+		}
 		// BaseCharacter->SetOverlappingWeapon(nullptr);
 	}
 }

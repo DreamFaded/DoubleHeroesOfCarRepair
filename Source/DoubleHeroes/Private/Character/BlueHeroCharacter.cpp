@@ -171,10 +171,10 @@ void ABlueHeroCharacter::PossessedBy(AController* NewController)
 
 
 
-void ABlueHeroCharacter::Input_AbilityInputPressed(FGameplayTag InInputTag)
-{
-	DHAbilitySystemComponent->OnAbilityInputPressed(InInputTag);
-}
+// void ABlueHeroCharacter::Input_AbilityInputPressed(FGameplayTag InInputTag)
+// {
+// 	DHAbilitySystemComponent->OnAbilityInputPressed(InInputTag);
+// }
 
 void ABlueHeroCharacter::Input_AbilityInputReleased(FGameplayTag InInputTag)
 {

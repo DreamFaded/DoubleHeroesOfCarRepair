@@ -13,12 +13,12 @@
 void UPawnCombatComponent::RegisterSpawnedWeapon(FGameplayTag InWeaponTagToRegister,
                                                  ADoubleHeroesWeaponBase* InWeaponToRegister, bool bRegisterAsEquippedWeapon)
 {
+	check(InWeaponToRegister);
 	if(CharacterCarriedWeaponMap.Contains(InWeaponTagToRegister))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Weapon with tag %s is already registered. Skipping registration."), *InWeaponTagToRegister.ToString());
 		return;
 	}
-	check(InWeaponToRegister);
 
 	CharacterCarriedWeaponMap.Emplace(InWeaponTagToRegister, InWeaponToRegister);
 

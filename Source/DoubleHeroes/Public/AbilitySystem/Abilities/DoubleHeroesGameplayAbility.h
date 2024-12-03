@@ -27,13 +27,13 @@ public:
 	virtual void OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 	
-	UPROPERTY(EditDefaultsOnly, Category="DoubleHeroesAbility")
+	UPROPERTY(EditDefaultsOnly, Category="DoubleHeroes|Ability")
 	EDoubleHeroesAbilityActivationPolicy AbilityActivationPolicy = EDoubleHeroesAbilityActivationPolicy::OnTriggered;
 
 	UFUNCTION(BlueprintPure, Category = "DoubleHeroes|Ability")
 	UPawnCombatComponent* GetPawnCombatComponentFromActorInfo() const;
 
-	UFUNCTION(BlueprintPure, Category="DoubleHeroesAbility")
+	UFUNCTION(BlueprintPure, Category="DoubleHeroes|Ability")
 	UDHAbilitySystemComponent* GetDHAbilitySystemComponentFromActorInfo() const;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")

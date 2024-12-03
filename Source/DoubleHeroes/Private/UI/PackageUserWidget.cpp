@@ -4,6 +4,7 @@
 #include "UI/PackageUserWidget.h"
 
 #include "Character/DoubleHeroesBaseCharacter.h"
+#include "UI/WheelUIUserWidget.h"
 
 void UPackageUserWidget::ShowUI()
 {
@@ -20,8 +21,10 @@ void UPackageUserWidget::ShowUI()
 
 void UPackageUserWidget::OnAddNearItem(ASceneItemActor* SceneItemActor)
 {
+	WheelUIUserWidget->AddPackageItemWidget(SceneItemActor);
 }
 
 void UPackageUserWidget::OnRemoveNearItem(ASceneItemActor* SceneItemActor)
 {
+	
 }

@@ -13,4 +13,17 @@ UCLASS()
 class DOUBLEHEROES_API UEquipUIUserWidget : public UUserWidget
 {
 	GENERATED_BODY()
+
+public:
+	virtual void NativeOnInitialized() override;
+	
+
+protected:
+
+	UPROPERTY(meta = (BindWidget))
+	class UImage* IconImage;
+
+	UPROPERTY()
+	TArray<UTexture2D*> IconArray;
+	
 };

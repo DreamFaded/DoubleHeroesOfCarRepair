@@ -2,3 +2,10 @@
 
 
 #include "UI/EquipUIUserWidget.h"
+
+void UEquipUIUserWidget::NativeOnInitialized()
+{
+	Super::NativeOnInitialized();
+
+	
+}

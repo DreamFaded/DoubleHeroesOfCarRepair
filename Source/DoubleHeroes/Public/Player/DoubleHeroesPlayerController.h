@@ -9,12 +9,14 @@
 #include "Interaction/EnemyInterface.h"
 #include "DoubleHeroesPlayerController.generated.h"
 
+class ADoubleHeroesBaseCharacter;
 class USplineComponent;
 class UDamageTextComponent;
 class UInputMappingContext;
 class UDoubleHeroesInputConfig;
 struct FInputActionValue;
 class UInputAction;
+class UDataAsset_InputConfig;
 /**
  * 
  */
@@ -58,6 +60,10 @@ protected:
 	
 	void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent);
 	void Input_Move(const FInputActionValue& InputActionValue);
+	void Input_PressW(const FInputActionValue& InputActionValue);
+	void Input_PressA(const FInputActionValue& InputActionValue);
+	void Input_PressS(const FInputActionValue& InputActionValue);
+	void Input_PressD(const FInputActionValue& InputActionValue);
 	void Input_ReleaseW(const FInputActionValue& InputActionValue);
 	void Input_ReleaseA(const FInputActionValue& InputActionValue);
 	void Input_ReleaseS(const FInputActionValue& InputActionValue);

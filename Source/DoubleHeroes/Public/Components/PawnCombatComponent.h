@@ -10,6 +10,7 @@
 
 class ADoubleHeroesWeaponBase;
 struct FGameplayTag;
+class AWeapon;
 
 UCLASS()
 class DOUBLEHEROES_API UPawnCombatComponent : public UPawnExtensionComponentBase

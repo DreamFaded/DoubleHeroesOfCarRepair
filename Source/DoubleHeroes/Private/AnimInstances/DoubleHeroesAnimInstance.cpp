@@ -22,11 +22,12 @@ void UDoubleHeroesAnimInstance::NativeThreadSafeUpdateAnimation(float DeltaSecon
 {
 	if(!OwningCharacter||!OwningMovementComponent)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("OwningCharacter or OwningMovementComponent is nullptr"));
 		return;
 	}
 	GroundSpeed = OwningCharacter->GetVelocity().Size2D();
 	bHasAcceleration = OwningMovementComponent->GetCurrentAcceleration().SizeSquared2D() > 0.f;
-	bSprinting = OwningCharacter->IsRunning();
+	// bSprinting = OwningCharacter->IsRunning();
 }
 
 void UDoubleHeroesAnimInstance::NativeUpdateAnimation(float DeltaTime)

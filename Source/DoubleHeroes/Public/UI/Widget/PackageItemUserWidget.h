@@ -20,8 +20,8 @@ class DOUBLEHEROES_API UPackageItemUserWidget : public UUserWidget
 public:
 
 protected:
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* NameTextBlock;
+	// UPROPERTY(meta = (BindWidget))
+	// UTextBlock* NameTextBlock;
 
 	UPROPERTY(meta = (BindWidget))
 	UImage* IconImage;
