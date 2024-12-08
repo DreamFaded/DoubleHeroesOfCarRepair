@@ -3,6 +3,60 @@
 
 #include "UI/HUD/DoubleHeroesHUD.h"
 #include "UI/DoubleHeroesUserWidget.h"
+#include "UI/PackageUserWidget.h"
+
+void ADoubleHeroesHUD::TogglePackageUI()
+{
+	if (!PackageUserWidget)
+	{
+		TSubclassOf<UPackageUserWidget> PackageClass = LoadClass<UPackageUserWidget>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Blueprints/UI/Wheel/WBP_PackageUserWidget.WBP_PackageUserWidget_C'"));
+		PackageUserWidget = CreateWidget<UPackageUserWidget>(GetOwningPlayerController(), PackageClass);
+	}
+	if (PackageUserWidget)
+	{
+		if (PackageUserWidget->IsInViewport())
+		{
+			PackageUserWidget->RemoveFromParent();
+		}
+		else
+		{
+			PackageUserWidget->AddToViewport();
+		}
+		GetOwningPlayerController()->bShowMouseCursor = PackageUserWidget->IsInViewport();
+	}
+}
+
+void ADoubleHeroesHUD::OpenPackageUI()
+{
+	if (!PackageUserWidget)
+	{
+		TSubclassOf<UPackageUserWidget> PackageClass = LoadClass<UPackageUserWidget>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Blueprints/UI/Wheel/WBP_PackageUserWidget.WBP_PackageUserWidget_C'"));
+		PackageUserWidget = CreateWidget<UPackageUserWidget>(GetOwningPlayerController(), PackageClass);
+	}
+		FInputModeGameAndUI InputMode;
+		GetOwningPlayerController()->SetInputMode(InputMode);
+	if (PackageUserWidget)
+	{
+		GetOwningPlayerController()->bShowMouseCursor = true;
+		PackageUserWidget->ShowUI();
+		// InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		PackageUserWidget->AddToViewport();
+	}
+}
+
+void ADoubleHeroesHUD::ClosePackageUI()
+{
+	FInputModeGameOnly InputModeGame;
+	GetOwningPlayerController()->SetInputMode(InputModeGame);
+	if (PackageUserWidget)
+	{
+		if (PackageUserWidget->IsInViewport())
+		{
+			PackageUserWidget->RemoveFromParent();
+			GetOwningPlayerController()->bShowMouseCursor = false;
+		}
+	}
+}
 
 UOverlayWidgetController* ADoubleHeroesHUD::GetOverlayWidgetController(const FWidgetControllerParams& WCParams)
 {

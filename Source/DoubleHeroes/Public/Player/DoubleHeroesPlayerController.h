@@ -26,6 +26,11 @@ class DOUBLEHEROES_API ADoubleHeroesPlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(Server, Reliable)
+	void Server_SetMaxWalkSpeed(float NewSpeed);
+
+	UPROPERTY()
+	bool bTogglePackage = false;
 	
 	FVector2D MovementVector = FVector2D();
 
@@ -58,7 +63,7 @@ protected:
 
 	// virtual void SetupInputComponent() override;
 	
-	void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent);
+	virtual void SetupInputComponent() override;
 	void Input_Move(const FInputActionValue& InputActionValue);
 	void Input_PressW(const FInputActionValue& InputActionValue);
 	void Input_PressA(const FInputActionValue& InputActionValue);
@@ -72,7 +77,9 @@ protected:
 	void Input_Look(const FInputActionValue& InputActionValue);
 	void Input_StartRun();
 	void Input_StopRun();
-	void Input_TogglePackage(const FInputActionValue& InputActionValue);
+	void Input_TogglePackage();
+	void Input_OpenPackage();
+	void Input_ClosePackage();
 	void Input_AbilityInputPressed(FGameplayTag InInputTag);
 
 private:

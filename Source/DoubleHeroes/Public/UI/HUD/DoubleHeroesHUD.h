@@ -9,6 +9,7 @@
 #include "UI/WidgetController/OverlayWidgetController.h"
 #include "DoubleHeroesHUD.generated.h"
 
+class UPackageUserWidget;
 struct FWidgetControllerParams;
 /**
  * 
@@ -20,6 +21,9 @@ class DOUBLEHEROES_API ADoubleHeroesHUD : public AHUD
 
 public:
 
+	void TogglePackageUI();
+	void OpenPackageUI();
+	void ClosePackageUI();
 	
 
 	UOverlayWidgetController* GetOverlayWidgetController(const FWidgetControllerParams& WCParams);
@@ -30,6 +34,8 @@ public:
 
 protected:
 
+	UPROPERTY()
+	UPackageUserWidget* PackageUserWidget;
 	
 private:
 

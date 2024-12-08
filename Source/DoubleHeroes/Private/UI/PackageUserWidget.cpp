@@ -4,7 +4,11 @@
 #include "UI/PackageUserWidget.h"
 
 #include "Character/DoubleHeroesBaseCharacter.h"
+#include "Subsystem/ItemSubsystem.h"
 #include "UI/WheelUIUserWidget.h"
+#include "UI/Widget/PackageItemUserWidget.h"
+
+
 
 void UPackageUserWidget::ShowUI()
 {
@@ -12,19 +16,73 @@ void UPackageUserWidget::ShowUI()
 	{
 		if (Character->GetPackageComponent())
 		{
-			Character->GetPackageComponent()->OnAddNearItem.AddUObject(this, &UPackageUserWidget::OnAddNearItem);
-			Character->GetPackageComponent()->OnRemoveNearItem.AddUObject(this, &UPackageUserWidget::OnRemoveNearItem);
+			// Character->GetPackageComponent()->OnAddNearItem.AddUObject(this, &UPackageComponent::OnAddNearItem);
+			// Character->GetPackageComponent()->OnRemoveNearItem.AddUObject(this, &UPackageComponent::OnRemoveNearItem);
+			//
+			// Character->GetPackageComponent()->OnAddItemToPackage.AddUObject(this, &UPackageUserWidget::OnAddPackageItem);
+			// Character->GetPackageComponent()->OnRemoveItemFromPackage.AddUObject(this, &UPackageUserWidget::OnRemovePackageItem);
+			if(PackageItemArray.Num() <= 0)
+			{
+				AddItemWidgetToArray();
+			}
+			PackageItemMap = Character->GetPackageComponent()->PackageMap;
+			ItemSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UItemSubsystem>();
+			PackageItemMap.Add(1,1);
+			PackageItemMap.Add(2,2);
+			for (int32 i = 0; i <= 3; i++)
+			{
+				if(PackageItemMap.Contains(i+1))
+				{
+					PackageItemArray[i]->CurrentItemId = PackageItemMap[i+1];
+					PackageItemArray[i]->IconImage->SetBrushFromTexture(ItemSubsystem->GetItemData(i+1)->Icon);
+				}
+			}
+			// if(PackageItemMap.Contains(1))
+			// {
+			// 	PackageItem_1->CurrentItemId = PackageItemMap[1];
+			// 	PackageItem_1->IconImage->SetBrushFromTexture(ItemSubsystem->GetItemData(1)->Icon);
+			// }
+			// if(PackageItemMap.FindKey(2))
+			// {
+			// 	PackageItem_2->CurrentItemId = PackageItemMap[2];
+			// 	PackageItem_2->IconImage->SetBrushFromTexture(ItemSubsystem->GetItemData(2)->Icon);
+			// }
+			// if(PackageItemMap.FindKey(3))
+			// {
+			// 	PackageItem_2->CurrentItemId = PackageItemMap[3];
+			// 	PackageItem_2->IconImage->SetBrushFromTexture(ItemSubsystem->GetItemData(3)->Icon);
+			// }
+			// if(PackageItemMap.FindKey(4))
+			// {
+			// 	PackageItem_2->CurrentItemId = PackageItemMap[4];
+			// 	PackageItem_2->IconImage->SetBrushFromTexture(ItemSubsystem->GetItemData(4)->Icon);
+			// }
 		}
 	}
-	AddToViewport();
 }
 
-void UPackageUserWidget::OnAddNearItem(ASceneItemActor* SceneItemActor)
+void UPackageUserWidget::AddPackageItemWidget(int32 Sign, int32 ItemID)
 {
-	WheelUIUserWidget->AddPackageItemWidget(SceneItemActor);
-}
-
-void UPackageUserWidget::OnRemoveNearItem(ASceneItemActor* SceneItemActor)
-{
+	if (ItemWidgetClass)
+	{
+		ItemWidgetClass = LoadClass<UPackageItemUserWidget>(nullptr, TEXT("/Game/Blueprints/UI/Package/WBP_PackageItem.WBP_PackageItem_C"));
+	}
+	UPackageItemUserWidget* ItemUserWidget = CreateWidget<UPackageItemUserWidget>(GetOwningPlayer(), ItemWidgetClass);
+	// ItemUserWidget->InitPanel(Sign, ItemID);
 	
 }
+
+void UPackageUserWidget::RemoveItemWidget(int32 Sign, int32 ItemID)
+{
+}
+
+void UPackageUserWidget::AddItemWidgetToArray()
+{
+	PackageItemArray.Add(PackageItem_1);
+	PackageItemArray.Add(PackageItem_2);
+	PackageItemArray.Add(PackageItem_3);
+	PackageItemArray.Add(PackageItem_4);
+}
+
+
+

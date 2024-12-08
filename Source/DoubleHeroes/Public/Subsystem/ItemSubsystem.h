@@ -23,7 +23,7 @@ enum class ESkinPartType : uint8
 	ESPT_Glasses,
 	ESPT_Helmet,
 	ESPT_Hair,
-	ESPT_Body,
+	ESPT_Clothes,
 	ESPT_Pants,
 	ESPT_Shoes,
 	ESPT_Backpack,

@@ -9,14 +9,29 @@
 #include "GameFramework/Controller.h"
 #include "Components/InputComponent.h"
 #include "InputActionValue.h"
+#include "Character/BlueHeroCharacter.h"
 #include "Character/DoubleHeroesBaseCharacter.h"
 #include "Character/DoubleHeroesCharacter.h"
 #include "Components/SplineComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PawnMovementComponent.h"
 #include "Input/DoubleHeroesInputComponent.h"
 #include "Interaction/EnemyInterface.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "UI/HUD/DoubleHeroesHUD.h"
 #include "UI/HUD/WheelHUD.h"
 #include "UI/Widget/DamageTextComponent.h"
+
+void ADoubleHeroesPlayerController::Server_SetMaxWalkSpeed_Implementation(float NewSpeed)
+{
+	if (ADoubleHeroesCharacter* ControlledCharacter = Cast<ADoubleHeroesCharacter>(GetPawn()))
+	{
+		ControlledCharacter->GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
+	}
+}
+
+
 
 ADoubleHeroesPlayerController::ADoubleHeroesPlayerController()
 {
@@ -245,10 +260,21 @@ void ADoubleHeroesPlayerController::BeginPlay()
 	// InputModeData.SetHideCursorDuringCapture(false);
 	// SetInputMode(InputModeData);
 	ControlledPawn = GetPawn<APawn>();
-	BaseCharacter = Cast<ADoubleHeroesBaseCharacter>(GetPawn());
+	BaseCharacter = Cast<ADoubleHeroesBaseCharacter>(ControlledPawn);
+	if (BaseCharacter && HasAuthority())
+	{
+		BaseCharacter->SetReplicates(true);
+		BaseCharacter->SetReplicateMovement(true);
+	}
 	DHAbilitySystemComponent = GetASC();
-	SetupPlayerInputComponent(InputComponent);
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+	if (Subsystem)
+	{
+		Subsystem->AddMappingContext(InputConfigDataAsset->DefaultMappingContext, 0);
+	}
+	// SetupInputComponent();
 }
+
 
 // void ADoubleHeroesPlayerController::SetupInputComponent()
 // {
@@ -270,13 +296,11 @@ void ADoubleHeroesPlayerController::BeginPlay()
 // 	&ADoubleHeroesPlayerController::ShiftReleased);
 // }
 
-void ADoubleHeroesPlayerController::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
+void ADoubleHeroesPlayerController::SetupInputComponent()
 {
-		
-	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	check(Subsystem);
-	Subsystem->AddMappingContext(InputConfigDataAsset->DefaultMappingContext, 0);
-	UDoubleHeroesInputComponent* DoubleHeroesInputComponent = CastChecked<UDoubleHeroesInputComponent>(PlayerInputComponent);
+	Super::SetupInputComponent();
+	
+	UDoubleHeroesInputComponent* DoubleHeroesInputComponent = CastChecked<UDoubleHeroesInputComponent>(InputComponent);
 	// DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_Move, ETriggerEvent::Triggered, this, &ThisClass::Input_Move);
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveForward, ETriggerEvent::Triggered, this, &ThisClass::Input_Move);
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveForward, ETriggerEvent::Started, this, &ThisClass::Input_PressW);
@@ -291,7 +315,8 @@ void ADoubleHeroesPlayerController::SetupPlayerInputComponent(class UInputCompon
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveRight, ETriggerEvent::Started, this, &ThisClass::Input_PressD);
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveRight, ETriggerEvent::Completed, this, &ThisClass::Input_ReleaseD);
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_Look, ETriggerEvent::Triggered, this, &ThisClass::Input_Look);
-	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_TogglePackage, ETriggerEvent::Triggered, this, &ThisClass::Input_TogglePackage);
+	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_TogglePackage, ETriggerEvent::Started, this, &ThisClass::Input_OpenPackage);
+	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_TogglePackage, ETriggerEvent::Completed, this, &ThisClass::Input_ClosePackage);
 	DoubleHeroesInputComponent->BindAbilityInputAction(InputConfigDataAsset, this, &ThisClass::Input_AbilityInputPressed, &ThisClass::Input_AbilityInputPressed);
 }
 
@@ -317,8 +342,10 @@ void ADoubleHeroesPlayerController::Input_Move(const FInputActionValue& InputAct
 	// 		ControlledPawn->AddMovementInput(RightDirection, MovementVector.X);
 	// 	}
 	// }
-	
-	BaseCharacter->Input_Move(InputActionValue);
+	if (BaseCharacter)
+	{
+		BaseCharacter->Input_Move(InputActionValue);
+	}
 }
 
 void ADoubleHeroesPlayerController::Input_PressW(const FInputActionValue& InputActionValue)
@@ -371,7 +398,7 @@ void ADoubleHeroesPlayerController::Input_ReleaseD(const FInputActionValue& Inpu
 
 void ADoubleHeroesPlayerController::Input_SaveClick(const FInputActionValue& InputActionValue)
 {
-	MovementVector = InputActionValue.Get<FVector2D>();
+	// MovementVector = InputActionValue.Get<FVector2D>();
 	CurrentTime = FPlatformTime::Seconds();
 	if ((PressedKey == LastPressedKey) && (CurrentTime - LastTime < DoubleClickThreshold))
 	{
@@ -383,25 +410,56 @@ void ADoubleHeroesPlayerController::Input_SaveClick(const FInputActionValue& Inp
 
 void ADoubleHeroesPlayerController::Input_Look(const FInputActionValue& InputActionValue)
 {
-	BaseCharacter->Input_Look(InputActionValue);
+	if (BaseCharacter && (!bTogglePackage))
+	{
+		BaseCharacter->Input_Look(InputActionValue);
+	}
 }
 
 void ADoubleHeroesPlayerController::Input_StartRun()
 {
-	BaseCharacter->Input_StartRun();
+	if (BaseCharacter)
+	{
+		BaseCharacter->Input_StartRun();
+	}
 }
 
 void ADoubleHeroesPlayerController::Input_StopRun()
 {
-	BaseCharacter->Input_StopRun();
+	BaseCharacter = Cast<ADoubleHeroesBaseCharacter>(GetPawn());
+	if (BaseCharacter)
+	{
+		BaseCharacter->GetCharacterMovement()->MaxWalkSpeed = 400;
+		// BaseCharacter->Input_StopRun();
+	}
 }
 
 
-void ADoubleHeroesPlayerController::Input_TogglePackage(const FInputActionValue& InputActionValue)
+
+void ADoubleHeroesPlayerController::Input_TogglePackage()
 {
-	if(AWheelHUD* WheelHUD = Cast<AWheelHUD>(GetHUD()))
+	if(ADoubleHeroesHUD* DoubleHeroesHUD = Cast<ADoubleHeroesHUD>(GetHUD()))
 	{
-		WheelHUD->TogglePackageUI();
+		DoubleHeroesHUD->TogglePackageUI();
+		
+	}
+}
+
+void ADoubleHeroesPlayerController::Input_OpenPackage()
+{
+	if(ADoubleHeroesHUD* DoubleHeroesHUD = Cast<ADoubleHeroesHUD>(GetHUD()))
+	{
+		DoubleHeroesHUD->OpenPackageUI();
+		bTogglePackage = true;
+	}
+}
+
+void ADoubleHeroesPlayerController::Input_ClosePackage()
+{
+	if(ADoubleHeroesHUD* DoubleHeroesHUD = Cast<ADoubleHeroesHUD>(GetHUD()))
+	{
+		DoubleHeroesHUD->ClosePackageUI();
+		bTogglePackage = false;
 	}
 }
 

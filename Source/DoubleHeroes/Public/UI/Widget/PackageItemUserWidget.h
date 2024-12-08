@@ -18,15 +18,13 @@ class DOUBLEHEROES_API UPackageItemUserWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-
-protected:
-	// UPROPERTY(meta = (BindWidget))
-	// UTextBlock* NameTextBlock;
+	int32 CurrentItemId = 0;
 
 	UPROPERTY(meta = (BindWidget))
 	UImage* IconImage;
-	
-	virtual void NativeConstruct() override;
+protected:
+	// UPROPERTY(meta = (BindWidget))
+	// UTextBlock* NameTextBlock;
 
 	void InitPanel(ASceneItemActor* SceneItemActor);
 

@@ -4,11 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/Image.h"
 #include "PackageUserWidget.generated.h"
 
+class UPackageItemUserWidget;
 class UWheelUIUserWidget;
 class UEquipUIUserWidget;
 class ASceneItemActor;
+class UPackageScrollWidget;
+class UItemSubsystem;
+
 /**
  * 
  */
@@ -18,13 +23,32 @@ class DOUBLEHEROES_API UPackageUserWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	// UPROPERTY(meta = (BindWidget))
+	// UEquipUIUserWidget* EquipUIUserWidget;
 	UPROPERTY(meta = (BindWidget))
-	UWheelUIUserWidget* WheelUIUserWidget;
+	UPackageItemUserWidget* PackageItem_1;
+	UPROPERTY(meta = (BindWidget))
+	UPackageItemUserWidget* PackageItem_2;
+	UPROPERTY(meta = (BindWidget))
+	UPackageItemUserWidget* PackageItem_3;
+	UPROPERTY(meta = (BindWidget))
+	UPackageItemUserWidget* PackageItem_4;
+
+	TMap<int32, int32> PackageItemMap;
+	
+	TArray<UPackageItemUserWidget*> PackageItemArray;
+	
+	UItemSubsystem* ItemSubsystem;
 	
 	void ShowUI();
+
+	void AddPackageItemWidget(int32 Sign, int32 ItemID);
+	void RemoveItemWidget(int32 Sign, int32 ItemID);
+
+	void AddItemWidgetToArray();
+
 	
 protected:
-	
-	void OnAddNearItem(ASceneItemActor* SceneItemActor);
-	void OnRemoveNearItem(ASceneItemActor* SceneItemActor);
+	UClass* ItemWidgetClass;
+
 };

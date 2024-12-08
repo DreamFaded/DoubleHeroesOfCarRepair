@@ -19,6 +19,16 @@ class DOUBLEHEROES_API ADoubleHeroesBaseCharacter : public ACharacter, public IA
 	GENERATED_BODY()
 
 public:
+	// Sets default values for this character's properties
+	ADoubleHeroesBaseCharacter();
+	
+	UPROPERTY(ReplicatedUsing=OnRep_Run, BlueprintReadOnly)
+	bool bIsRunning = false;
+	UPROPERTY(Replicated)
+	bool bEquipped = false;
+
+	UPROPERTY(Replicated)
+	float MovementSpeedMultiplier;
 
 	FVector2D MovementVector;
 
@@ -34,8 +44,6 @@ public:
 
 	FKey LastPressedKey = EKeys::Invalid;
 	
-	// Sets default values for this character's properties
-	ADoubleHeroesBaseCharacter();
 
 	// Begin IAbilitySystemInterface Interface
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
@@ -51,13 +59,15 @@ public:
 	void Input_Look(const FInputActionValue& InputActionValue);
 	void Input_StartRun();
 	void Input_StopRun();
+	
+	UFUNCTION()
+	virtual void OnRep_Run();
 
 protected:
 	UPROPERTY(VisibleAnywhere)
 	UPackageComponent* PackageComponent;
 
-	bool bRunning;
-	bool bEquipped;
+	
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
@@ -68,7 +78,7 @@ protected:
 	virtual void PossessedBy(AController* NewController) override;
 	//End APawn Interface
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AbilitySystem")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AbilitySystem", Replicated)
 	UDHAbilitySystemComponent* DHAbilitySystemComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AbilitySystem")
@@ -76,6 +86,8 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CharacterData")
 	TSoftObjectPtr<UDataAsset_StartUpDataBase> CharacterStartUpData;
+
+	virtual void BeginPlay() override;
 
 public:
 	FORCEINLINE UDHAbilitySystemComponent* GetDHAbilitySystemComponent() const { return DHAbilitySystemComponent; }

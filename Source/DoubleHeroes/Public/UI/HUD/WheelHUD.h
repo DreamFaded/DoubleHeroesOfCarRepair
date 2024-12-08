@@ -20,7 +20,7 @@ public:
 	FString EquipUIPath;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString WheelUIPath;
+	FString WheelUIPath = "/Script/UMGEditor.WidgetBlueprint'/Game/Blueprints/UI/Wheel/WBP_WheelUI.WBP_WheelUI_C'";
 
 	AWheelHUD();
 

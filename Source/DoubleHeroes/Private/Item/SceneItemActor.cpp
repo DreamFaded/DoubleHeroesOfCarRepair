@@ -31,7 +31,11 @@ void ASceneItemActor::Init()
 
 	if(FItemBase* ItemBase = GetWorld()->GetGameInstance()->GetSubsystem<UItemSubsystem>()->GetItemData(ItemID))
 	{
-		if (ItemBase->Type == EItemType::EPT_SkinPart)
+		if (ItemBase->Type == EItemType::EPT_Weapon)
+		{
+			if(!SMCMap)
+		}
+		else if (ItemBase->Type == EItemType::EPT_SkinPart)
 		{
 			FSkinPart* SkinPart = static_cast<FSkinPart*>(ItemBase);
 			if (SkinPart->StaticMesh)

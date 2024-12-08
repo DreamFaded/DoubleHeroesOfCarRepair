@@ -24,7 +24,21 @@ ADoubleHeroesBaseCharacter::ADoubleHeroesBaseCharacter()
 	DHAbilitySystemComponent = CreateDefaultSubobject<UDHAbilitySystemComponent>(TEXT("DoubleHeroesAbilitySystemComponent"));
 
 	DoubleHeroesAttributeSet = CreateDefaultSubobject<UDoubleHeroesAttributeSet>(TEXT("DoubleHeroesAttributeSet"));
+
+	
 }
+
+void ADoubleHeroesBaseCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (HasAuthority())
+	{
+		SetReplicates(true);
+		SetReplicateMovement(true);
+	}
+}
+
 
 UAbilitySystemComponent* ADoubleHeroesBaseCharacter::GetAbilitySystemComponent() const
 {
@@ -35,7 +49,9 @@ void ADoubleHeroesBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProp
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME_CONDITION(ThisClass, OverlappingWeapon, COND_OwnerOnly); //COND_OwnerOnly只在网络的所有者客户端上复制该变量
-	// DOREPLIFETIME(ADoubleHeroesBaseCharacter, DHAbilitySystemComponent);
+	DOREPLIFETIME(ADoubleHeroesBaseCharacter, DHAbilitySystemComponent);
+	DOREPLIFETIME(ADoubleHeroesBaseCharacter, bIsRunning);
+	DOREPLIFETIME(ADoubleHeroesBaseCharacter, bEquipped);
 }
 
 
@@ -57,7 +73,7 @@ void ADoubleHeroesBaseCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
 
 bool ADoubleHeroesBaseCharacter::IsRunning()
 {
-	return bRunning;
+	return bIsRunning;
 }
 
 void ADoubleHeroesBaseCharacter::SetOverlappingWeapon(AWeapon* Weapon)
@@ -78,8 +94,6 @@ void ADoubleHeroesBaseCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 
 void ADoubleHeroesBaseCharacter::Input_Move(const FInputActionValue& InputActionValue)
 {
-
-	
 	// find out which way is forward
 	MovementVector = InputActionValue.Get<FVector2D>();
 	MovementRotation = FRotator(0.f, GetControlRotation().Yaw, 0.f);
@@ -112,13 +126,28 @@ void ADoubleHeroesBaseCharacter::Input_Look(const FInputActionValue& InputAction
 
 void ADoubleHeroesBaseCharacter::Input_StartRun()
 {
-	bRunning = true;
-	GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
+	bIsRunning = true;
+	if (HasAuthority())
+	{
+		
+	}
 }
 
 void ADoubleHeroesBaseCharacter::Input_StopRun()
 {
-	bRunning = false;
-	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	MovementSpeedMultiplier = 1;
+	bIsRunning = false;
+}
+
+void ADoubleHeroesBaseCharacter::OnRep_Run()
+{
+	if (bIsRunning)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 1200;
+	}
+	else
+	{
+		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	}
 }
 

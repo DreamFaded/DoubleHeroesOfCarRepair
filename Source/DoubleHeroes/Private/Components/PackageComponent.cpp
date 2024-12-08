@@ -3,6 +3,8 @@
 
 #include "Components/PackageComponent.h"
 
+#include "Item/SceneItemActor.h"
+
 
 // Sets default values for this component's properties
 UPackageComponent::UPackageComponent()
@@ -14,12 +16,12 @@ UPackageComponent::UPackageComponent()
 	// ...
 }
 
-void UPackageComponent::AddNearItem(ASceneItemActor* SceneItemActor)
+void UPackageComponent::AddNearItem(ASceneItemActor* ItemActor)
 {
-	NearItems.AddUnique(SceneItemActor);//只添加一次
+	NearItems.AddUnique(ItemActor);//只添加一次
 	if (OnAddNearItem.IsBound())//代理是否存在有效绑定
 	{
-		OnAddNearItem.Broadcast(SceneItemActor);
+		OnAddNearItem.Broadcast(ItemActor);
 	}
 }
 
@@ -33,6 +35,8 @@ void UPackageComponent::RemoveNearItem(ASceneItemActor* SceneItemActor)
 }
 
 
+
+
 // Called when the game starts
 void UPackageComponent::BeginPlay()
 {
@@ -43,6 +47,16 @@ void UPackageComponent::BeginPlay()
 }
 
 
+void UPackageComponent::Server_AddItemToPackage_Implementation(ASceneItemActor* ItemActor)
+{
+	AddItemToPackage(ItemActor);
+}
+
+bool UPackageComponent::Server_AddItemToPackage_Validate(ASceneItemActor* ItemActor)
+{
+	return (ItemActor->GetActorLocation() - GetOwner() ->GetActorLocation()).Size() < 500;
+}
+
 // Called every frame
 void UPackageComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                       FActorComponentTickFunction* ThisTickFunction)
@@ -52,3 +66,41 @@ void UPackageComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	// ...
 }
 
+
+void UPackageComponent::AddItemToPackage(ASceneItemActor* ItemActor)
+{
+	if (ItemActor)
+	{
+		if (!GetOwner()->HasAuthority())
+		{
+			Server_AddItemToPackage(ItemActor);
+			return;
+		}
+		int32 Sign = GetPackageMapSign();
+		PackageMap.Add(GetPackageMapSign(), ItemActor->GetItemID());
+
+		if (OnAddItemToPackage.IsBound())
+		{
+			OnAddItemToPackage.Broadcast(Sign, ItemActor->GetItemID());
+		}
+		// ItemActor->Destroy();
+	}
+}
+
+void UPackageComponent::RemoveItemFromPackage(ASceneItemActor* ItemActor)
+{
+	if (ItemActor)
+	{
+		PackageMap.Remove(ItemActor->GetItemID());
+	}
+}
+
+int32 UPackageComponent::GetPackageMapSign()
+{
+	int32 Index = 0;
+	while (PackageMap.Contains(Index))
+	{
+		Index++;
+	}
+	return Index;
+}

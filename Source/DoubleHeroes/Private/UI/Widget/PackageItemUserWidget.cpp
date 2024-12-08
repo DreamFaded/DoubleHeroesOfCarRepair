@@ -9,17 +9,7 @@
 #include "Item/SceneItemActor.h"
 #include "Subsystem/ItemSubsystem.h"
 
-void UPackageItemUserWidget::NativeConstruct()
-{
-	Super::NativeConstruct();
 
-	// 绑定鼠标进入和离开事件
-	if (IsValid(this))
-	{
-		// this->OnMouseEnter.AddDynamic(this, &UPackageItemUserWidget::OnMouseEntera);
-		// this->OnMouseLeaveEvent.AddDynamic(this, &UPackageItemUserWidget::OnMouseLeave);
-	}
-}
 
 void UPackageItemUserWidget::InitPanel(ASceneItemActor* SceneItemActor)
 {
@@ -37,9 +27,11 @@ void UPackageItemUserWidget::InitPanel(ASceneItemActor* SceneItemActor)
 void UPackageItemUserWidget::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
+	SetRenderScale(FVector2D(1.5f, 1.5f));
 }
 
 void UPackageItemUserWidget::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseLeave(InMouseEvent);
+	SetRenderScale(FVector2D(1.f, 1.f));
 }

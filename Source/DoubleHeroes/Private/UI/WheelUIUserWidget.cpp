@@ -11,5 +11,8 @@ void UWheelUIUserWidget::AddPackageItemWidget(ASceneItemActor* SceneItemActor)
 	{
 		ItemWidgetClass = LoadClass<UPackageItemUserWidget>(this, *PackageItemPath);
 	}
-	CreateWidget<UPackageItemUserWidget>(GetOwningPlayer(), ItemWidgetClass);
+	UPackageItemUserWidget* ItemUserWidget = CreateWidget<UPackageItemUserWidget>(GetOwningPlayer(), ItemWidgetClass);
+	// ItemUserWidget->SetItemID(SceneItemActor->GetItemID());
+	
 }
+

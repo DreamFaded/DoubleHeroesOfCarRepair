@@ -17,7 +17,7 @@ void UItemSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	Super::Initialize(Collection);
 
 	//加载数据表格
-	ItemData = LoadObject<UDataTable>(this, TEXT(""));
+	ItemData = LoadObject<UDataTable>(this, TEXT("/Script/Engine.DataTable'/Game/Data/DT_SkinPart.DT_SkinPart'"));
 
 	if (ItemData)
 	{
