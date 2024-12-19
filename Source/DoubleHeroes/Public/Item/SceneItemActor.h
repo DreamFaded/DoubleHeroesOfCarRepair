@@ -17,6 +17,9 @@ public:
 
 	int32 GetItemID() const { return ItemID; }
 
+	void SetID(int32 OutID, bool bInit);
+	void SetItemID(int32 ID);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -26,6 +29,9 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(EditAnywhere)
+	int32 ID;
 
 	UPROPERTY(EditAnywhere)
 	int32 ItemID;

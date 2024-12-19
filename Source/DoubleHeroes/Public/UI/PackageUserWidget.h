@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Image.h"
+#include "Subsystem/ItemSubsystem.h"
 #include "PackageUserWidget.generated.h"
 
 class UPackageItemUserWidget;
@@ -48,7 +49,14 @@ public:
 	void AddItemWidgetToArray();
 
 	
+	virtual void RemoveFromParent() override;
 protected:
 	UClass* ItemWidgetClass;
+
+	void OnPutOnItem(ESkinPartType PartType, int32 ItemID);
+	void OnTakeOffItem(ESkinPartType PartType, int32 ItemID);
+
+
+	
 
 };

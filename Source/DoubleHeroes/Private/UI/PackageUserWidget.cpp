@@ -84,5 +84,32 @@ void UPackageUserWidget::AddItemWidgetToArray()
 	PackageItemArray.Add(PackageItem_4);
 }
 
+void UPackageUserWidget::OnPutOnItem(ESkinPartType PartType, int32 ItemID)
+{
+	
+}
+
+void UPackageUserWidget::OnTakeOffItem(ESkinPartType PartType, int32 ItemID)
+{
+}
+
+void UPackageUserWidget::RemoveFromParent()
+{
+	Super::RemoveFromParent();
+
+	if(ADoubleHeroesBaseCharacter* Player = Cast<ADoubleHeroesBaseCharacter>(GetOwningPlayerPawn()))
+	{
+		if (Player->GetPackageComponent())
+		{
+			//解绑通知
+			// Player->GetPackageComponent()->AddNearItem.RemoveAll(this);
+			// Player->GetPackageComponent()->OnPutOnItem.RemoveAll(this);
+			// Player->GetPackageComponent()->OnTakeOffItem.RemoveAll(this, &UPackageUserWidget::OnTakeOffItem);
+
+			
+		}
+	}
+}
+
 
 

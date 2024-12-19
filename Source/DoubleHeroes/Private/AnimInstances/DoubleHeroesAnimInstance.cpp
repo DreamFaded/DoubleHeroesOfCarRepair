@@ -34,6 +34,13 @@ void UDoubleHeroesAnimInstance::NativeUpdateAnimation(float DeltaTime)
 {
 	Super::NativeUpdateAnimation(DeltaTime);
 
+	bHoldWeapon = OwningCharacter->GetHoldWeapon() != nullptr;
+
+	if (!bHoldWeapon)
+	{
+		
+	}
+
 	/*if (BlueHeroCharacter == nullptr)
 	{
 		BlueHeroCharacter = Cast<ABlueHeroCharacter>(TryGetPawnOwner());

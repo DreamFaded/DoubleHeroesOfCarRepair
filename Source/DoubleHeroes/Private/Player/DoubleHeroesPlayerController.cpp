@@ -426,11 +426,9 @@ void ADoubleHeroesPlayerController::Input_StartRun()
 
 void ADoubleHeroesPlayerController::Input_StopRun()
 {
-	BaseCharacter = Cast<ADoubleHeroesBaseCharacter>(GetPawn());
 	if (BaseCharacter)
 	{
-		BaseCharacter->GetCharacterMovement()->MaxWalkSpeed = 400;
-		// BaseCharacter->Input_StopRun();
+		BaseCharacter->Input_StopRun();
 	}
 }
 

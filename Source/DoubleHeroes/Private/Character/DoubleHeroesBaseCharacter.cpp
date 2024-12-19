@@ -6,6 +6,7 @@
 #include "InputActionValue.h"
 #include "AbilitySystem/DHAbilitySystemComponent.h"
 #include "AbilitySystem/DoubleHeroesAttributeSet.h"
+#include "Components/SkinComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
 
@@ -18,6 +19,7 @@ ADoubleHeroesBaseCharacter::ADoubleHeroesBaseCharacter()
 	PrimaryActorTick.bStartWithTickEnabled = false;
 
 	PackageComponent = CreateDefaultSubobject<UPackageComponent>(TEXT("PackageComponent"));
+	SkinComponent = CreateDefaultSubobject<USkinComponent>(TEXT("SkinComponent"));
 
 	GetMesh()->bReceivesDecals = false;
 
@@ -37,12 +39,44 @@ void ADoubleHeroesBaseCharacter::BeginPlay()
 		SetReplicates(true);
 		SetReplicateMovement(true);
 	}
+
+	if (PackageComponent)
+	{
+		PackageComponent->OnPutOnItem.AddUObject(SkinComponent, &USkinComponent::OnPutOnItem);
+		PackageComponent->OnTakeOffItem.AddUObject(SkinComponent, &USkinComponent::OnTakeOffItem);
+	}
+}
+
+USkeletalMeshComponent* ADoubleHeroesBaseCharacter::GetSkeletalMeshComponent()
+{
+	return GetMesh();
+}
+
+AWeapon* ADoubleHeroesBaseCharacter::GetHoldWeapon() const
+{
+	if (PackageComponent)
+	{
+		return PackageComponent->GetHoloWeapon();
+	}
+	return nullptr;
 }
 
 
 UAbilitySystemComponent* ADoubleHeroesBaseCharacter::GetAbilitySystemComponent() const
 {
 	return GetDHAbilitySystemComponent();
+}
+
+void ADoubleHeroesBaseCharacter::Server_SetRunning_Implementation(bool bNewRunning)
+{
+	if (bNewRunning)
+	{
+		Input_StartRun();
+	}
+	else
+	{
+		Input_StopRun();
+	}
 }
 
 void ADoubleHeroesBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -127,16 +161,25 @@ void ADoubleHeroesBaseCharacter::Input_Look(const FInputActionValue& InputAction
 void ADoubleHeroesBaseCharacter::Input_StartRun()
 {
 	bIsRunning = true;
-	if (HasAuthority())
+	GetCharacterMovement()->MaxWalkSpeed = 1200;
+	
+	//如果在客户端，需要上服务器执行
+	if (!HasAuthority())
 	{
-		
+		Server_SetRunning(true);
 	}
 }
 
 void ADoubleHeroesBaseCharacter::Input_StopRun()
 {
-	MovementSpeedMultiplier = 1;
 	bIsRunning = false;
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+
+	//如果在客户端，需要上服务器执行
+	if (!HasAuthority())
+	{
+		Server_SetRunning(false);
+	}
 }
 
 void ADoubleHeroesBaseCharacter::OnRep_Run()

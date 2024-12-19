@@ -7,6 +7,10 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "ItemSubsystem.generated.h"
 
+#define WEAPONINDEX 100
+
+class AWeapon;
+
 //区分装饰型道具和武器型道具
 UENUM()
 enum class EItemType : uint8
@@ -62,6 +66,22 @@ struct FSkinPart : public FItemBase
 	UPROPERTY(EditAnywhere)
 	USkeletalMesh* SkeletalMesh;
 };
+
+USTRUCT()
+struct FWeaponInfo : public FItemBase
+{
+	GENERATED_BODY()
+	FWeaponInfo()
+	{
+		Type = EItemType::EPT_Weapon;
+	}
+
+	UPROPERTY(EditAnywhere)
+	USkeletalMesh* SkeletalMesh;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AWeapon> WeaponClass;
+};
 /**
  * 
  */
@@ -77,6 +97,9 @@ protected:
 
 	UPROPERTY()
 	UDataTable* ItemData;
+
+	UPROPERTY()
+	UDataTable* WeaponData;
 
 	TMap<int32, FItemBase*> ItemMap;
 

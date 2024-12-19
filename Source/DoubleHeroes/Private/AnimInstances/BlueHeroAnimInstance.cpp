@@ -19,7 +19,7 @@ void UBlueHeroAnimInstance::NativeThreadSafeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeThreadSafeUpdateAnimation(DeltaSeconds);
 
-	if (bHasAcceleration)
+	if (bHasAcceleration || bIsCrouched)
 	{
 		IdleElpasedTime = 0.f;
 		bShouldEnterRelaxState = false;

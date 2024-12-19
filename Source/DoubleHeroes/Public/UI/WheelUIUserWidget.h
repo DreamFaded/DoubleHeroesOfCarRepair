@@ -7,6 +7,7 @@
 #include "WheelUIUserWidget.generated.h"
 
 class UPackageItemUserWidget;
+class ASceneItemActor;
 /**
  * 
  */

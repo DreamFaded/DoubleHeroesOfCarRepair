@@ -41,4 +41,30 @@ void UItemSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 			}
 		}
 	}
+
+	//加载武器表格
+	WeaponData = LoadObject<UDataTable>(this, TEXT("/Script/Engine.DataTable'/Game/Data/DT_WeaponInfo.DT_WeaponInfo''"));
+
+	if (WeaponData)
+	{
+		TArray<FName> RowNames = WeaponData->GetRowNames();
+		for (auto Key : RowNames)
+		{
+			FItemBase* ItemBase = reinterpret_cast<FItemBase*>(WeaponData->GetRowMap()[Key]);
+			FString Sign = Key.ToString();
+			FString LeftStr;
+			FString RightStr;
+			int32 ID = WEAPONINDEX;
+			if(Sign.Split(TEXT("_"), &LeftStr, &RightStr))
+			{
+				//字符转整型
+				ID = FCString::Atoi(*RightStr) + 1 + WEAPONINDEX;
+			}
+
+			if (!ItemMap.Contains(ID))
+			{
+				ItemMap.Add(ID, ItemBase);//添加元素
+			}
+		}
+	}
 }

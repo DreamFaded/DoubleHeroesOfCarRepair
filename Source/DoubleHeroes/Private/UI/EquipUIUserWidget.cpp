@@ -9,3 +9,13 @@ void UEquipUIUserWidget::NativeOnInitialized()
 
 	
 }
+
+void UEquipUIUserWidget::InitPanel(int32 ItemID)
+{
+}
+
+void UEquipUIUserWidget::NativePreConstruct()
+{
+	Super::NativePreConstruct();
+	
+}

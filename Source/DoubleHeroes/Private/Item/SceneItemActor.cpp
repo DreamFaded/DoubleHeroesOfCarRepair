@@ -15,6 +15,20 @@ ASceneItemActor::ASceneItemActor()
 	ItemID = -1;
 }
 
+void ASceneItemActor::SetID(int32 OutID, bool bInit)
+{
+	ID = OutID;
+	if (bInit)
+	{
+		Init();
+	}
+}
+
+void ASceneItemActor::SetItemID(int32 OutID)
+{
+	ItemID = OutID;
+}
+
 // Called when the game starts or when spawned
 void ASceneItemActor::BeginPlay()
 {
@@ -33,7 +47,7 @@ void ASceneItemActor::Init()
 	{
 		if (ItemBase->Type == EItemType::EPT_Weapon)
 		{
-			if(!SMCMap)
+			// if(!SMCMap)
 		}
 		else if (ItemBase->Type == EItemType::EPT_SkinPart)
 		{
@@ -52,8 +66,30 @@ void ASceneItemActor::Init()
 			}
 			else if (SkinPart->SkeletalMesh)
 			{
-				
+				if (!SkeletalMeshComponent)
+				{
+					SkeletalMeshComponent = NewObject<USkeletalMeshComponent>(this);
+					SkeletalMeshComponent->RegisterComponentWithWorld(GetWorld());
+					SkeletalMeshComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+					SkeletalMeshComponent->SetCollisionProfileName(TEXT("SceneItem"));
+					SkeletalMeshComponent->SetGenerateOverlapEvents(true);
+				}
+				SkeletalMeshComponent->SetSkeletalMesh(SkinPart->SkeletalMesh);
 			}
+		}
+		else
+		{
+			//武器的
+			FWeaponInfo* WeaponInfo = static_cast<FWeaponInfo*>(ItemBase);
+			if (!SkeletalMeshComponent)
+			{
+				SkeletalMeshComponent = NewObject<USkeletalMeshComponent>(this);
+				SkeletalMeshComponent->RegisterComponentWithWorld(GetWorld());
+				SkeletalMeshComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+				SkeletalMeshComponent->SetCollisionProfileName(TEXT("SceneItem"));
+				SkeletalMeshComponent->SetGenerateOverlapEvents(true);
+			}
+			SkeletalMeshComponent->SetSkeletalMesh(WeaponInfo->SkeletalMesh);
 		}
 	}
 }

@@ -28,6 +28,11 @@ protected:
 
 	void InitPanel(ASceneItemActor* SceneItemActor);
 
+	UPROPERTY()
+	ASceneItemActor* BindSceneItem;
+	
+	int32 PackageSign;
+
 
 private:
 

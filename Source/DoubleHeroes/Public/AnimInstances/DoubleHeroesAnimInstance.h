@@ -17,6 +17,10 @@ class DOUBLEHEROES_API UDoubleHeroesAnimInstance : public UDoubleHeroesBaseAnimI
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(BlueprintReadOnly, Category = Character, meta = (AllowPrivateAccess = "true"))
+	bool bIsCrouched;
+
+	
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeThreadSafeUpdateAnimation(float DeltaSeconds);
 	virtual void NativeUpdateAnimation(float DeltaTime) override;
@@ -38,6 +42,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "AnimData||LocomotionData")
 	bool bSprinting;
 
+	UPROPERTY()
+	bool bHoldWeapon;
+
 private:
 
 	UPROPERTY(BlueprintReadOnly, Category = Character, meta = (AllowPrivateAccess = "true"))
@@ -52,8 +59,6 @@ private:
 	UPROPERTY(BlueprintReadOnly, Category = Character, meta = (AllowPrivateAccess = "true"))
 	bool bWeaponEquipped;
 
-	UPROPERTY(BlueprintReadOnly, Category = Character, meta = (AllowPrivateAccess = "true"))
-	bool bIsCrouched;
 
 	UPROPERTY(BlueprintReadOnly, Category = Character, meta = (AllowPrivateAccess = "true"))
 	float YawOffset;

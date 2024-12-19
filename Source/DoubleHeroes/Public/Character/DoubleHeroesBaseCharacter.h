@@ -7,14 +7,16 @@
 #include "InputActionValue.h"
 #include "Components/PackageComponent.h"
 #include "GameFramework/Character.h"
+#include "Interface/ISkinInterface.h"
 #include "DoubleHeroesBaseCharacter.generated.h"
 
 class UDataAsset_StartUpDataBase;
 class UDoubleHeroesAttributeSet;
 class UDHAbilitySystemComponent;
+class USkinComponent;
 
 UCLASS()
-class DOUBLEHEROES_API ADoubleHeroesBaseCharacter : public ACharacter, public IAbilitySystemInterface
+class DOUBLEHEROES_API ADoubleHeroesBaseCharacter : public ACharacter, public IAbilitySystemInterface, public IISkinInterface
 {
 	GENERATED_BODY()
 
@@ -62,21 +64,20 @@ public:
 	
 	UFUNCTION()
 	virtual void OnRep_Run();
+	
+	AWeapon* GetHoldWeapon() const;
 
 protected:
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UPackageComponent* PackageComponent;
-
 	
+	UPROPERTY(VisibleAnywhere)
+	USkinComponent* SkinComponent;
 
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	
 	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
 	class AWeapon* OverlappingWeapon;
+	
 
-	//Begin APawn Interface
-	virtual void PossessedBy(AController* NewController) override;
-	//End APawn Interface
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AbilitySystem", Replicated)
 	UDHAbilitySystemComponent* DHAbilitySystemComponent;
@@ -87,7 +88,20 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CharacterData")
 	TSoftObjectPtr<UDataAsset_StartUpDataBase> CharacterStartUpData;
 
+	UFUNCTION(Server, Reliable)
+	void Server_SetRunning(bool bNewRunning);
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
+
+	//Begin APawn Interface
+	virtual void PossessedBy(AController* NewController) override;
+	//End APawn Interface
+	
 	virtual void BeginPlay() override;
+
+	virtual USkeletalMeshComponent* GetSkeletalMeshComponent() override;
+
 
 public:
 	FORCEINLINE UDHAbilitySystemComponent* GetDHAbilitySystemComponent() const { return DHAbilitySystemComponent; }

@@ -24,7 +24,9 @@ public:
 	void TogglePackageUI();
 	void OpenPackageUI();
 	void ClosePackageUI();
-	
+
+	template<typename TWidgetClass>
+	TWidgetClass* GetCloneWidget(UClass* OutClass = nullptr);
 
 	UOverlayWidgetController* GetOverlayWidgetController(const FWidgetControllerParams& WCParams);
 
@@ -36,7 +38,9 @@ protected:
 
 	UPROPERTY()
 	UPackageUserWidget* PackageUserWidget;
-	
+
+	UPROPERTY()
+	TMap<UClass*, UUserWidget*> CloneWidgetMap;
 private:
 
 	UPROPERTY()
@@ -57,3 +61,22 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UAttributeMenuWidgetController> AttributeMenuWidgetControllerClass;
 };
+
+template <typename TWidgetClass>
+TWidgetClass* ADoubleHeroesHUD::GetCloneWidget(UClass* OutClass)
+{
+	if (!OutClass)
+	{
+		OutClass = TWidgetClass::StaticClass();
+	}
+	if (CloneWidgetMap.Contains(OutClass))
+	{
+		return Cast<TWidgetClass>(CloneWidgetMap[OutClass]);
+	}
+	else
+	{
+		TWidgetClass* Widget = CreateWidget<TWidgetClass>(GetOwningPlayerController(), OutClass);
+		CloneWidgetMap.Add(OutClass, Widget);
+		return Widget;
+	}
+}
