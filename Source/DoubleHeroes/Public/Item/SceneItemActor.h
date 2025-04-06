@@ -18,7 +18,7 @@ public:
 	int32 GetItemID() const { return ItemID; }
 
 	void SetID(int32 OutID, bool bInit);
-	void SetItemID(int32 ID);
+	void SetItemID(int32 ItemID);
 
 protected:
 	// Called when the game starts or when spawned

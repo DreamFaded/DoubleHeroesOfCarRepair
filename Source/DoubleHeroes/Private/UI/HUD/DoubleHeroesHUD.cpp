@@ -4,6 +4,7 @@
 #include "UI/HUD/DoubleHeroesHUD.h"
 #include "UI/DoubleHeroesUserWidget.h"
 #include "UI/PackageUserWidget.h"
+#include "UI/Widget/PackageItemUserWidget.h"
 
 void ADoubleHeroesHUD::TogglePackageUI()
 {
@@ -52,6 +53,15 @@ void ADoubleHeroesHUD::ClosePackageUI()
 	{
 		if (PackageUserWidget->IsInViewport())
 		{
+			TArray<UPackageItemUserWidget*> ItemArray = PackageUserWidget->PackageItemArray;
+			for(int32 i = 0; i < ItemArray.Num(); i++)
+			{
+				if(ItemArray[i] && ItemArray[i]->CurrentItemId > 0)
+				{
+					PackageUserWidget->OnPutOnItem(i);
+					return;
+				}
+			}
 			PackageUserWidget->RemoveFromParent();
 			GetOwningPlayerController()->bShowMouseCursor = false;
 		}

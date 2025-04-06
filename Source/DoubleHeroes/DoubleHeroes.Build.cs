@@ -8,9 +8,9 @@ public class DoubleHeroes : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "OnlineSubsystem", "OnlineSubsystemSteam", "GameplayAbilities", "UMG" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "OnlineSubsystem", "OnlineSubsystemSteam", "GameplayAbilities", "UMG", "ModularGameplay" });
 
-		PrivateDependencyModuleNames.AddRange(new string[] {"GameplayTags", "GameplayTasks", "NavigationSystem", "Niagara" });
+		PrivateDependencyModuleNames.AddRange(new string[] {"GameplayTags", "GameplayTasks", "NavigationSystem", "Niagara", "NetCore" });
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
@@ -19,5 +19,7 @@ public class DoubleHeroes : ModuleRules
 		// PrivateDependencyModuleNames.Add("OnlineSubsystem");
 
 		// To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
+		
+		//SetupIrisSupport(Target);
 	}
 }

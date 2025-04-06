@@ -3,6 +3,98 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ActiveGameplayEffectHandle.h"
+#include "GameplayTagContainer.h"
+#include "GameplayAbilitySpecHandle.h"
+#include "Engine/DataTable.h"
+#include "EquipmentTypes.generated.h"
+
+
+class UGameplayAbility;
+class UGameplayEffect;
+
+USTRUCT()
+struct FEquipmentGrantedHandles
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FGameplayAbilitySpecHandle GrantedAbility = FGameplayAbilitySpecHandle();
+
+	UPROPERTY()
+	TArray<FActiveGameplayEffectHandle> ActiveEffects = TArray<FActiveGameplayEffectHandle>();
+
+	UPROPERTY()
+	FGameplayAbilitySpecHandle AbilitySpecHandle;
+
+	void AddEffectHandle(FActiveGameplayEffectHandle EffectHandle)
+	{
+		ActiveEffects.Add(EffectHandle);
+	}
+	
+};
+
+USTRUCT(BlueprintType)
+struct FEquipmentStatEffectGroup : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag StatEffectTag = FGameplayTag();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSoftClassPtr<UGameplayEffect> EffectClass = nullptr;
+
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float MinStatLevel = 1.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float MaxStatLevel = 1.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bFractionStat = false;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float ProbabilityToSelect = 0.f;
+
+	UPROPERTY(BlueprintReadOnly)
+	float CurrentValue = 0.f;
+};
+
+USTRUCT(BlueprintType)
+struct FEquipmentAbilityGroup : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag AbilityTag = FGameplayTag();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSoftClassPtr<UGameplayAbility> AbilityClass = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 AbilityLevel = 1;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag ContextTag = FGameplayTag();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float ProbabilityToSelect = 0.f;
+	
+};
+
+USTRUCT(BlueprintType)
+struct FEquipmentEffectPackage
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	TArray<FEquipmentStatEffectGroup> StatEffects = TArray<FEquipmentStatEffectGroup>();
+
+	UPROPERTY()
+	FEquipmentAbilityGroup Ability = FEquipmentAbilityGroup();
+};
 
 /**
  * 

@@ -97,13 +97,17 @@ void UPackageComponent::RemoveItemFromPackageToScene(int32 Sign)
 	}
 }
 
+//从背包中移除物品
 void UPackageComponent::RemoveItemFromPackage(int32 Sign)
 {
-	if (OnRemoveItemFromPackage.IsBound())
+	if (PackageMap.Contains(Sign))
 	{
-		OnRemoveItemFromPackage.Broadcast(Sign, PackageMap[Sign]);
+		if (OnRemoveItemFromPackage.IsBound())
+		{
+			OnRemoveItemFromPackage.Broadcast(Sign, PackageMap[Sign]);
+		}
+		PackageMap.Remove(Sign);
 	}
-	PackageMap.Remove(Sign);
 }
 
 void UPackageComponent::PutOnItemFromNear(ASceneItemActor* ItemActor, ESkinPartType SkinPart)
@@ -222,9 +226,9 @@ void UPackageComponent::SpawnNearSceneItem(int32 ItemID)
 	
 }
 
-AWeapon* UPackageComponent::GetHoloWeapon() const
+AWeapon* UPackageComponent::GetHoldWeapon() const
 {
-	return HoloWeapon;
+	return HoldWeapon;
 }
 
 int32 UPackageComponent::GetPackageMapSign()

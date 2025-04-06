@@ -58,7 +58,7 @@ public:
 	//怪物掉落道具
 	void SpawnNearSceneItem(int32 ItemID);
 
-	AWeapon* GetHoloWeapon() const;
+	AWeapon* GetHoldWeapon() const;
 	
 protected:
 	// Called when the game starts
@@ -68,7 +68,7 @@ protected:
 	TArray<ASceneItemActor*> NearItems;
 
 	UPROPERTY()
-	AWeapon* HoloWeapon;
+	AWeapon* HoldWeapon;
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_AddItemToPackage(ASceneItemActor* SceneItemActor);

@@ -9,13 +9,15 @@
 
 ADoubleHeroesPlayerState::ADoubleHeroesPlayerState()
 {
+	NetUpdateFrequency = 100.f;
+	MinNetUpdateFrequency = 66.f;
+	
 	AbilitySystemComponent = CreateDefaultSubobject<UDHAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 	
 	AttributeSet = CreateDefaultSubobject<UDoubleHeroesAttributeSet>(TEXT("AttributeSet"));
 	
-	NetUpdateFrequency = 100.0f;
 }
 
 void ADoubleHeroesPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -28,6 +30,21 @@ void ADoubleHeroesPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 UAbilitySystemComponent* ADoubleHeroesPlayerState::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
+}
+
+UDHAbilitySystemComponent* ADoubleHeroesPlayerState::GetDHAbilitySystemComponent() const
+{
+	return Cast<UDHAbilitySystemComponent>(AbilitySystemComponent);
+}
+
+void ADoubleHeroesPlayerState::BindCallbacksToDependencies()
+{
+
+}
+
+UDoubleHeroesAttributeSet* ADoubleHeroesPlayerState::GetDoubleHeroesAttributes() const
+{
+	return Cast<UDoubleHeroesAttributeSet>(AttributeSet);
 }
 
 void ADoubleHeroesPlayerState::OnRep_Level(int32 OldLevel)

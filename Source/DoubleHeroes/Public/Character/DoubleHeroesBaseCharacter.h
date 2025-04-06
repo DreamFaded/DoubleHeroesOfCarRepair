@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
+#include "GameplayTagContainer.h"
 #include "InputActionValue.h"
 #include "Components/PackageComponent.h"
 #include "GameFramework/Character.h"
@@ -14,6 +15,7 @@ class UDataAsset_StartUpDataBase;
 class UDoubleHeroesAttributeSet;
 class UDHAbilitySystemComponent;
 class USkinComponent;
+class UGameplayEffect;
 
 UCLASS()
 class DOUBLEHEROES_API ADoubleHeroesBaseCharacter : public ACharacter, public IAbilitySystemInterface, public IISkinInterface
@@ -67,6 +69,15 @@ public:
 	
 	AWeapon* GetHoldWeapon() const;
 
+	FORCEINLINE UDHAbilitySystemComponent* GetDHAbilitySystemComponent() const { return DHAbilitySystemComponent; }
+
+	FORCEINLINE UDoubleHeroesAttributeSet* GetDoubleHeroesAttributeSet() const { return DoubleHeroesAttributeSet; }
+
+	//APawn Interface
+	virtual void PossessedBy(AController* NewController) override;
+	
+	virtual void OnRep_PlayerState() override;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UPackageComponent* PackageComponent;
@@ -82,33 +93,54 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AbilitySystem", Replicated)
 	UDHAbilitySystemComponent* DHAbilitySystemComponent;
 
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	TObjectPtr<UDoubleHeroesAttributeSet> DoubleHeroesAttributes;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AbilitySystem")
 	UDoubleHeroesAttributeSet* DoubleHeroesAttributeSet;
 
+	UPROPERTY(EditAnywhere, Category = "Custom Values|Character Info")
+	FGameplayTag CharacterTag;
+	
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = true))
+	TObjectPtr<USceneComponent> DynamicProjectileSpawnPoint;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CharacterData")
 	TSoftObjectPtr<UDataAsset_StartUpDataBase> CharacterStartUpData;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	TSubclassOf<UGameplayEffect> DefaultSecondaryAttributes;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
+
+	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const;
+
+
+	virtual void InitializeDefaultAttributes() const;
 
 	UFUNCTION(Server, Reliable)
 	void Server_SetRunning(bool bNewRunning);
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
-
-	//Begin APawn Interface
-	virtual void PossessedBy(AController* NewController) override;
-	//End APawn Interface
-	
 	virtual void BeginPlay() override;
 
 	virtual USkeletalMeshComponent* GetSkeletalMeshComponent() override;
 
-
-public:
-	FORCEINLINE UDHAbilitySystemComponent* GetDHAbilitySystemComponent() const { return DHAbilitySystemComponent; }
-
-	FORCEINLINE UDoubleHeroesAttributeSet* GetDoubleHeroesAttributeSet() const { return DoubleHeroesAttributeSet; }
-
 private:
+
+	// UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	// TObjectPtr<UDHAbilitySystemComponent> DHAbilitySystemComponent;
+
+	void InitAbilityActorInfo();
+
+	void InitClassDefaults();
+
+	
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(AWeapon* LastWeapon);
 

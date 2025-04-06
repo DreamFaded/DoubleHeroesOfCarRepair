@@ -12,16 +12,21 @@
 #include "Character/BlueHeroCharacter.h"
 #include "Character/DoubleHeroesBaseCharacter.h"
 #include "Character/DoubleHeroesCharacter.h"
+#include "Components/InventoryComponent.h"
 #include "Components/SplineComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "Input/DoubleHeroesInputComponent.h"
 #include "Interaction/EnemyInterface.h"
+#include "Items/EquipmentManagerComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/DoubleHeroesPlayerState.h"
 #include "UI/HUD/DoubleHeroesHUD.h"
 #include "UI/HUD/WheelHUD.h"
 #include "UI/Widget/DamageTextComponent.h"
+#include "UI/WidgetController/DoubleHeroesSystemsWidget.h"
+#include "UI/WidgetController/InventoryWidgetController.h"
 
 void ADoubleHeroesPlayerController::Server_SetMaxWalkSpeed_Implementation(float NewSpeed)
 {
@@ -38,6 +43,55 @@ ADoubleHeroesPlayerController::ADoubleHeroesPlayerController()
 	bReplicates = true;
 
 	Spline = CreateDefaultSubobject<USplineComponent>(TEXT("Spline"));
+
+	EquipmentComponent = CreateDefaultSubobject<UEquipmentManagerComponent>("EquipmentComponent");
+
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
+	InventoryComponent->SetIsReplicated(true);
+}
+
+UInventoryComponent* ADoubleHeroesPlayerController::GetInventoryComponent_Implementation()
+{
+	return InventoryComponent;
+}
+
+void ADoubleHeroesPlayerController::SetDynamicProjectile_Implementation(const FGameplayTag& ProjectileTag)
+{
+	if (IsValid(DHAbilitySystemComp))
+	{
+		
+	}
+}
+
+UAbilitySystemComponent* ADoubleHeroesPlayerController::GetAbilitySystemComponent() const
+{
+	return UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn());
+}
+
+UInventoryWidgetController* ADoubleHeroesPlayerController::GetInventoryWidgetController()
+{
+	if (!IsValid(InventoryWidgetController))
+	{
+		InventoryWidgetController = NewObject<UInventoryWidgetController>(this, InventoryWidgetControllerClass);
+		InventoryWidgetController->SetOwningActor(this);
+	}
+
+	return InventoryWidgetController;
+}
+
+void ADoubleHeroesPlayerController::CreateInventoryWidget()
+{
+	if(UUserWidget* Widget = CreateWidget<UDoubleHeroesSystemsWidget>(this, InventoryWidgetClass))
+	{
+		InventoryWidget = Cast<UDoubleHeroesSystemsWidget>(Widget);
+		InventoryWidget->SetWidgetController(GetInventoryWidgetController());
+		InventoryWidgetController->BroadcastInitialValues();
+		InventoryWidget->AddToViewport();
+	}
+}
+
+void ADoubleHeroesPlayerController::CreateWidgetController()
+{
 }
 
 void ADoubleHeroesPlayerController::PlayerTick(float DeltaTime)
@@ -299,7 +353,7 @@ void ADoubleHeroesPlayerController::BeginPlay()
 void ADoubleHeroesPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
-	
+
 	UDoubleHeroesInputComponent* DoubleHeroesInputComponent = CastChecked<UDoubleHeroesInputComponent>(InputComponent);
 	// DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_Move, ETriggerEvent::Triggered, this, &ThisClass::Input_Move);
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveForward, ETriggerEvent::Triggered, this, &ThisClass::Input_Move);
@@ -433,16 +487,6 @@ void ADoubleHeroesPlayerController::Input_StopRun()
 }
 
 
-
-void ADoubleHeroesPlayerController::Input_TogglePackage()
-{
-	if(ADoubleHeroesHUD* DoubleHeroesHUD = Cast<ADoubleHeroesHUD>(GetHUD()))
-	{
-		DoubleHeroesHUD->TogglePackageUI();
-		
-	}
-}
-
 void ADoubleHeroesPlayerController::Input_OpenPackage()
 {
 	if(ADoubleHeroesHUD* DoubleHeroesHUD = Cast<ADoubleHeroesHUD>(GetHUD()))
@@ -466,7 +510,56 @@ void ADoubleHeroesPlayerController::Input_AbilityInputPressed(const FGameplayTag
 	DHAbilitySystemComponent->OnAbilityInputPressed(InInputTag);
 }
 
+UDHAbilitySystemComponent* ADoubleHeroesPlayerController::GetDHAbilitySystemComponent()
+{
+	if (!IsValid(DHAbilitySystemComponent))
+	{
+		if(const ADoubleHeroesPlayerState* DoubleHeroesPlayerState = GetPlayerState<ADoubleHeroesPlayerState>())
+		{
+			DHAbilitySystemComponent = DoubleHeroesPlayerState->GetDHAbilitySystemComponent();
+		}
+	}
 
+	return DHAbilitySystemComponent;
+}
+
+void ADoubleHeroesPlayerController::BindCallbacksToDependencies()
+{
+	if (IsValid(InventoryComponent) && IsValid(EquipmentComponent))
+	{
+		// InventoryComponent->EquipmentItemDelegate.AddLambda(
+		// 	[this] (const TSubclassOf<UEquipmentDefinition>& EquipmentDefinition, const FEquipmentEffectPackage& EffectPackage)
+		// 	{
+		// 		if (IsValid(EquipmentComponent))
+		// 		{
+		// 			EquipmentComponent->EquipItem(EquipmentDefinition, EffectPackage);
+		// 		}
+		// 	});
+
+		// EquipmentComponent->EquipmentList.UnEquippedEntryDelegate.AddLambda(
+		// 	[this] (const FDoubleHeroesEquipmentEntry& UnEquippedEntry)
+		// 	{
+		// 		if (IsValid(InventoryComponent))
+		// 		{
+		// 			InventoryComponent->AddUnEquippedItemEntry(UnEquippedEntry.EntryTag, UnEquippedEntry.EffectPackage);
+		// 		}
+		// 	});
+	}
+}
+
+void ADoubleHeroesPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ADoubleHeroesPlayerController, InventoryComponent);
+}
+
+void ADoubleHeroesPlayerController::AbilityInputPressed(FGameplayTag InputTag)
+{
+	if (IsValid(GetDHAbilitySystemComponent()))
+	{
+		DHAbilitySystemComponent->OnAbilityInputPressed(InputTag);
+	}
+}
 /*
 void ADoubleHeroesPlayerController::Move(const FInputActionValue& InputActionValue)
 {

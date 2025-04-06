@@ -6,8 +6,10 @@
 #include "UObject/Interface.h"
 #include "InventoryInterface.generated.h"
 
+
+class UInventoryComponent;
 // This class does not need to be modified.
-UINTERFACE()
+UINTERFACE(MinimalAPI)
 class UInventoryInterface : public UInterface
 {
 	GENERATED_BODY()
@@ -22,4 +24,7 @@ class DOUBLEHEROES_API IInventoryInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	UInventoryComponent* GetInventoryComponent();
 };

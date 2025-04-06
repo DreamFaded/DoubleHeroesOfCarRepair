@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "PackageItemUserWidget.generated.h"
 
+class UPackageUserWidget;
 class UTextBlock;
 class UImage;
 class ASceneItemActor;
@@ -30,6 +31,8 @@ protected:
 
 	UPROPERTY()
 	ASceneItemActor* BindSceneItem;
+	
+	UPackageUserWidget* PackageUserWidget;
 	
 	int32 PackageSign;
 

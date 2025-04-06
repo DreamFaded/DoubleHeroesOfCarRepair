@@ -6,6 +6,7 @@
 #include "Engine/DataAsset.h"
 #include "CharacterClassInfo.generated.h"
 
+struct FGameplayTag;
 class UGameplayAbility;
 class UGameplayEffect;
 
@@ -24,6 +25,15 @@ struct FCharacterClassDefaultInfo
 
 	UPROPERTY(EditDefaultsOnly, Category = "Class Defaults")
 	TSubclassOf<UGameplayEffect> PrimaryAttributes;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UGameplayEffect> DefaultAttributes;
+	
+	UPROPERTY(EditAnywhere)
+	TArray<TSubclassOf<UGameplayAbility>> StartingAbilities;
+
+	UPROPERTY(EditAnywhere)
+	TArray<TSubclassOf<UGameplayAbility>> StartingPassives;
 };
 
 /**
@@ -49,6 +59,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Common Class Defaults|Damage")
 	TObjectPtr<UCurveTable> DamageCalculationCoefficients;
+
+	UPROPERTY(EditDefaultsOnly)
+	TMap<FGameplayTag, FCharacterClassDefaultInfo> ClassDefaultInfoMap;
 
 	FCharacterClassDefaultInfo GetClassDefaultInfo(ECharacterClass CharacterClass);
 };

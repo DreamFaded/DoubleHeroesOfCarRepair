@@ -19,6 +19,7 @@ void UPackageItemUserWidget::InitPanel(ASceneItemActor* SceneItemActor)
 		{
 			// NameTextBlock->SetText(ItemBase->Name);
 			IconImage->SetBrushFromTexture(ItemBase->Icon);
+			BindSceneItem = SceneItemActor;
 		}
 		
 	}
@@ -28,10 +29,15 @@ void UPackageItemUserWidget::NativeOnMouseEnter(const FGeometry& InGeometry, con
 {
 	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
 	SetRenderScale(FVector2D(1.5f, 1.5f));
+	if(BindSceneItem)
+	{
+		CurrentItemId = BindSceneItem->ID;
+	}
 }
 
 void UPackageItemUserWidget::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseLeave(InMouseEvent);
 	SetRenderScale(FVector2D(1.f, 1.f));
+	CurrentItemId = 0;
 }

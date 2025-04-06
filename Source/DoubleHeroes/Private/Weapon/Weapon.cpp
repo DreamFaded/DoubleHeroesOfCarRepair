@@ -87,7 +87,7 @@ void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 				PackageComponent->RemoveNearItem(SceneItemActor);
 			}
 		}
-		// BaseCharacter->SetOverlappingWeapon(nullptr);
+		BaseCharacter->SetOverlappingWeapon(nullptr);
 	}
 }
 

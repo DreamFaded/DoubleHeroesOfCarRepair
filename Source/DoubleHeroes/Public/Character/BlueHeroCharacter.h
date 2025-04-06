@@ -10,6 +10,14 @@
 class UHeroCombatComponent;
 class UDataAsset_InputConfig;
 
+UENUM(BlueprintType)
+enum class ECharacterState : uint8
+{
+	ECS_Unequipped UMETA(DisplayName = "Unequipped"),
+	ECS_EquippedOneHandedWeapon UMETA(DisplayName = "Equipped One-Handed Weapon"),
+	ECS_EquippedTwoHandedWeapon UMETA(DisplayName = "Equipped Two-Handed Weapon")
+};
+
 UCLASS()
 class DOUBLEHEROES_API ABlueHeroCharacter : public ADoubleHeroesBaseCharacter
 {
@@ -75,6 +83,8 @@ protected:
 
 
 private:
+	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
+	
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* CameraBoom;
 

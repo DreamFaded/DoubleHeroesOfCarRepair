@@ -36,8 +36,11 @@ public:
 	UPackageItemUserWidget* PackageItem_4;
 
 	TMap<int32, int32> PackageItemMap;
-	
+
 	TArray<UPackageItemUserWidget*> PackageItemArray;
+
+	UPROPERTY(ReplicatedUsing=OnRep_ActiveSlotIndex)
+	int32 ActiveSlotIndex = -1;
 	
 	UItemSubsystem* ItemSubsystem;
 	
@@ -45,6 +48,15 @@ public:
 
 	void AddPackageItemWidget(int32 Sign, int32 ItemID);
 	void RemoveItemWidget(int32 Sign, int32 ItemID);
+
+	// UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	// void AddItemToSlot(int32 SlotIndex, ULyraInventoryItemInstance* Item);
+	//
+	// UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	// ULyraInventoryItemInstance* RemoveItemFromSlot(int32 SlotIndex);
+
+	void OnPutOnItem(int32 ItemID);
+	void OnTakeOffItem(int32 ItemID);
 
 	void AddItemWidgetToArray();
 
@@ -55,6 +67,12 @@ protected:
 
 	void OnPutOnItem(ESkinPartType PartType, int32 ItemID);
 	void OnTakeOffItem(ESkinPartType PartType, int32 ItemID);
+
+	UFUNCTION()
+	void OnRep_ActiveSlotIndex();
+
+	UFUNCTION()
+	void OnRep_Slots();
 
 
 	

@@ -22,4 +22,10 @@ class DOUBLEHEROES_API IDoubleHeroesAbilitySystemInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	USceneComponent* GetDynamicSpawnPoint();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetDynamicProjectile(const FGameplayTag& ProjectileTag);
 };

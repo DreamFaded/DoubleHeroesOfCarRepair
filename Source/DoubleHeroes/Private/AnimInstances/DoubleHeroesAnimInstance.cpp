@@ -34,7 +34,7 @@ void UDoubleHeroesAnimInstance::NativeUpdateAnimation(float DeltaTime)
 {
 	Super::NativeUpdateAnimation(DeltaTime);
 
-	bHoldWeapon = OwningCharacter->GetHoldWeapon() != nullptr;
+	// bHoldWeapon = OwningCharacter->GetHoldWeapon() != nullptr;
 
 	if (!bHoldWeapon)
 	{

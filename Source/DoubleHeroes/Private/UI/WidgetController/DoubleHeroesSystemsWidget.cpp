@@ -2,3 +2,9 @@
 
 
 #include "UI/WidgetController/DoubleHeroesSystemsWidget.h"
+
+void UDoubleHeroesSystemsWidget::SetWidgetController(UWidgetController* InWidgetController)
+{
+	WidgetController = InWidgetController;
+	OnWidgetControllerSet();
+}

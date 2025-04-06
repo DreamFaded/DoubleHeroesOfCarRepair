@@ -7,8 +7,11 @@
 #include "AbilitySystem/DHAbilitySystemComponent.h"
 #include "AbilitySystem/DoubleHeroesAttributeSet.h"
 #include "Components/SkinComponent.h"
+#include "Data/CharacterClassInfo.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Libraries/DHAbilitySystemLibrary.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/DoubleHeroesPlayerState.h"
 
 
 // Sets default values
@@ -56,7 +59,7 @@ AWeapon* ADoubleHeroesBaseCharacter::GetHoldWeapon() const
 {
 	if (PackageComponent)
 	{
-		return PackageComponent->GetHoloWeapon();
+		return PackageComponent->GetHoldWeapon();
 	}
 	return nullptr;
 }
@@ -79,6 +82,23 @@ void ADoubleHeroesBaseCharacter::Server_SetRunning_Implementation(bool bNewRunni
 	}
 }
 
+void ADoubleHeroesBaseCharacter::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const
+{
+	check(IsValid(GetAbilitySystemComponent()));
+	check(GameplayEffectClass);
+	FGameplayEffectContextHandle ContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
+	ContextHandle.AddSourceObject(this);
+	const FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(GameplayEffectClass, Level, ContextHandle);
+	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), GetAbilitySystemComponent());
+}
+
+void ADoubleHeroesBaseCharacter::InitializeDefaultAttributes() const
+{
+	ApplyEffectToSelf(DefaultPrimaryAttributes, 1.f);
+	ApplyEffectToSelf(DefaultSecondaryAttributes, 1.f);
+	ApplyEffectToSelf(DefaultVitalAttributes, 1.f);
+}
+
 void ADoubleHeroesBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -93,11 +113,52 @@ void ADoubleHeroesBaseCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	if (DHAbilitySystemComponent)
+	if (HasAuthority())
 	{
-		DHAbilitySystemComponent->InitAbilityActorInfo(this, this);
+		InitAbilityActorInfo();
 
 		ensureMsgf(!CharacterStartUpData.IsNull(),TEXT("Forgot to assign start up to %s"), *GetName());
+	}
+}
+
+void ADoubleHeroesBaseCharacter::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+
+	InitAbilityActorInfo();
+}
+
+void ADoubleHeroesBaseCharacter::InitAbilityActorInfo()
+{
+	if (ADoubleHeroesPlayerState* DoubleHeroesPlayerState = GetPlayerState<ADoubleHeroesPlayerState>())
+	{
+		DHAbilitySystemComponent = DoubleHeroesPlayerState->GetDHAbilitySystemComponent();
+		DoubleHeroesAttributes = DoubleHeroesPlayerState->GetDoubleHeroesAttributes();
+
+		if (IsValid(DHAbilitySystemComponent))
+		{
+			DHAbilitySystemComponent->InitAbilityActorInfo(DoubleHeroesPlayerState, this);
+		}
+	}
+}
+
+void ADoubleHeroesBaseCharacter::InitClassDefaults()
+{
+	if (!CharacterTag.IsValid())
+	{
+		UE_LOG(LogTemp, Error, TEXT("No Character Tag Selected In This Chatacter %s"), *GetNameSafe(this));
+	}
+	else if (UCharacterClassInfo* ClassInfo = UDHAbilitySystemLibrary::GetCharacterClassDefaultInfo(this))
+	{
+		if (FCharacterClassDefaultInfo* SelectedClassInfo = ClassInfo->ClassDefaultInfoMap.Find(CharacterTag))
+		{
+			if (IsValid(DHAbilitySystemComponent))
+			{
+				DHAbilitySystemComponent->AddCharacterAbilities(SelectedClassInfo->StartingAbilities);
+				DHAbilitySystemComponent->AddCharacterPassiveAbilities(SelectedClassInfo->StartingPassives);
+				DHAbilitySystemComponent->InitializeDefaultAttributes(SelectedClassInfo->DefaultAttributes);
+			}
+		}
 	}
 }
 

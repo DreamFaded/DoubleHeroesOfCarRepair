@@ -4,11 +4,19 @@
 #include "UI/PackageUserWidget.h"
 
 #include "Character/DoubleHeroesBaseCharacter.h"
+#include "Net/UnrealNetwork.h"
 #include "Subsystem/ItemSubsystem.h"
 #include "UI/WheelUIUserWidget.h"
 #include "UI/Widget/PackageItemUserWidget.h"
 
 
+void UPackageUserWidget::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// DOREPLIFETIME(ThisClass, Slots);
+	DOREPLIFETIME(ThisClass, ActiveSlotIndex);
+}
 
 void UPackageUserWidget::ShowUI()
 {
@@ -29,7 +37,8 @@ void UPackageUserWidget::ShowUI()
 			ItemSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UItemSubsystem>();
 			PackageItemMap.Add(1,1);
 			PackageItemMap.Add(2,2);
-			for (int32 i = 0; i <= 3; i++)
+			//把所有的物品都显示出来
+			for (int32 i = 0; i < 4; i++)
 			{
 				if(PackageItemMap.Contains(i+1))
 				{
@@ -76,6 +85,29 @@ void UPackageUserWidget::RemoveItemWidget(int32 Sign, int32 ItemID)
 {
 }
 
+void UPackageUserWidget::OnPutOnItem(int32 index)
+{
+
+	//穿戴装备
+	if (ADoubleHeroesBaseCharacter* Player = Cast<ADoubleHeroesBaseCharacter>(GetOwningPlayerPawn()))
+	{
+		if (Player->GetPackageComponent())
+		{
+			if (Player->GetPackageComponent()->PackageMap.Contains(index))
+			{
+				//把角色当前身上的装备Attach到Socket上
+				
+			}
+		}
+	}
+	
+	ActiveSlotIndex = index;
+}
+
+void UPackageUserWidget::OnTakeOffItem(int32 ItemID)
+{
+}
+
 void UPackageUserWidget::AddItemWidgetToArray()
 {
 	PackageItemArray.Add(PackageItem_1);
@@ -90,6 +122,14 @@ void UPackageUserWidget::OnPutOnItem(ESkinPartType PartType, int32 ItemID)
 }
 
 void UPackageUserWidget::OnTakeOffItem(ESkinPartType PartType, int32 ItemID)
+{
+}
+
+void UPackageUserWidget::OnRep_ActiveSlotIndex()
+{
+}
+
+void UPackageUserWidget::OnRep_Slots()
 {
 }
 

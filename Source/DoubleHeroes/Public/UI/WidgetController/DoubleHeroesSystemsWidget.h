@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "DoubleHeroesSystemsWidget.generated.h"
 
+class UWidgetController;
 /**
  * 
  */
@@ -13,4 +14,16 @@ UCLASS()
 class DOUBLEHEROES_API UDoubleHeroesSystemsWidget : public UUserWidget
 {
 	GENERATED_BODY()
+
+public:
+
+	void SetWidgetController(UWidgetController* InWidgetController);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnWidgetControllerSet();
+
+private:
+
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	TObjectPtr<UWidgetController> WidgetController;
 };

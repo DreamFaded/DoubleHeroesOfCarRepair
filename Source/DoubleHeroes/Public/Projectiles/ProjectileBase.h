@@ -3,8 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DoubleHeroesAbilityTypes.h"
 #include "GameFramework/Actor.h"
 #include "ProjectileBase.generated.h"
+
+class UBoxComponent;
+class UDamageTextComponent;
+class USphereComponent;
+struct FProjectileParams;
+class UProjectileMovementComponent;
 
 UCLASS()
 class DOUBLEHEROES_API AProjectileBase : public AActor
@@ -15,11 +22,30 @@ public:
 	// Sets default values for this actor's properties
 	AProjectileBase();
 
+	void SetProjectileParams(const FProjectileParams& Params);
+
+	UPROPERTY(BlueprintReadWrite)
+	FDamageEffectInfo DamageEffectInfo;
+
 protected:
-	// Called when the game starts or when spawned
+	
 	virtual void BeginPlay() override;
 
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	UFUNCTION()
+	virtual void OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+
+private:
+
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = true))
+	TObjectPtr<UStaticMeshComponent> ProjectileMesh;
+
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = true))
+	TObjectPtr<UBoxComponent> OverlapBox;
+
+	UPROPERTY()
+	TObjectPtr<UProjectileMovementComponent> ProjectileMovementComponent;
+
+	UPROPERTY()
+	TObjectPtr<UDamageTextComponent> DamageTextComponent;
+
 };

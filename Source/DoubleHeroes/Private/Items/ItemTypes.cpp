@@ -1,13 +1,6 @@
-﻿$COPYRIGHT_LINE$
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-$MY_HEADER_INCLUDE_DIRECTIVE$
+#include "Items/ItemTypes.h"
 
 
-$UNPREFIXED_CLASS_NAME$::$UNPREFIXED_CLASS_NAME$()
-{
-}
-
-$UNPREFIXED_CLASS_NAME$::~$UNPREFIXED_CLASS_NAME$()
-{
-}

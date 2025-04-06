@@ -3,12 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
 #include "AbilitySystem/DHAbilitySystemComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "Input/DoubleHeroesInputConfig.h"
 #include "Interaction/EnemyInterface.h"
+#include "Interface/DoubleHeroesAbilitySystemInterface.h"
+#include "Interface/InventoryInterface.h"
 #include "DoubleHeroesPlayerController.generated.h"
 
+class UDoubleHeroesSystemsWidget;
+class UInventoryWidgetController;
+class UInventoryComponent;
+class UEquipmentManagerComponent;
 class ADoubleHeroesBaseCharacter;
 class USplineComponent;
 class UDamageTextComponent;
@@ -21,7 +28,7 @@ class UDataAsset_InputConfig;
  * 
  */
 UCLASS()
-class DOUBLEHEROES_API ADoubleHeroesPlayerController : public APlayerController
+class DOUBLEHEROES_API ADoubleHeroesPlayerController : public APlayerController, public IAbilitySystemInterface, public IInventoryInterface, public IDoubleHeroesAbilitySystemInterface 
 {
 	GENERATED_BODY()
 
@@ -52,6 +59,18 @@ public:
 	ADoubleHeroesBaseCharacter* BaseCharacter;
 	
 	ADoubleHeroesPlayerController();
+	
+	virtual UInventoryComponent* GetInventoryComponent_Implementation() override;
+
+	virtual void SetDynamicProjectile_Implementation(const FGameplayTag& ProjectileTag) override;
+
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	
+	UInventoryWidgetController* GetInventoryWidgetController();
+
+	void CreateInventoryWidget();
+
+	void CreateWidgetController();
 
 	virtual void PlayerTick(float DeltaTime) override;
 
@@ -77,15 +96,39 @@ protected:
 	void Input_Look(const FInputActionValue& InputActionValue);
 	void Input_StartRun();
 	void Input_StopRun();
-	void Input_TogglePackage();
 	void Input_OpenPackage();
 	void Input_ClosePackage();
 	void Input_AbilityInputPressed(FGameplayTag InInputTag);
+
+	void BindCallbacksToDependencies();
 
 private:
 
 	UPROPERTY()
 	APawn* ControlledPawn;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Replicated)
+	TObjectPtr<UInventoryComponent> InventoryComponent;
+
+	TObjectPtr<UDHAbilitySystemComponent> DHAbilitySystemComp;
+
+	UPROPERTY()
+	TObjectPtr<UInventoryWidgetController> InventoryWidgetController;
+
+	UPROPERTY(EditDefaultsOnly, Category="Custom|Widgets")
+	TSubclassOf<UInventoryWidgetController> InventoryWidgetControllerClass;
+
+	UPROPERTY()
+	TObjectPtr<UDoubleHeroesSystemsWidget> InventoryWidget;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Custom|Widgets")
+	TSubclassOf<UDoubleHeroesSystemsWidget> InventoryWidgetClass;
+
+	UDHAbilitySystemComponent* GetDHAbilitySystemComponent();
+
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	void AbilityInputPressed(FGameplayTag InputTag);
 	
 	// UPROPERTY(EditAnywhere, Category = "Input")
 	// TObjectPtr<UInputMappingContext> DoubleHeroesContext;
@@ -114,10 +157,9 @@ private:
 	void Look(const FInputActionValue& InputActionValue);*/
 	// void AutoRun();
 
-	bool bShiftKeyDown = false;
-	void ShiftPressed() { bShiftKeyDown = true; }
-	void ShiftReleased() { bShiftKeyDown = false; }
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UEquipmentManagerComponent> EquipmentComponent;
+	
 	void CursorTrace();
 
 	IEnemyInterface* LastActor;

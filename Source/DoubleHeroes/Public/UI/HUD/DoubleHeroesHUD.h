@@ -21,6 +21,8 @@ class DOUBLEHEROES_API ADoubleHeroesHUD : public AHUD
 
 public:
 
+	int32 HoverItemID = 0;
+
 	void TogglePackageUI();
 	void OpenPackageUI();
 	void ClosePackageUI();
