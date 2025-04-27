@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "DoubleHeroesDamageAbility.h"
-#include "DoubleHeroesAbilityTypes.h"
+#include "AbilitySystem/DoubleHeroesAbilityTypes.h"
 #include "ProjectileAbility.generated.h"
 
 /**
@@ -30,5 +30,6 @@ private:
 
 	FProjectileParams CurrentProjectileParams;
 
+	UFUNCTION(BlueprintCallable)
 	void SpawnProjectile();
 };

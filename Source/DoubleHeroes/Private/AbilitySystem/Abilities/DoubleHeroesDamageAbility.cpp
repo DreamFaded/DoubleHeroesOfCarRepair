@@ -4,7 +4,7 @@
 #include "AbilitySystem/Abilities/DoubleHeroesDamageAbility.h"
 
 #include "AbilitySystemGlobals.h"
-#include "DoubleHeroesAbilityTypes.h"
+#include "AbilitySystem/DoubleHeroesAbilityTypes.h"
 
 void UDoubleHeroesDamageAbility::CaptureDamageEffectInfo(AActor* TargetActor, FDamageEffectInfo& OutInfo)
 {

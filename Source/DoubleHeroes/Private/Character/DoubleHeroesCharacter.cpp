@@ -11,6 +11,7 @@
 #include "AbilitySystem/AbilityTasks/TargetDataUnderMouse.h"
 #include "Camera/CameraComponent.h"
 #include "Data/CharacterClassInfo.h"
+#include "DataAsset/DataAsset_StartUpDataBase.h"
 #include "DataAsset/Input/DataAsset_InputConfig.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -47,6 +48,8 @@ ADoubleHeroesCharacter::ADoubleHeroesCharacter()
 
 	DynamicProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>("ProjectileSpawnPoint");
 	DynamicProjectileSpawnPoint->SetupAttachment(GetRootComponent());
+
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 }
 
 void ADoubleHeroesCharacter::PossessedBy(AController* NewController)
@@ -54,7 +57,17 @@ void ADoubleHeroesCharacter::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 
 	//Init ability actor info for the Server
-	InitAbilityActorInfo();
+	if (HasAuthority())
+	{
+		InitAbilityActorInfo();
+	}
+	// if (!CharacterStartUpData.IsNull())
+	// {
+	// 	if (UDataAsset_StartUpDataBase* LoadedData = CharacterStartUpData.LoadSynchronous())
+	// 	{
+	// 		LoadedData->GiveToAbilitySystemComponent(DHAbilitySystemComponent);
+	// 	}
+	// }
 	// AddCharacterAbilities();
 }
 
@@ -75,7 +88,8 @@ int32 ADoubleHeroesCharacter::GetPlayerLevel_Implementation()
 
 USceneComponent* ADoubleHeroesCharacter::GetDynamicSpawnPoint_Implementation()
 {
-	return IDoubleHeroesAbilitySystemInterface::GetDynamicSpawnPoint_Implementation();
+	// return IDoubleHeroesAbilitySystemInterface::GetDynamicSpawnPoint_Implementation();
+	return DynamicProjectileSpawnPoint;
 }
 
 // void ADoubleHeroesCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -120,6 +134,12 @@ void ADoubleHeroesCharacter::InitAbilityActorInfo()
 		if (HasAuthority())
 		{
 			InitClassDefaults();
+		}
+
+		if (UDoubleHeroesAnimInstance* DoubleHeroesAnimInstance = Cast<UDoubleHeroesAnimInstance>(
+			GetMesh()->GetAnimInstance()))
+		{
+			DoubleHeroesAnimInstance->InitializeWithAbilitySystem(DHAbilitySystemComponent);
 		}
 	}
 	InitializeDefaultAttributes();
@@ -172,6 +192,10 @@ void ADoubleHeroesCharacter::InitClassDefaults()
 				DHAbilitySystemComponent->InitializeDefaultAttributes(SelectedClassInfo->DefaultAttributes);
 			}
 		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("No Character Class Info Found For This Character %s"), *GetNameSafe(this));
 	}
 }
 

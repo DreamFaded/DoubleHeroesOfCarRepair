@@ -3,7 +3,7 @@
 
 #include "AbilitySystem/DoubleHeroesAbilitySystemGlobals.h"
 
-#include "DoubleHeroesAbilityTypes.h"
+#include "AbilitySystem/DoubleHeroesAbilityTypes.h"
 
 FGameplayEffectContext* UDoubleHeroesAbilitySystemGlobals::AllocGameplayEffectContext() const
 {

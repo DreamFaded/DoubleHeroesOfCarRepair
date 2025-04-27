@@ -34,11 +34,18 @@ void FDoubleHeroesEquipmentList::RemoveEquipmentStats(FDoubleHeroesEquipmentEntr
 
 void FDoubleHeroesEquipmentList::AddEquipmentAbility(FDoubleHeroesEquipmentEntry* Entry)
 {
-	
+	if (UDHAbilitySystemComponent* ASC = GetAbilitySystemComponent())
+	{
+		ASC->AddEquipmentAbility(Entry);
+	}
 }
 
 void FDoubleHeroesEquipmentList::RemoveEquipmentAbility(FDoubleHeroesEquipmentEntry* Entry)
 {
+	if (UDHAbilitySystemComponent* ASC = GetAbilitySystemComponent())
+	{
+		ASC->RemoveEquipmentAbility(Entry);
+	}
 }
 
 UEquipmentInstance* FDoubleHeroesEquipmentList::AddEntry(const TSubclassOf<UEquipmentDefinition>& EquipmentDefinition, const FEquipmentEffectPackage& EffectPackage)
@@ -82,6 +89,8 @@ UEquipmentInstance* FDoubleHeroesEquipmentList::AddEntry(const TSubclassOf<UEqui
 	{
 		AddEquipmentAbility(&NewEntry);
 	}
+
+	NewEntry.Instance->SpawnEquipmentActors(EquipmentCDO->ActorToSpawns);
 
 	MarkItemDirty(NewEntry);
 	EquipmentEntryDelegate.Broadcast(NewEntry);
@@ -138,7 +147,7 @@ void FDoubleHeroesEquipmentList::PostReplicatedChange(const TArrayView<int32> Ch
 {
 	for (const int32 Index : ChangedIndices)
 	{
-		const FDoubleHeroesEquipmentEntry& Entry = Entries[Index];
+		FDoubleHeroesEquipmentEntry& Entry = Entries[Index];
 
 		EquipmentEntryDelegate.Broadcast(Entry);
 	}
@@ -163,7 +172,7 @@ void UEquipmentManagerComponent::EquipItem(const TSubclassOf<UEquipmentDefinitio
 {
 	if (!GetOwner()->HasAuthority())
 	{
-		// ServerEquipItem(EquipmentDefinition, EffectPackage);
+		ServerEquipItem(EquipmentDefinition, EffectPackage);
 		return;
 	}
 	

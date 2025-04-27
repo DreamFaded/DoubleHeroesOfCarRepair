@@ -20,14 +20,7 @@ namespace DoubleHeroesGameplayTags::Static
 	UE_DEFINE_GAMEPLAY_TAG_STATIC(Category_Equipment, "Item.Equipment");
 }
 
-bool FPackagedInventory::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess)
-{
-	SafeNetSerializeTArray_WithNetSerialize<100>(Ar, ItemTags, Map);
-	SafeNetSerializeTArray_Default<100>(Ar, ItemQuantities);
 
-	bOutSuccess = true;
-	return true;
-}
 
 void FDoubleHeroesInventoryList::AddItem(const FGameplayTag& ItemTag, int32 NumItems)
 {
@@ -65,7 +58,7 @@ void FDoubleHeroesInventoryList::AddItem(const FGameplayTag& ItemTag, int32 NumI
 
 	if (NewEntry.ItemTag.MatchesTag(DoubleHeroesGameplayTags::Static::Category_Equipment) && IsValid(WeakStats.Get()))
 	{
-		// RollForStats(Item.EquipmentItemProps.EquipmentClass, &NewEntry);
+		RollForStats(Item.EquipmentItemProps.EquipmentClass, &NewEntry);
 	}
 	
 	if (OwnerComponent->GetOwner()->HasAuthority())
@@ -102,12 +95,22 @@ void FDoubleHeroesInventoryList::RemoveItem(const FDoubleHeroesInventoryEntry& I
 		{
 			Entry.Quantity -= NumItems;
 
-			MarkItemDirty(Entry);
-			
-			if (OwnerComponent->GetOwner()->HasAuthority())
+			if (Entry.Quantity > 0)
 			{
-				DirtyItemDelegate.Broadcast(Entry);
+				MarkItemDirty(Entry);
+				
+				if (OwnerComponent->GetOwner()->HasAuthority())
+				{
+					DirtyItemDelegate.Broadcast(Entry);
+				}
 			}
+			else
+			{
+				InventoryItemRemovedDelegate.Broadcast(Entry.ItemID);
+				EntryIt.RemoveCurrent();
+				MarkArrayDirty();
+			}
+
 			break;
 		}
 	}
@@ -152,6 +155,8 @@ void FDoubleHeroesInventoryList::SetStats(UEquipmentStatEffects* InStats)
 	WeakStats = InStats;
 }
 
+
+
 void FDoubleHeroesInventoryList::RollForStats(const TSubclassOf<UEquipmentDefinition>& EquipmentDefinition,
 	FDoubleHeroesInventoryEntry* Entry)
 {
@@ -162,7 +167,7 @@ void FDoubleHeroesInventoryList::RollForStats(const TSubclassOf<UEquipmentDefini
 	{
 		const int32 RandomIndex = FMath::RandRange(0, EquipmentCDO->PossibleAbilityRolls.Num() - 1);
 		const FGameplayTag& RandomTag = EquipmentCDO->PossibleAbilityRolls.GetByIndex(RandomIndex);
-
+	
 		for (const auto& Pair : StatEffects->MasterStatMap)
 		{
 			if (RandomTag.MatchesTag(Pair.Key))
@@ -218,11 +223,23 @@ void FDoubleHeroesInventoryList::RollForStats(const TSubclassOf<UEquipmentDefini
 void FDoubleHeroesInventoryList::PreReplicatedRemove(const TArrayView<int32> RemovedIndices, int32 FinalSize)
 {
 	// If you can figure out what to do with this go for it. I don't know what it is reliably good for.
+
+	for (const int32 Index : RemovedIndices)
+	{
+		const FDoubleHeroesInventoryEntry& Entry = Entries[Index];
+
+		InventoryItemRemovedDelegate.Broadcast(Entry.ItemID);
+	}
 }
 
 void FDoubleHeroesInventoryList::PostReplicatedChange(const TArrayView<int32> ChangedIndices, int32 FinalSize)
 {
-	
+	for (const int32 Index : ChangedIndices)
+	{
+		FDoubleHeroesInventoryEntry& Entry = Entries[Index];
+
+		DirtyItemDelegate.Broadcast(Entry);
+	}
 }
 
 void FDoubleHeroesInventoryList::PostReplicatedAdd(const TArrayView<int32> AddedIndices, int32 FinalSize)
@@ -236,7 +253,7 @@ void FDoubleHeroesInventoryList::PostReplicatedAdd(const TArrayView<int32> Added
 }
 
 // Sets default values for this component's properties
-UInventoryComponent::UInventoryComponent()
+UInventoryComponent::UInventoryComponent() : InventoryList(this)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -250,7 +267,7 @@ void UInventoryComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(UInventoryComponent, InventoryList);
-	DOREPLIFETIME(UInventoryComponent, CachedInventory);
+	// DOREPLIFETIME(UInventoryComponent, CachedInventory);
 }
 
 void UInventoryComponent::BeginPlay()
@@ -275,19 +292,7 @@ void UInventoryComponent::AddItem(const FGameplayTag& ItemTag, int32 NumItems)
 		return;
 	}
 
-	if (InventoryTagMap.Contains(ItemTag))
-	{
-		InventoryTagMap[ItemTag] += NumItems;
-	}
-	else
-	{
-		InventoryTagMap.Emplace(ItemTag, NumItems);
-	}
-
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Magenta,
-		FString::Printf(TEXT("Server Item Added %s"), *ItemTag.ToString()));
-
-	PackageInventory(CachedInventory);
+	InventoryList.AddItem(ItemTag, NumItems);
 	
 }
 
@@ -321,11 +326,11 @@ void UInventoryComponent::UseItem(const FDoubleHeroesInventoryEntry& Entry, int3
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Magenta,
 					FString::Printf(TEXT("Server Item Used %s"), *Item.ItemTag.ToString()));
 			}
-			// if (IsValid(Item.EquipmentItemProps.EquipmentClass))
-			// {
-			// 	EquipmentItemDelegate.Broadcast(Item.EquipmentItemProps.EquipmentClass, Entry.EffectPackage);
-			// 	InventoryList.RemoveItem(Entry);
-			// }
+			if (IsValid(Item.EquipmentItemProps.EquipmentClass))
+			{
+				EquipmentItemDelegate.Broadcast(Item.EquipmentItemProps.EquipmentClass, Entry.EffectPackage);
+				InventoryList.RemoveItem(Entry);
+			}
 		}
 	}
 
@@ -340,7 +345,10 @@ FMasterItemDefinition UInventoryComponent::GetItemDefinitionByTag(const FGamepla
 	{
 		if (ItemTag.MatchesTag(Pair.Key))
 		{
-			return *UDHAbilitySystemLibrary::GetDataTableRowByTag<FMasterItemDefinition>(Pair.Value, ItemTag);
+			if(const FMasterItemDefinition* ValidItem = UDHAbilitySystemLibrary::GetDataTableRowByTag<FMasterItemDefinition>(Pair.Value, ItemTag))
+			{
+				return *ValidItem;
+			}
 		}
 	}
 	return FMasterItemDefinition();
@@ -357,6 +365,20 @@ void UInventoryComponent::AddUnEquippedItemEntry(const FGameplayTag& ItemTag,
 	InventoryList.AddUnEquippedItem(ItemTag, EffectPackage);
 }
 
+bool UInventoryComponent::ServerUseItem_Validate(const FDoubleHeroesInventoryEntry& Entry, int32 NumItems)
+{
+	return Entry.IsValid() && InventoryList.HasEnough(Entry.ItemTag, NumItems);
+}
+
+/*
+*bool FPackagedInventory::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess)
+{
+	SafeNetSerializeTArray_WithNetSerialize<100>(Ar, ItemTags, Map);
+	SafeNetSerializeTArray_Default<100>(Ar, ItemQuantities);
+
+	bOutSuccess = true;
+	return true;
+}
 void UInventoryComponent::PackageInventory(FPackagedInventory& OutInventory)
 {
 	OutInventory.ItemTags.Empty();
@@ -389,7 +411,7 @@ void UInventoryComponent::ReconstructInventoryMap(const FPackagedInventory& Inve
 void UInventoryComponent::OnRep_CachedInventory()
 {
 	ReconstructInventoryMap(CachedInventory);
-}
+}*/
 
 void UInventoryComponent::ServerAddItem_Implementation(const FGameplayTag& ItemTag, int32 NumItems)
 {

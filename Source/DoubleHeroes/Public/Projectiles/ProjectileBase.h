@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "DoubleHeroesAbilityTypes.h"
+#include "AbilitySystem/DoubleHeroesAbilityTypes.h"
 #include "GameFramework/Actor.h"
 #include "ProjectileBase.generated.h"
 

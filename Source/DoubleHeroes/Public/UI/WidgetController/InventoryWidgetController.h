@@ -9,7 +9,8 @@
 struct FMasterItemDefinition;
 class UInventoryComponent;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryItemSignature, const FMasterItemDefinition&, Item);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryItemSignature, const FDoubleHeroesInventoryEntry&, Entry);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryItemRemoved, const int64, ItemID);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInventoryBroadcastComplete);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FScrollBoxResetSignature);
 /**
@@ -23,7 +24,10 @@ class DOUBLEHEROES_API UInventoryWidgetController : public UWidgetController
 public:
 
 	UPROPERTY(BlueprintAssignable)
-	FInventoryItemSignature InventoryItemDelegate;
+	FInventoryItemSignature InventoryEntryDelegate;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnInventoryItemRemoved OnInventoryItemRemoved;
 
 	UPROPERTY(BlueprintAssignable)
 	FInventoryBroadcastComplete InventoryBroadcastComplete;
@@ -43,4 +47,6 @@ private:
 	
 	UPROPERTY()
 	TObjectPtr<UInventoryComponent> OwningInventory;
+
+	void BroadcastInventoryContents();
 };

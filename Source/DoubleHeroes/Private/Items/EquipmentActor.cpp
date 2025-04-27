@@ -16,5 +16,8 @@ AEquipmentActor::AEquipmentActor()
 	SetRootComponent(RootScene);
 
 	EquipmentMesh = CreateDefaultSubobject<UStaticMeshComponent>("EquipmentMesh");
+	EquipmentMesh->SetupAttachment(GetRootComponent());
+	EquipmentMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
 }
 

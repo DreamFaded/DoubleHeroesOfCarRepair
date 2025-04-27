@@ -6,7 +6,7 @@
 const UInputAction* UDoubleHeroesInputConfig::FindAbilityInputActionForTag(const FGameplayTag& InputTag,
 	bool bLogNotFound) const
 {
-	for (const FDoubleHeroesInputAction& Action : AbilityInputActions)
+	for (const FDoubleHeroesInputAction& Action : DoubleHeroesInputActions)
 	{
 		if (Action.InputAction && Action.InputTag == InputTag)
 		{

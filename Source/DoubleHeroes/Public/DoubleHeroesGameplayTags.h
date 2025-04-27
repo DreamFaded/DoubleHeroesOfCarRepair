@@ -7,6 +7,16 @@
 #include "NativeGameplayTags.h"
 
 
+namespace DoubleHeroesGameplayTags::Combat
+{
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Data_Damage);
+}
+
+namespace DoubleHeroesGameplayTags::Player::State
+{
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Crouch);
+}
+
 namespace DoubleHeroesGameplayTags
 {
 	DOUBLEHEROES_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Move);

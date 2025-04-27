@@ -3,10 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DoubleHeroesInputConfig.h"
 #include "EnhancedInputComponent.h"
 #include "DataAsset/Input/DataAsset_InputConfig.h"
 #include "DoubleHeroesInputComponent.generated.h"
 
+
+struct FDoubleHeroesInputAction;
+class UDoubleHeroesInputConfig;
 
 UCLASS()
 class DOUBLEHEROES_API UDoubleHeroesInputComponent : public UEnhancedInputComponent
@@ -20,6 +24,10 @@ public:
 
 	template <class UserObject, typename CallbackFunc>
 	void BindAbilityInputAction(const UDataAsset_InputConfig* InInputConfig, UserObject* ContextObject, CallbackFunc InputPressedFunc, CallbackFunc InputReleasedFunc);
+
+	//GAS
+	template<class UserClass, typename PressedFuncType, typename ReleasedFuncType>
+	void BindAbilityActions(UDoubleHeroesInputConfig* InputConfig, UserClass* Object, PressedFuncType PressedFunc, ReleasedFuncType ReleasedFunc);
 };
 
 template <class UserObject, typename CallbackFunc>
@@ -46,4 +54,27 @@ void UDoubleHeroesInputComponent::BindAbilityInputAction(const UDataAsset_InputC
 		BindAction(AbilityInputActionConfig.InputAction, ETriggerEvent::Started, ContextObject, InputPressedFunc, AbilityInputActionConfig.InputTag);
 		BindAction(AbilityInputActionConfig.InputAction, ETriggerEvent::Completed, ContextObject, InputReleasedFunc, AbilityInputActionConfig.InputTag);
 	}
+}
+
+template <class UserClass, typename PressedFuncType, typename ReleasedFuncType>
+void UDoubleHeroesInputComponent::BindAbilityActions(UDoubleHeroesInputConfig* InputConfig, UserClass* Object,
+	PressedFuncType PressedFunc, ReleasedFuncType ReleasedFunc)
+{
+	check(InputConfig);
+
+	for (const FDoubleHeroesInputAction& Action : InputConfig->DoubleHeroesInputActions)
+	{
+		if (IsValid(Action.InputAction) && Action.InputTag.IsValid())
+		{
+			if (PressedFunc)
+			{
+				BindAction(Action.InputAction, ETriggerEvent::Started, Object, PressedFunc, Action.InputTag);
+			}
+			if (ReleasedFunc)
+			{
+				BindAction(Action.InputAction, ETriggerEvent::Completed, Object, ReleasedFunc, Action.InputTag);
+			}
+		}
+	}
+	
 }

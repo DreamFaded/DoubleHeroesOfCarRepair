@@ -25,7 +25,7 @@ class DOUBLEHEROES_API UDoubleHeroesGameplayAbility : public UGameplayAbility
 
 public:
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Custom Values|Input")
 	FGameplayTag InputTag;
 	
 	virtual void OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;

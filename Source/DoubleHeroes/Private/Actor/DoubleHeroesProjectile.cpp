@@ -47,12 +47,12 @@ void ADoubleHeroesProjectile::BeginPlay()
 
 void ADoubleHeroesProjectile::Destroyed()
 {
-	if (!bHit && !HasAuthority())
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
-		LoopingSoundComponent->Stop();
-	}
+	// if (!bHit && !HasAuthority())
+	// {
+	// 	UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
+	// 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
+	// 	LoopingSoundComponent->Stop();
+	// }
 	Super::Destroyed();
 }
 

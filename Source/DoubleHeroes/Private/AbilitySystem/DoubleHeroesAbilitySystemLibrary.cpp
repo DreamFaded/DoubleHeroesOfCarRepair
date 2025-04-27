@@ -4,8 +4,7 @@
 #include "AbilitySystem/DoubleHeroesAbilitySystemLibrary.h"
 
 #include "AbilitySystemComponent.h"
-#include "..\..\Public\DoubleHeroesAbilityTypes.h"
-#include "Character/DoubleHeroesCharacter.h"
+#include "AbilitySystem/DoubleHeroesAbilityTypes.h"
 #include "Game/DoubleHeroesGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/DoubleHeroesPlayerState.h"

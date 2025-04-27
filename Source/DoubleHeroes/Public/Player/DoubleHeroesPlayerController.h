@@ -62,12 +62,13 @@ public:
 	
 	virtual UInventoryComponent* GetInventoryComponent_Implementation() override;
 
-	virtual void SetDynamicProjectile_Implementation(const FGameplayTag& ProjectileTag) override;
+	virtual void SetDynamicProjectile_Implementation(const FGameplayTag& ProjectileTag, int32 AbilityLevel) override;
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	
 	UInventoryWidgetController* GetInventoryWidgetController();
 
+	UFUNCTION(BlueprintCallable)
 	void CreateInventoryWidget();
 
 	void CreateWidgetController();
@@ -98,7 +99,9 @@ protected:
 	void Input_StopRun();
 	void Input_OpenPackage();
 	void Input_ClosePackage();
-	void Input_AbilityInputPressed(FGameplayTag InInputTag);
+	void Input_AbilityInputPressed(FGameplayTag InputTag);
+
+	void Input_AbilityInputReleased(FGameplayTag InputTag);
 
 	void BindCallbacksToDependencies();
 
@@ -107,10 +110,11 @@ private:
 	UPROPERTY()
 	APawn* ControlledPawn;
 
+	// UPROPERTY(EditDefaultsOnly, Category="Custom Values|Input")
+	// TObjectPtr<UDoubleHeroesInputConfig> DoubleHeroesInputConfig;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Replicated)
 	TObjectPtr<UInventoryComponent> InventoryComponent;
-
-	TObjectPtr<UDHAbilitySystemComponent> DHAbilitySystemComp;
 
 	UPROPERTY()
 	TObjectPtr<UInventoryWidgetController> InventoryWidgetController;
@@ -129,6 +133,7 @@ private:
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	void AbilityInputPressed(FGameplayTag InputTag);
+	void AbilityInputReleased(FGameplayTag InputTag);
 	
 	// UPROPERTY(EditAnywhere, Category = "Input")
 	// TObjectPtr<UInputMappingContext> DoubleHeroesContext;
@@ -170,9 +175,6 @@ private:
 	void AbilityInputTagPressed(FGameplayTag InputTag);
 	// void AbilityInputTagReleased(FGameplayTag InputTag);
 	// void AbilityInputTagHeld(FGameplayTag InputTag);
-	
-	// UPROPERTY(EditDefaultsOnly, Category = "Input")
-	// TObjectPtr<UDoubleHeroesInputConfig> InputConfig;
 
 	UPROPERTY()
 	TObjectPtr<UDHAbilitySystemComponent> DHAbilitySystemComponent;

@@ -1,5 +1,5 @@
 
-#include "..\Public\DoubleHeroesAbilityTypes.h"
+#include "AbilitySystem/DoubleHeroesAbilityTypes.h"
 
 bool FDoubleHeroesGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess)
 {

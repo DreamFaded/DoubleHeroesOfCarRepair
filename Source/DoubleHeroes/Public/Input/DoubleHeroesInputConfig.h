@@ -33,5 +33,5 @@ public:
 	const UInputAction* FindAbilityInputActionForTag(const FGameplayTag& InputTag, bool bLogNotFound = false) const;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TArray<FDoubleHeroesInputAction> AbilityInputActions;
+	TArray<FDoubleHeroesInputAction> DoubleHeroesInputActions;
 };

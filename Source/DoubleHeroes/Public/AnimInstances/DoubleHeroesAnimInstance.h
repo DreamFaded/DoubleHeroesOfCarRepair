@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "DoubleHeroesBaseAnimInstance.h"
+#include "GameplayEffectTypes.h"
 #include "DoubleHeroesAnimInstance.generated.h"
 
 class UCharacterMovementComponent;
@@ -25,6 +26,9 @@ public:
 	virtual void NativeThreadSafeUpdateAnimation(float DeltaSeconds);
 	virtual void NativeUpdateAnimation(float DeltaTime) override;
 
+	//GAS
+	void InitializeWithAbilitySystem(UAbilitySystemComponent* ASC);
+
 protected:
 
 	UPROPERTY()
@@ -33,7 +37,7 @@ protected:
 	UPROPERTY()
 	UCharacterMovementComponent* OwningMovementComponent;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "AnimData||LocomotionData")
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "AnimData||LocomotionData")
 	float GroundSpeed;
 	
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "AnimData||LocomotionData")
@@ -69,4 +73,8 @@ private:
 	FRotator CharacterRotationLastFrame;
 	FRotator CharacterRotation;
 	FRotator DeltaRotation;
+
+	//GAS
+	UPROPERTY(EditDefaultsOnly, Category="Custom Values|Property Map")
+	FGameplayTagBlueprintPropertyMap PropertyMap;
 };

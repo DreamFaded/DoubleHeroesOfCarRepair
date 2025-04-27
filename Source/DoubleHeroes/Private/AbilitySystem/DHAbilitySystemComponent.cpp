@@ -16,22 +16,57 @@ void UDHAbilitySystemComponent::AbilityActorInfoSet()
 	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &UDHAbilitySystemComponent::ClientEffectApplied);
 }
 
-void UDHAbilitySystemComponent::OnAbilityInputPressed(const FGameplayTag& InInputTag)
+void UDHAbilitySystemComponent::OnAbilityInputPressed(const FGameplayTag& InputTag)
 {
-	if (!InInputTag.IsValid())
-	{
-		return;
-	}
-	for(const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
-	{
-		if(!AbilitySpec.DynamicAbilityTags.HasTagExact(InInputTag)) continue;
+	// if (!InputTag.IsValid())
+	// {
+	// 	return;
+	// }
+	// for(const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	// {
+	// 	if(!AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag)) continue;
+	//
+	// 	TryActivateAbility(AbilitySpec.Handle);
+	// }
 
-		TryActivateAbility(AbilitySpec.Handle);
+	//GAS
+	if(!InputTag.IsValid()) return;
+
+	ABILITYLIST_SCOPE_LOCK();
+
+
+	for (const FGameplayAbilitySpec& Spec : GetActivatableAbilities())
+	{
+		if (Spec.DynamicAbilityTags.HasTagExact(InputTag))
+		{
+			if (!Spec.IsActive())
+			{
+				TryActivateAbility(Spec.Handle);
+			}
+			else
+			{
+				InvokeReplicatedEvent(EAbilityGenericReplicatedEvent::InputPressed, Spec.Handle,
+					Spec.ActivationInfo.GetActivationPredictionKey());
+			}
+		}
 	}
+	//GAS
 }
 
-void UDHAbilitySystemComponent::OnAbilityInputReleased(const FGameplayTag& InInputTag)
+void UDHAbilitySystemComponent::OnAbilityInputReleased(const FGameplayTag& InputTag)
 {
+	if(!InputTag.IsValid()) return;
+
+	ABILITYLIST_SCOPE_LOCK();
+
+	for (const FGameplayAbilitySpec& Spec : GetActivatableAbilities())
+	{
+		if (Spec.DynamicAbilityTags.HasTagExact(InputTag))
+		{
+			InvokeReplicatedEvent(EAbilityGenericReplicatedEvent::InputReleased, Spec.Handle,
+				Spec.ActivationInfo.GetActivationPredictionKey());
+		}
+	}
 }
 
 /*void UDHAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities)
@@ -69,13 +104,27 @@ void UDHAbilitySystemComponent::AbilityInputTagHeld(const FGameplayTag& InputTag
 
 void UDHAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& InputTag)
 {
-	if (!InputTag.IsValid()) return;
-	
-	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	// if (!InputTag.IsValid()) return;
+	//
+	// for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	// {
+	// 	if (AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag))
+	// 	{
+	// 		AbilitySpecInputReleased(AbilitySpec);
+	// 	}
+	// }
+
+	//GAS
+	if(!InputTag.IsValid()) return;
+
+	ABILITYLIST_SCOPE_LOCK();
+	for (const FGameplayAbilitySpec& Spec : GetActivatableAbilities())
 	{
-		if (AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag))
+		if (Spec.DynamicAbilityTags.HasTagExact((InputTag)))
 		{
-			AbilitySpecInputReleased(AbilitySpec);
+			InvokeReplicatedEvent(EAbilityGenericReplicatedEvent::InputReleased, Spec.Handle,
+			                      Spec.ActivationInfo.GetActivationPredictionKey());
+			
 		}
 	}
 }
@@ -173,11 +222,27 @@ void UDHAbilitySystemComponent::RemoveEquipmentAbility(const FDoubleHeroesEquipm
 
 void UDHAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& AbilitiesToGrant)
 {
+	// for (const TSubclassOf<UGameplayAbility>& Ability : AbilitiesToGrant)
+	// {
+	// 	FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(Ability, 1.f);
+	// 	GiveAbility(AbilitySpec);
+	// }
+
+
+	//GAS
 	for (const TSubclassOf<UGameplayAbility>& Ability : AbilitiesToGrant)
 	{
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(Ability, 1.f);
-		GiveAbility(AbilitySpec);
+	
+		if (UDoubleHeroesGameplayAbility* DoubleHeroesAbility = Cast<UDoubleHeroesGameplayAbility>(
+			AbilitySpec.Ability))
+		{
+			AbilitySpec.DynamicAbilityTags.AddTag(DoubleHeroesAbility->InputTag);
+			GiveAbility(AbilitySpec);
+		}
 	}
+
+	//GAS
 }
 
 void UDHAbilitySystemComponent::AddCharacterPassiveAbilities(
@@ -243,7 +308,7 @@ FGameplayAbilitySpecHandle UDHAbilitySystemComponent::GrantEquipmentAbility(
 
 	if (UDoubleHeroesGameplayAbility* DoubleHeroesAbility = Cast<UDoubleHeroesGameplayAbility>(AbilitySpec.Ability))
 	{
-		// AbilitySpec.DynamicAbilityTags.AddTag(DoubleHeroesAbility->InputTag);
+		AbilitySpec.DynamicAbilityTags.AddTag(DoubleHeroesAbility->InputTag);
 	}
 
 	if (UProjectileAbility* ProjectileAbility = Cast<UProjectileAbility>(AbilitySpec.Ability))
@@ -256,10 +321,7 @@ FGameplayAbilitySpecHandle UDHAbilitySystemComponent::GrantEquipmentAbility(
 
 void UDHAbilitySystemComponent::ServerSetDynamicProjectile_Implementation(const FGameplayTag& ProjectileTag, int32 AbilityLevel)
 {
-	// if (IsValid(DoubleHeroesSystemComp))
-	// {
-	// 	DOubleHeroesSystemComp->SetDynamicProjectile(ProjectileTag);
-	// }
+	SetDynamicProjectile(ProjectileTag, AbilityLevel);
 }
 
 

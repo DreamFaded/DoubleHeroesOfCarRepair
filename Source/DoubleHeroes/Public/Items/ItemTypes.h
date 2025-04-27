@@ -16,8 +16,8 @@ struct FEquipmentItemProps
 {
 	GENERATED_BODY()
 
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	// TSubclassOf<UEquipmentDefinition> EquipmentClass = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UEquipmentDefinition> EquipmentClass = nullptr;
 };
 
 USTRUCT(BlueprintType)
@@ -39,6 +39,9 @@ struct FMasterItemDefinition : public FTableRowBase
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FGameplayTag ItemTag  = FGameplayTag();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FText ItemDescription = FText();
 
 	UPROPERTY(BlueprintReadOnly)
 	int32 ItemQuantity = 0;

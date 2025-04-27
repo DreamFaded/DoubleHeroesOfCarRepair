@@ -56,5 +56,4 @@ void UProjectileAbility::SpawnProjectile()
 		}
 	}
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Spawning Projectile %s"), *CurrentProjectileParams.ProjectileClass->GetName()));
 }

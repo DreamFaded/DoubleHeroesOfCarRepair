@@ -3,9 +3,11 @@
 
 #include "Libraries/DHAbilitySystemLibrary.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "GameplayEffectTypes.h"
-#include "DoubleHeroesAbilityTypes.h"
+#include "AbilitySystem/DoubleHeroesAbilityTypes.h"
+#include "DoubleHeroesGameplayTags.h"
 #include "GameMode/DoubleHeroesGameMode.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -15,6 +17,10 @@ UCharacterClassInfo* UDHAbilitySystemLibrary::GetCharacterClassDefaultInfo(const
 		UGameplayStatics::GetGameMode(WorldContextObject)))
 	{
 		return DoubleHeroesGameMode->GetCharacterClassDefaultInfo();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("UDHAbilitySystemLibrary::GetCharacterClassDefaultInfo: DoubleHeroesGameMode is nullptr"));
 	}
 	return nullptr;
 }
@@ -36,6 +42,7 @@ void UDHAbilitySystemLibrary::ApplyDamageEffect(const FDamageEffectInfo& DamageE
 	
 	const FGameplayEffectSpecHandle SpecHandle = DamageEffectInfo.SourceASC->MakeOutgoingSpec(DamageEffectInfo.DamageEffect, DamageEffectInfo.AbilityLevel, ContextHandle);
 
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, DoubleHeroesGameplayTags::Combat::Data_Damage, DamageEffectInfo.BaseDamage);
 	if(IsValid(DamageEffectInfo.TargetASC))
 	{
 		DamageEffectInfo.TargetASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());

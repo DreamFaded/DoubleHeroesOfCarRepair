@@ -89,10 +89,10 @@ struct FEquipmentEffectPackage
 {
 	GENERATED_BODY()
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	TArray<FEquipmentStatEffectGroup> StatEffects = TArray<FEquipmentStatEffectGroup>();
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	FEquipmentAbilityGroup Ability = FEquipmentAbilityGroup();
 };
 

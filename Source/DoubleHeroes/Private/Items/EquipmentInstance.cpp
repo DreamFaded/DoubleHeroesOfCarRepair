@@ -42,8 +42,9 @@ void UEquipmentInstance::SpawnEquipmentActors(const TArray<FEquipmentActorsToSpa
 						ActorToSpawn.EquipmentClass.Get(), FTransform::Identity, OwningCharacter);
 
 					NewActor->FinishSpawning(FTransform::Identity);
-					NewActor->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules:: KeepRelativeTransform, ActorToSpawn.AttachName);
+					NewActor->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, ActorToSpawn.AttachName);
 					WeakThis->SpawnedActors.Emplace(NewActor);
+					
 				});
 			}
 		}

@@ -20,7 +20,7 @@ struct FGameplayTag;
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FEquipmentItemUsed, const TSubclassOf<UEquipmentDefinition>& /* Equipment Definition */, const FEquipmentEffectPackage&)
 
-USTRUCT()
+/*USTRUCT()
 struct FPackagedInventory
 {
 	GENERATED_BODY()
@@ -44,6 +44,10 @@ struct TStructOpsTypeTraits<FPackagedInventory> : TStructOpsTypeTraitsBase2<FPac
 		WithNetSerializer = true
 	};
 };
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FInventoryPackageSignature, const FPackagedInventory&);
+
+*/
 
 USTRUCT(BlueprintType)
 struct FDoubleHeroesInventoryEntry : public FFastArraySerializerItem
@@ -72,6 +76,7 @@ struct FDoubleHeroesInventoryEntry : public FFastArraySerializerItem
 };
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FDirtyInventoryItemSignature, const FDoubleHeroesInventoryEntry& /* Dirty Item */);
+DECLARE_MULTICAST_DELEGATE_OneParam(FInventoryItemRemovedSignature, const int64 /* ItemID */);
 
 USTRUCT()
 struct FDoubleHeroesInventoryList : public FFastArraySerializer
@@ -106,6 +111,7 @@ struct FDoubleHeroesInventoryList : public FFastArraySerializer
 	}
 
 	FDirtyInventoryItemSignature DirtyItemDelegate;
+	FInventoryItemRemovedSignature InventoryItemRemovedDelegate;
 
 private:
 
@@ -141,6 +147,8 @@ class DOUBLEHEROES_API UInventoryComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
+
+	// FInventoryPackagedSignature InventoryPackagedSignature;
 
 	FEquipmentItemUsed EquipmentItemDelegate;
 
@@ -184,11 +192,13 @@ private:
 	UFUNCTION(Server, Reliable)
 	void ServerAddItem(const FGameplayTag& ItemTag, int32 NumItems);
 	
-	UFUNCTION(Server, Reliable)
+	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerUseItem(const FDoubleHeroesInventoryEntry& Entry, int32 NumItems);
 
+	bool ServerUseItem_Validate(const FDoubleHeroesInventoryEntry& Entry, int32 NumItems);
 
-	UPROPERTY(ReplicatedUsing=OnRep_CachedInventory)
+
+	/*UPROPERTY(ReplicatedUsing=OnRep_CachedInventory)
 	FPackagedInventory CachedInventory;
 	
 
@@ -197,5 +207,5 @@ private:
 	void ReconstructInventoryMap(const FPackagedInventory& Inventory);
 
 	UFUNCTION()
-	void OnRep_CachedInventory();
+	void OnRep_CachedInventory();*/
 };

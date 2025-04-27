@@ -78,3 +78,10 @@ void UDoubleHeroesAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	// 将插值结果限制在 -90 到 90 度之间
 	Lean = FMath::Clamp(Interp, -90.f, 90.f);*/
 }
+
+void UDoubleHeroesAnimInstance::InitializeWithAbilitySystem(UAbilitySystemComponent* ASC)
+{
+	check(ASC);
+
+	PropertyMap.Initialize(this, ASC);
+}

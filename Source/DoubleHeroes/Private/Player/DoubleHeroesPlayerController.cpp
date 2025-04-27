@@ -55,11 +55,11 @@ UInventoryComponent* ADoubleHeroesPlayerController::GetInventoryComponent_Implem
 	return InventoryComponent;
 }
 
-void ADoubleHeroesPlayerController::SetDynamicProjectile_Implementation(const FGameplayTag& ProjectileTag)
+void ADoubleHeroesPlayerController::SetDynamicProjectile_Implementation(const FGameplayTag& ProjectileTag, int32 AbilityLevel)
 {
-	if (IsValid(DHAbilitySystemComp))
+	if (IsValid(DHAbilitySystemComponent))
 	{
-		
+		DHAbilitySystemComponent->SetDynamicProjectile(ProjectileTag);
 	}
 }
 
@@ -74,6 +74,7 @@ UInventoryWidgetController* ADoubleHeroesPlayerController::GetInventoryWidgetCon
 	{
 		InventoryWidgetController = NewObject<UInventoryWidgetController>(this, InventoryWidgetControllerClass);
 		InventoryWidgetController->SetOwningActor(this);
+		InventoryWidgetController->BindCallbacksToDependencies();
 	}
 
 	return InventoryWidgetController;
@@ -284,11 +285,18 @@ void ADoubleHeroesPlayerController::AbilityInputTagPressed(FGameplayTag InputTag
 
 UDHAbilitySystemComponent* ADoubleHeroesPlayerController::GetASC()
 {
+	//一
 	if (DHAbilitySystemComponent == nullptr)
 	{
 		DHAbilitySystemComponent = Cast<UDHAbilitySystemComponent>(
 			UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn<APawn>()));
 	}
+
+	//GAS
+	// ADoubleHeroesPlayerState* DoubleHeroesPlayerState = GetPlayerState<ADoubleHeroesPlayerState>();
+	// check(DoubleHeroesPlayerState);
+	// DHAbilitySystemComponent = DoubleHeroesPlayerState->GetDHAbilitySystemComponent();
+	//GAS
 	return DHAbilitySystemComponent;
 }
 
@@ -315,12 +323,15 @@ void ADoubleHeroesPlayerController::BeginPlay()
 	// SetInputMode(InputModeData);
 	ControlledPawn = GetPawn<APawn>();
 	BaseCharacter = Cast<ADoubleHeroesBaseCharacter>(ControlledPawn);
+	BindCallbacksToDependencies();
 	if (BaseCharacter && HasAuthority())
 	{
 		BaseCharacter->SetReplicates(true);
 		BaseCharacter->SetReplicateMovement(true);
 	}
 	DHAbilitySystemComponent = GetASC();
+	
+	
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
 	if (Subsystem)
 	{
@@ -356,6 +367,8 @@ void ADoubleHeroesPlayerController::SetupInputComponent()
 
 	UDoubleHeroesInputComponent* DoubleHeroesInputComponent = CastChecked<UDoubleHeroesInputComponent>(InputComponent);
 	// DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_Move, ETriggerEvent::Triggered, this, &ThisClass::Input_Move);
+
+	
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveForward, ETriggerEvent::Triggered, this, &ThisClass::Input_Move);
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveForward, ETriggerEvent::Started, this, &ThisClass::Input_PressW);
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveForward, ETriggerEvent::Completed, this, &ThisClass::Input_ReleaseW);
@@ -369,9 +382,11 @@ void ADoubleHeroesPlayerController::SetupInputComponent()
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveRight, ETriggerEvent::Started, this, &ThisClass::Input_PressD);
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveRight, ETriggerEvent::Completed, this, &ThisClass::Input_ReleaseD);
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_Look, ETriggerEvent::Triggered, this, &ThisClass::Input_Look);
-	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_TogglePackage, ETriggerEvent::Started, this, &ThisClass::Input_OpenPackage);
-	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_TogglePackage, ETriggerEvent::Completed, this, &ThisClass::Input_ClosePackage);
+	// DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_TogglePackage, ETriggerEvent::Started, this, &ThisClass::Input_OpenPackage);
+	// DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_TogglePackage, ETriggerEvent::Completed, this, &ThisClass::Input_ClosePackage);
 	DoubleHeroesInputComponent->BindAbilityInputAction(InputConfigDataAsset, this, &ThisClass::Input_AbilityInputPressed, &ThisClass::Input_AbilityInputPressed);
+	DoubleHeroesInputComponent->BindAbilityInputAction(InputConfigDataAsset, this, &ThisClass::Input_AbilityInputReleased, &ThisClass::Input_AbilityInputReleased);
+	// DoubleHeroesInputComponent->BindAbilityActions(DoubleHeroesInputConfig, this, &ThisClass::AbilityInputPressed, &ThisClass::AbilityInputPressed);
 }
 
 void ADoubleHeroesPlayerController::Input_Move(const FInputActionValue& InputActionValue)
@@ -505,9 +520,14 @@ void ADoubleHeroesPlayerController::Input_ClosePackage()
 	}
 }
 
-void ADoubleHeroesPlayerController::Input_AbilityInputPressed(const FGameplayTag InInputTag)
+void ADoubleHeroesPlayerController::Input_AbilityInputPressed(const FGameplayTag InputTag)
 {
-	DHAbilitySystemComponent->OnAbilityInputPressed(InInputTag);
+	DHAbilitySystemComponent->OnAbilityInputPressed(InputTag);
+}
+
+void ADoubleHeroesPlayerController::Input_AbilityInputReleased(FGameplayTag InputTag)
+{
+	DHAbilitySystemComponent->OnAbilityInputReleased(InputTag);
 }
 
 UDHAbilitySystemComponent* ADoubleHeroesPlayerController::GetDHAbilitySystemComponent()
@@ -527,23 +547,23 @@ void ADoubleHeroesPlayerController::BindCallbacksToDependencies()
 {
 	if (IsValid(InventoryComponent) && IsValid(EquipmentComponent))
 	{
-		// InventoryComponent->EquipmentItemDelegate.AddLambda(
-		// 	[this] (const TSubclassOf<UEquipmentDefinition>& EquipmentDefinition, const FEquipmentEffectPackage& EffectPackage)
-		// 	{
-		// 		if (IsValid(EquipmentComponent))
-		// 		{
-		// 			EquipmentComponent->EquipItem(EquipmentDefinition, EffectPackage);
-		// 		}
-		// 	});
+		InventoryComponent->EquipmentItemDelegate.AddLambda(
+			[this] (const TSubclassOf<UEquipmentDefinition>& EquipmentDefinition, const FEquipmentEffectPackage& EffectPackage)
+			{
+				if (IsValid(EquipmentComponent))
+				{
+					EquipmentComponent->EquipItem(EquipmentDefinition, EffectPackage);
+				}
+			});
 
-		// EquipmentComponent->EquipmentList.UnEquippedEntryDelegate.AddLambda(
-		// 	[this] (const FDoubleHeroesEquipmentEntry& UnEquippedEntry)
-		// 	{
-		// 		if (IsValid(InventoryComponent))
-		// 		{
-		// 			InventoryComponent->AddUnEquippedItemEntry(UnEquippedEntry.EntryTag, UnEquippedEntry.EffectPackage);
-		// 		}
-		// 	});
+		EquipmentComponent->EquipmentList.UnEquippedEntryDelegate.AddLambda(
+			[this] (const FDoubleHeroesEquipmentEntry& UnEquippedEntry)
+			{
+				if (IsValid(InventoryComponent))
+				{
+					InventoryComponent->AddUnEquippedItemEntry(UnEquippedEntry.EntryTag, UnEquippedEntry.EffectPackage);
+				}
+			});
 	}
 }
 
@@ -555,9 +575,16 @@ void ADoubleHeroesPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeP
 
 void ADoubleHeroesPlayerController::AbilityInputPressed(FGameplayTag InputTag)
 {
-	if (IsValid(GetDHAbilitySystemComponent()))
+	if (IsValid(DHAbilitySystemComponent))
 	{
 		DHAbilitySystemComponent->OnAbilityInputPressed(InputTag);
+	}
+}
+void ADoubleHeroesPlayerController::AbilityInputReleased(FGameplayTag InputTag)
+{
+	if (IsValid(DHAbilitySystemComponent))
+	{
+		DHAbilitySystemComponent->OnAbilityInputReleased(InputTag);
 	}
 }
 /*

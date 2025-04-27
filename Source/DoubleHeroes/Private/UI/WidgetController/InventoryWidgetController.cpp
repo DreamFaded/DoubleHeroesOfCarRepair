@@ -21,10 +21,16 @@ void UInventoryWidgetController::BindCallbacksToDependencies()
 		OwningInventory->InventoryList.DirtyItemDelegate.AddLambda(
 			[this](const FDoubleHeroesInventoryEntry& DirtyItem)
 		{
-				FMasterItemDefinition Item = OwningInventory->GetItemDefinitionByTag(DirtyItem.ItemTag);
-				Item.ItemQuantity = DirtyItem.Quantity;
+				// FMasterItemDefinition Item = OwningInventory->GetItemDefinitionByTag(DirtyItem.ItemTag);
+				// Item.ItemQuantity = DirtyItem.Quantity;
 
-				InventoryItemDelegate.Broadcast(Item);
+				InventoryEntryDelegate.Broadcast(DirtyItem);
+		});
+
+		OwningInventory->InventoryList.InventoryItemRemovedDelegate.AddLambda(
+			[this](const int64 ItemID)
+		{
+				OnInventoryItemRemoved.Broadcast(ItemID);
 		});
 	}
 }
@@ -35,10 +41,29 @@ void UInventoryWidgetController::BroadcastInitialValues()
 	{
 		for (const FDoubleHeroesInventoryEntry& Entry : OwningInventory->GetInventoryEntries())
 		{
-			FMasterItemDefinition Item = OwningInventory->GetItemDefinitionByTag(Entry.ItemTag);
-			Item.ItemQuantity = Entry.Quantity;
+			// FMasterItemDefinition Item = OwningInventory->GetItemDefinitionByTag(Entry.ItemTag);
+			// Item.ItemQuantity = Entry.Quantity;
 
-			InventoryItemDelegate.Broadcast(Item);
+			InventoryEntryDelegate.Broadcast(Entry);
 		}
 	}
+}
+
+void UInventoryWidgetController::BroadcastInventoryContents()
+{
+	// if (IsValid(OwningInventory))
+	// {
+	// 	TMap<FGameplayTag, int32> LocalInventoryMap = OwningInventory->GetInventoryTagMap();
+	//
+	// 	ScrollBoxResetDelegate.Broadcast();
+	//
+	// 	for (const auto& Pair : LocalInventoryMap)
+	// 	{
+	// 		FMasterItemDefinition Item = OwningInventory->GetItemDefinitionByTag(Pair.Key);
+	// 		Item.ItemQuantity = Pair.Value;
+	// 		InventoryItemDelegate.Broadcast(Item);
+	// 	}
+	//
+	// 	InventoryBroadcastComplete.Broadcast();
+	// }
 }
