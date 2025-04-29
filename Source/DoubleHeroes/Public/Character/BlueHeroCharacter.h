@@ -35,7 +35,7 @@ class DOUBLEHEROES_API ABlueHeroCharacter : public ADoubleHeroesBaseCharacter
 
 public:
 	// Sets default values for this character's properties
-	ABlueHeroCharacter();
+	ABlueHeroCharacter(const FObjectInitializer& ObjectInitializer);
 	FORCEINLINE UHeroCombatComponent* GetHeroCombatComponent() const { return HeroCombatComponent; } 
 	virtual void Tick(float DeltaTime) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

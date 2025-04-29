@@ -3,6 +3,9 @@
 
 #include "Components/DHCharacterMovementComponent.h"
 
+#include "AbilitySystemComponent.h"
+#include "AbilitySystemGlobals.h"
+#include "DoubleHeroesGameplayTags.h"
 #include "Character/BlueHeroCharacter.h"
 #include "Character/DoubleHeroesBaseCharacter.h"
 #include "Character/DoubleHeroesCharacter.h"
@@ -27,5 +30,25 @@ float UDHCharacterMovementComponent::GetMaxSpeed() const
 		}
 	}
 	return Speed;
+}
+
+void UDHCharacterMovementComponent::Crouch(bool bClientSimulation)
+{
+	Super::Crouch(bClientSimulation);
+
+	if (UAbilitySystemComponent* ASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetOwner()))
+	{
+		ASC->AddLooseGameplayTag(DoubleHeroesGameplayTags::Player::State::Crouch);
+	}
+}
+
+void UDHCharacterMovementComponent::UnCrouch(bool bClientSimulation)
+{
+	Super::UnCrouch(bClientSimulation);
+
+	if (UAbilitySystemComponent* ASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetOwner()))
+	{
+		ASC->RemoveLooseGameplayTag(DoubleHeroesGameplayTags::Player::State::Crouch);
+	}
 }
 

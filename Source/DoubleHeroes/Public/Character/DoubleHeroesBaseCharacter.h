@@ -24,7 +24,7 @@ class DOUBLEHEROES_API ADoubleHeroesBaseCharacter : public ACharacter, public IA
 
 public:
 	// Sets default values for this character's properties
-	ADoubleHeroesBaseCharacter();
+	ADoubleHeroesBaseCharacter(const FObjectInitializer& ObjectInitializer);
 	
 	UPROPERTY(ReplicatedUsing=OnRep_Run, BlueprintReadOnly)
 	bool bIsRunning = false;

@@ -23,7 +23,7 @@ class DOUBLEHEROES_API ADoubleHeroesCharacter : public ADoubleHeroesBaseCharacte
 
 public:
 	// Sets default values for this character's properties
-	ADoubleHeroesCharacter();
+	ADoubleHeroesCharacter(const FObjectInitializer& ObjectInitializer);
 
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;

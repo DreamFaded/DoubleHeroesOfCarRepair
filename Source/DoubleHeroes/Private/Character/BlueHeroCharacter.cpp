@@ -8,6 +8,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "AbilitySystem/DHAbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/DHCharacterMovementComponent.h"
 #include "Components/HeroCombatComponent.h"
 #include "Components/InputComponent.h"
 #include "DataAsset/DataAsset_StartUpDataBase.h"
@@ -21,7 +22,10 @@
 
 
 // Sets default values
-ABlueHeroCharacter::ABlueHeroCharacter()
+// ABlueHeroCharacter::ABlueHeroCharacter()
+//GAS
+ABlueHeroCharacter::ABlueHeroCharacter(const FObjectInitializer& ObjectInitializer)
+:  Super(ObjectInitializer.SetDefaultSubobjectClass<UDHCharacterMovementComponent>(CharacterMovementComponentName))
 {
 	
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.

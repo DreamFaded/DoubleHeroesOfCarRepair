@@ -48,3 +48,11 @@ void UDHAbilitySystemLibrary::ApplyDamageEffect(const FDamageEffectInfo& DamageE
 		DamageEffectInfo.TargetASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 	}
 }
+
+void UDHAbilitySystemLibrary::K2_SetLooseTagCountStatic(UAbilitySystemComponent* ASC, FGameplayTag Tag, int32 NewCount)
+{
+	if (IsValid(ASC))
+	{
+		ASC->SetLooseGameplayTagCount(Tag, NewCount);
+	}
+}

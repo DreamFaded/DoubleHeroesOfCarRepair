@@ -10,6 +10,7 @@
 #include "AbilitySystem/DoubleHeroesAttributeSet.h"
 #include "AbilitySystem/AbilityTasks/TargetDataUnderMouse.h"
 #include "Camera/CameraComponent.h"
+#include "Components/DHCharacterMovementComponent.h"
 #include "Data/CharacterClassInfo.h"
 #include "DataAsset/DataAsset_StartUpDataBase.h"
 #include "DataAsset/Input/DataAsset_InputConfig.h"
@@ -23,7 +24,8 @@
 
 
 // Sets default values
-ADoubleHeroesCharacter::ADoubleHeroesCharacter()
+ADoubleHeroesCharacter::ADoubleHeroesCharacter(const FObjectInitializer& ObjectInitializer)
+	:  Super(ObjectInitializer.SetDefaultSubobjectClass<UDHCharacterMovementComponent>(CharacterMovementComponentName))
 {
 	PrimaryActorTick.bCanEverTick = true;
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
