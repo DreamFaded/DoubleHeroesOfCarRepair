@@ -60,9 +60,13 @@ void UDoubleHeroesProjectileSpell::SpawnProjectile(const FVector& ProjectileTarg
 		const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), SourceASC->MakeEffectContext());
 
 		const FDoubleHeroesGameplayTags GameplayTags = FDoubleHeroesGameplayTags::Get();
-		const float ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel());
-		
-		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Damage, ScaledDamage);
+		// const float ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel());
+
+		for (auto& Pair : DamageTypes)
+		{
+			const float ScaledDamage = Pair.Value.GetValueAtLevel(GetAbilityLevel());
+			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, Pair.Key, ScaledDamage);
+		}
 		Projectile->DamageEffectSpecHandle = SpecHandle;
 		
 		Projectile->FinishSpawning(SpawnTransform);

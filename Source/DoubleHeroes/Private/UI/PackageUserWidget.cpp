@@ -10,14 +10,6 @@
 #include "UI/Widget/PackageItemUserWidget.h"
 
 
-void UPackageUserWidget::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	// DOREPLIFETIME(ThisClass, Slots);
-	DOREPLIFETIME(ThisClass, ActiveSlotIndex);
-}
-
 void UPackageUserWidget::ShowUI()
 {
 	if(ADoubleHeroesBaseCharacter* Character = Cast<ADoubleHeroesBaseCharacter>(GetOwningPlayerPawn()))
@@ -29,21 +21,19 @@ void UPackageUserWidget::ShowUI()
 			//
 			// Character->GetPackageComponent()->OnAddItemToPackage.AddUObject(this, &UPackageUserWidget::OnAddPackageItem);
 			// Character->GetPackageComponent()->OnRemoveItemFromPackage.AddUObject(this, &UPackageUserWidget::OnRemovePackageItem);
-			if(PackageItemArray.Num() <= 0)
-			{
-				AddItemWidgetToArray();
-			}
-			PackageItemMap = Character->GetPackageComponent()->PackageMap;
+			// if(PackageItemMap.Num() <= 0)
+			// {
+			// 	AddItemWidgetToMap();
+			// }
+			// PackageItemMap = Character->GetPackageComponent()->PackageMap;
 			ItemSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UItemSubsystem>();
-			PackageItemMap.Add(1,1);
-			PackageItemMap.Add(2,2);
+			
 			//把所有的物品都显示出来
 			for (int32 i = 0; i < 4; i++)
 			{
-				if(PackageItemMap.Contains(i+1))
+				if(PackageItemMap.Contains(i))
 				{
-					PackageItemArray[i]->CurrentItemId = PackageItemMap[i+1];
-					PackageItemArray[i]->IconImage->SetBrushFromTexture(ItemSubsystem->GetItemData(i+1)->Icon);
+					PackageItemMap[i]->IconImage->SetBrushFromTexture(ItemSubsystem->GetItemData(PackageItemMap[i]->ItemId)->Icon);
 				}
 			}
 			// if(PackageItemMap.Contains(1))
@@ -68,6 +58,12 @@ void UPackageUserWidget::ShowUI()
 			// }
 		}
 	}
+}
+
+void UPackageUserWidget::OpenPackageUI()
+{
+	AddItemWidgetToMap();
+	AddToViewport();
 }
 
 void UPackageUserWidget::AddPackageItemWidget(int32 Sign, int32 ItemID)
@@ -108,29 +104,16 @@ void UPackageUserWidget::OnTakeOffItem(int32 ItemID)
 {
 }
 
-void UPackageUserWidget::AddItemWidgetToArray()
+void UPackageUserWidget::AddItemWidgetToMap()
 {
-	PackageItemArray.Add(PackageItem_1);
-	PackageItemArray.Add(PackageItem_2);
-	PackageItemArray.Add(PackageItem_3);
-	PackageItemArray.Add(PackageItem_4);
-}
-
-void UPackageUserWidget::OnPutOnItem(ESkinPartType PartType, int32 ItemID)
-{
-	
-}
-
-void UPackageUserWidget::OnTakeOffItem(ESkinPartType PartType, int32 ItemID)
-{
-}
-
-void UPackageUserWidget::OnRep_ActiveSlotIndex()
-{
-}
-
-void UPackageUserWidget::OnRep_Slots()
-{
+	// PackageItem_0->SlotIndex = 0;
+	// PackageItem_1->SlotIndex = 1;
+	// PackageItem_2->SlotIndex = 2;
+	// PackageItem_3->SlotIndex = 3;
+	// PackageItemMap.Add(0, PackageItem_0);
+	// PackageItemMap.Add(1, PackageItem_1);
+	// PackageItemMap.Add(2, PackageItem_2);
+	// PackageItemMap.Add(3, PackageItem_3);
 }
 
 void UPackageUserWidget::RemoveFromParent()
@@ -149,6 +132,14 @@ void UPackageUserWidget::RemoveFromParent()
 			
 		}
 	}
+}
+
+void UPackageUserWidget::SetWidgetController(UWidgetController* InWidgetController)
+{
+	WidgetController = InWidgetController;
+
+	//蓝图绑定
+	OnWidgetControllerSet();
 }
 
 

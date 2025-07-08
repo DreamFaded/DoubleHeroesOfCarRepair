@@ -8,6 +8,9 @@
 #include "AbilitySystem/DHAbilitySystemComponent.h"
 #include "AbilitySystem/DoubleHeroesAbilitySystemLibrary.h"
 #include "AbilitySystem/DoubleHeroesAttributeSet.h"
+#include "AI/DoubleHeroesAIController.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Components/WidgetComponent.h"
 #include "DoubleHeroes/DoubleHeroes.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -25,6 +28,22 @@ ADoubleHeroesEnemy::ADoubleHeroesEnemy()
 
 	HealthBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBar"));
 	HealthBar->SetupAttachment(GetRootComponent());
+
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationRoll = false;
+	bUseControllerRotationYaw = false;
+	GetCharacterMovement()->bUseControllerDesiredRotation = true;
+}
+
+void ADoubleHeroesEnemy::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	if(!HasAuthority()) return;
+	DoubleHeroesAIController = Cast<ADoubleHeroesAIController>(NewController);
+	DoubleHeroesAIController->GetBlackboardComponent()->InitializeBlackboard(*BehaviorTree->BlackboardAsset);
+	DoubleHeroesAIController->RunBehaviorTree(BehaviorTree);
+	DoubleHeroesAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), false);
 }
 
 void ADoubleHeroesEnemy::HighlightActor()
@@ -106,6 +125,8 @@ void ADoubleHeroesEnemy::HitReactTagChanged(const FGameplayTag CallbackTag, int3
 {
 	bHitReacting = NewCount > 0;
 	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
+	DoubleHeroesAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), false);
+	DoubleHeroesAIController->GetBlackboardComponent()->SetValueAsBool(FName("RangedAttack34"), CharacterClass != ECharacterClass::Warrior);
 }
 
 void ADoubleHeroesEnemy::InitAbilityActorInfo()

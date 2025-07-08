@@ -29,15 +29,17 @@ void UPackageItemUserWidget::NativeOnMouseEnter(const FGeometry& InGeometry, con
 {
 	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
 	SetRenderScale(FVector2D(1.5f, 1.5f));
-	if(BindSceneItem)
-	{
-		CurrentItemId = BindSceneItem->ID;
-	}
+	bIsActiveSlot = true;
+	// if(BindSceneItem)
+	// {
+	// 	CurrentItemId = BindSceneItem->ID;
+	// }
 }
 
 void UPackageItemUserWidget::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseLeave(InMouseEvent);
 	SetRenderScale(FVector2D(1.f, 1.f));
-	CurrentItemId = 0;
+	bIsActiveSlot = false;
+	// CurrentItemId = 0;
 }

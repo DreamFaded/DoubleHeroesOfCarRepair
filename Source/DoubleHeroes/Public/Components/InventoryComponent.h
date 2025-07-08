@@ -91,6 +91,8 @@ struct FDoubleHeroesInventoryList : public FFastArraySerializer
 	{}
 
 	void AddItem(const FGameplayTag& ItemTag, int32 NumItems = 1);
+	void AddOneItem(const FGameplayTag& ItemTag);
+	
 	void AddUnEquippedItem(const FGameplayTag& ItemTag, const FEquipmentEffectPackage& EffectPackage);
 	void RemoveItem(const FDoubleHeroesInventoryEntry& InventoryEntry, int32 NumItems = 1);
 	bool HasEnough(const FGameplayTag& ItemTag, int32 NumItems = 1);
@@ -164,7 +166,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void AddItem(const FGameplayTag& ItemTag, int32 NumItems = 1);
-	
+
+	//添加一个Item
+	void AddOneItem(const FGameplayTag& ItemTag);
 
 	UFUNCTION(BlueprintCallable)
 	void UseItem(const FDoubleHeroesInventoryEntry& Entry, int32 NumItems);
@@ -191,6 +195,9 @@ private:
 
 	UFUNCTION(Server, Reliable)
 	void ServerAddItem(const FGameplayTag& ItemTag, int32 NumItems);
+
+	UFUNCTION(Server, Reliable)
+	void ServerAddOneItem(const FGameplayTag& ItemTag);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerUseItem(const FDoubleHeroesInventoryEntry& Entry, int32 NumItems);

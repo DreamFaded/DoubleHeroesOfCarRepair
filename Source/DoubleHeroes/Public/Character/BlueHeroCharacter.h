@@ -7,6 +7,7 @@
 #include "DoubleHeroesCharacterBase.h"
 #include "BlueHeroCharacter.generated.h"
 
+class UInteractionComponent;
 class UHeroCombatComponent;
 class UDataAsset_InputConfig;
 
@@ -40,7 +41,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents() override;
-	
 	// void SetOverlappingWeapon(AWeapon* Weapon);
 	bool IsWeaponEquipped();
 
@@ -93,6 +93,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	UHeroCombatComponent* HeroCombatComponent;
+	
+	// UInteractionComponent* InteractionComponent;
 
 	// UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
 	// class AWeapon* OverlappingWeapon;

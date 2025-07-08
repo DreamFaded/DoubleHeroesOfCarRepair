@@ -10,6 +10,8 @@
 #include "UI/WidgetController/OverlayWidgetController.h"
 #include "DoubleHeroesEnemy.generated.h"
 
+class ADoubleHeroesAIController;
+class UBehaviorTree;
 class UWidgetComponent;
 
 UCLASS()
@@ -19,6 +21,8 @@ class DOUBLEHEROES_API ADoubleHeroesEnemy : public ADoubleHeroesCharacterBase, p
 
 public:
 	ADoubleHeroesEnemy();
+
+	virtual void PossessedBy(AController* NewController) override;
 
 	//Enemy Interface
 	virtual void HighlightActor() override;
@@ -60,6 +64,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UWidgetComponent> HealthBar;
+
+	UPROPERTY(EditAnywhere, Category = "AI")
+	TObjectPtr<UBehaviorTree> BehaviorTree;
+
+	UPROPERTY()
+	TObjectPtr<ADoubleHeroesAIController> DoubleHeroesAIController;
 private:
 
 	

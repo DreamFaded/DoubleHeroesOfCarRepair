@@ -19,7 +19,9 @@ class DOUBLEHEROES_API UPackageItemUserWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	int32 CurrentItemId = 0;
+	int32 SlotIndex;
+	bool bIsActiveSlot = false;
+	int32 ItemId = 0;
 
 	UPROPERTY(meta = (BindWidget))
 	UImage* IconImage;
@@ -31,8 +33,6 @@ protected:
 
 	UPROPERTY()
 	ASceneItemActor* BindSceneItem;
-	
-	UPackageUserWidget* PackageUserWidget;
 	
 	int32 PackageSign;
 

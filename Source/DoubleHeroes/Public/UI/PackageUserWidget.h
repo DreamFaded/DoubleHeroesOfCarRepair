@@ -8,6 +8,7 @@
 #include "Subsystem/ItemSubsystem.h"
 #include "PackageUserWidget.generated.h"
 
+class UWidgetController;
 class UPackageItemUserWidget;
 class UWheelUIUserWidget;
 class UEquipUIUserWidget;
@@ -26,25 +27,25 @@ class DOUBLEHEROES_API UPackageUserWidget : public UUserWidget
 public:
 	// UPROPERTY(meta = (BindWidget))
 	// UEquipUIUserWidget* EquipUIUserWidget;
-	UPROPERTY(meta = (BindWidget))
-	UPackageItemUserWidget* PackageItem_1;
-	UPROPERTY(meta = (BindWidget))
-	UPackageItemUserWidget* PackageItem_2;
-	UPROPERTY(meta = (BindWidget))
-	UPackageItemUserWidget* PackageItem_3;
-	UPROPERTY(meta = (BindWidget))
-	UPackageItemUserWidget* PackageItem_4;
+	// UPROPERTY(meta = (BindWidget))
+	// UPackageItemUserWidget* PackageItem_0;
+	// UPROPERTY(meta = (BindWidget))
+	// UPackageItemUserWidget* PackageItem_1;
+	// UPROPERTY(meta = (BindWidget))
+	// UPackageItemUserWidget* PackageItem_2;
+	// UPROPERTY(meta = (BindWidget))
+	// UPackageItemUserWidget* PackageItem_3;
 
-	TMap<int32, int32> PackageItemMap;
+	TMap<int32, UPackageItemUserWidget*> PackageItemMap;
 
 	TArray<UPackageItemUserWidget*> PackageItemArray;
 
-	UPROPERTY(ReplicatedUsing=OnRep_ActiveSlotIndex)
 	int32 ActiveSlotIndex = -1;
 	
 	UItemSubsystem* ItemSubsystem;
 	
 	void ShowUI();
+	void OpenPackageUI();
 
 	void AddPackageItemWidget(int32 Sign, int32 ItemID);
 	void RemoveItemWidget(int32 Sign, int32 ItemID);
@@ -58,22 +59,23 @@ public:
 	void OnPutOnItem(int32 ItemID);
 	void OnTakeOffItem(int32 ItemID);
 
-	void AddItemWidgetToArray();
-
-	
+	void AddItemWidgetToMap();
 	virtual void RemoveFromParent() override;
+
+	void SetWidgetController(UWidgetController* InWidgetController);
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnWidgetControllerSet();
 protected:
 	UClass* ItemWidgetClass;
 
-	void OnPutOnItem(ESkinPartType PartType, int32 ItemID);
-	void OnTakeOffItem(ESkinPartType PartType, int32 ItemID);
+	// void OnPutOnItem(ESkinPartType PartType, int32 ItemID);
+	// void OnTakeOffItem(ESkinPartType PartType, int32 ItemID);
 
-	UFUNCTION()
-	void OnRep_ActiveSlotIndex();
+private:
 
-	UFUNCTION()
-	void OnRep_Slots();
-
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	TObjectPtr<UWidgetController> WidgetController;
 
 	
 

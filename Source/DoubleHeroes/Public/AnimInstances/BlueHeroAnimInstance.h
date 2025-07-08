@@ -18,10 +18,12 @@ class DOUBLEHEROES_API UBlueHeroAnimInstance : public UDoubleHeroesAnimInstance
 	GENERATED_BODY()
 
 public:
+	
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeThreadSafeUpdateAnimation(float DeltaSeconds) override;
 
 protected:
+	
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "AnimData||LocomotionData")
 	ABlueHeroCharacter* OwningHeroesCharacter;
 

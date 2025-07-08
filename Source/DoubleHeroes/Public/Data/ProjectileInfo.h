@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
+#include "AbilitySystem/DoubleHeroesAbilityTypes.h"
 #include "Engine/DataAsset.h"
 #include "ProjectileInfo.generated.h"
 
-struct FProjectileParams;
-struct FGameplayTag;
 /**
  * 
  */

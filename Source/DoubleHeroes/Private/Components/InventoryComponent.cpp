@@ -63,14 +63,59 @@ void FDoubleHeroesInventoryList::AddItem(const FGameplayTag& ItemTag, int32 NumI
 	
 	if (OwnerComponent->GetOwner()->HasAuthority())
 	{
+		//InventoryWidgetController进行UI更新
 		DirtyItemDelegate.Broadcast(NewEntry);
 	}
 
 	MarkItemDirty(NewEntry);
 }
 
+void FDoubleHeroesInventoryList::AddOneItem(const FGameplayTag& ItemTag)
+{
+	if (ItemTag.MatchesTag(DoubleHeroesGameplayTags::Static::Category_Equipment))
+	{
+		goto MakeNew;
+	}
+	for (auto EntryIt = Entries.CreateIterator(); EntryIt; ++EntryIt)
+	{
+		FDoubleHeroesInventoryEntry& Entry = *EntryIt;
+
+		if (Entry.ItemTag.MatchesTagExact(ItemTag))
+		{
+			MarkItemDirty(Entry);
+
+			if (OwnerComponent->GetOwner()->HasAuthority())
+			{
+				DirtyItemDelegate.Broadcast(Entry);
+			}
+			return;
+		}
+	}
+
+	MakeNew:
+	FMasterItemDefinition Item = OwnerComponent->GetItemDefinitionByTag(ItemTag);
+
+	FDoubleHeroesInventoryEntry& NewEntry = Entries.AddDefaulted_GetRef();
+	NewEntry.ItemTag = ItemTag;
+	NewEntry.ItemName = Item.ItemName;
+	NewEntry.ItemID = GenerateID();
+
+	if (NewEntry.ItemTag.MatchesTag(DoubleHeroesGameplayTags::Static::Category_Equipment) && IsValid(WeakStats.Get()))
+	{
+		RollForStats(Item.EquipmentItemProps.EquipmentClass, &NewEntry);
+	}
+	
+	if (OwnerComponent->GetOwner()->HasAuthority())
+	{
+		DirtyItemDelegate.Broadcast(NewEntry);
+	}
+
+	MarkItemDirty(NewEntry);
+}
+
+
 void FDoubleHeroesInventoryList::AddUnEquippedItem(const FGameplayTag& ItemTag,
-	const FEquipmentEffectPackage& EffectPackage)
+                                                   const FEquipmentEffectPackage& EffectPackage)
 {
 	const FMasterItemDefinition Item = OwnerComponent->GetItemDefinitionByTag(ItemTag);
 
@@ -296,6 +341,19 @@ void UInventoryComponent::AddItem(const FGameplayTag& ItemTag, int32 NumItems)
 	
 }
 
+void UInventoryComponent::AddOneItem(const FGameplayTag& ItemTag)
+{
+	AActor* Owner = GetOwner();
+	if(!IsValid(Owner)) return;
+
+	if (!Owner->HasAuthority())
+	{
+		ServerAddOneItem(ItemTag);
+		return;
+	}
+	InventoryList.AddOneItem(ItemTag);
+}
+
 void UInventoryComponent::UseItem(const FDoubleHeroesInventoryEntry& Entry, int32 NumItems)
 {
 	AActor* Owner = GetOwner();
@@ -363,6 +421,11 @@ void UInventoryComponent::AddUnEquippedItemEntry(const FGameplayTag& ItemTag,
 	const FEquipmentEffectPackage& EffectPackage)
 {
 	InventoryList.AddUnEquippedItem(ItemTag, EffectPackage);
+}
+
+void UInventoryComponent::ServerAddOneItem_Implementation(const FGameplayTag& ItemTag)
+{
+	AddOneItem(ItemTag);
 }
 
 bool UInventoryComponent::ServerUseItem_Validate(const FDoubleHeroesInventoryEntry& Entry, int32 NumItems)

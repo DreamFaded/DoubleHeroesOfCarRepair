@@ -12,6 +12,7 @@
 #include "Interface/InventoryInterface.h"
 #include "DoubleHeroesPlayerController.generated.h"
 
+class UPackageUserWidget;
 class UDoubleHeroesSystemsWidget;
 class UInventoryWidgetController;
 class UInventoryComponent;
@@ -59,8 +60,9 @@ public:
 	ADoubleHeroesBaseCharacter* BaseCharacter;
 	
 	ADoubleHeroesPlayerController();
-	
-	virtual UInventoryComponent* GetInventoryComponent_Implementation() override;
+
+	//Implement InventoryInterface
+	virtual UInventoryComponent* GetInventoryComponent_Implementation() override;;
 
 	virtual void SetDynamicProjectile_Implementation(const FGameplayTag& ProjectileTag, int32 AbilityLevel) override;
 
@@ -119,6 +121,7 @@ private:
 	UPROPERTY()
 	TObjectPtr<UInventoryWidgetController> InventoryWidgetController;
 
+
 	UPROPERTY(EditDefaultsOnly, Category="Custom|Widgets")
 	TSubclassOf<UInventoryWidgetController> InventoryWidgetControllerClass;
 
@@ -127,6 +130,12 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Custom|Widgets")
 	TSubclassOf<UDoubleHeroesSystemsWidget> InventoryWidgetClass;
+
+	UPROPERTY()
+	TObjectPtr<UPackageUserWidget> PackageUserWidget;
+
+	UPROPERTY(EditDefaultsOnly, Category="Custom|Widgets")
+	TSubclassOf<UPackageUserWidget> PackageUserWidgetClass;
 
 	UDHAbilitySystemComponent* GetDHAbilitySystemComponent();
 

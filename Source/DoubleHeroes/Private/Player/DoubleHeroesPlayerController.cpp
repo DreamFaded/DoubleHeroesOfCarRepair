@@ -22,6 +22,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/DoubleHeroesPlayerState.h"
+#include "UI/PackageUserWidget.h"
 #include "UI/HUD/DoubleHeroesHUD.h"
 #include "UI/HUD/WheelHUD.h"
 #include "UI/Widget/DamageTextComponent.h"
@@ -82,6 +83,7 @@ UInventoryWidgetController* ADoubleHeroesPlayerController::GetInventoryWidgetCon
 
 void ADoubleHeroesPlayerController::CreateInventoryWidget()
 {
+	
 	if(UUserWidget* Widget = CreateWidget<UDoubleHeroesSystemsWidget>(this, InventoryWidgetClass))
 	{
 		InventoryWidget = Cast<UDoubleHeroesSystemsWidget>(Widget);
@@ -382,8 +384,8 @@ void ADoubleHeroesPlayerController::SetupInputComponent()
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveRight, ETriggerEvent::Started, this, &ThisClass::Input_PressD);
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_MoveRight, ETriggerEvent::Completed, this, &ThisClass::Input_ReleaseD);
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_Look, ETriggerEvent::Triggered, this, &ThisClass::Input_Look);
-	// DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_TogglePackage, ETriggerEvent::Started, this, &ThisClass::Input_OpenPackage);
-	// DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_TogglePackage, ETriggerEvent::Completed, this, &ThisClass::Input_ClosePackage);
+	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_TogglePackage, ETriggerEvent::Started, this, &ThisClass::Input_OpenPackage);
+	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_TogglePackage, ETriggerEvent::Completed, this, &ThisClass::Input_ClosePackage);
 	DoubleHeroesInputComponent->BindAbilityInputAction(InputConfigDataAsset, this, &ThisClass::Input_AbilityInputPressed, &ThisClass::Input_AbilityInputPressed);
 	DoubleHeroesInputComponent->BindAbilityInputAction(InputConfigDataAsset, this, &ThisClass::Input_AbilityInputReleased, &ThisClass::Input_AbilityInputReleased);
 	// DoubleHeroesInputComponent->BindAbilityActions(DoubleHeroesInputConfig, this, &ThisClass::AbilityInputPressed, &ThisClass::AbilityInputPressed);
@@ -504,11 +506,20 @@ void ADoubleHeroesPlayerController::Input_StopRun()
 
 void ADoubleHeroesPlayerController::Input_OpenPackage()
 {
-	if(ADoubleHeroesHUD* DoubleHeroesHUD = Cast<ADoubleHeroesHUD>(GetHUD()))
+	if (!PackageUserWidget)
 	{
-		DoubleHeroesHUD->OpenPackageUI();
-		bTogglePackage = true;
+		if(UUserWidget* Widget = CreateWidget<UPackageUserWidget>(this, PackageUserWidgetClass))
+		{
+			PackageUserWidget = Cast<UPackageUserWidget>(Widget);
+			PackageUserWidget->SetWidgetController(GetInventoryWidgetController());
+			InventoryWidgetController->BroadcastInitialValues();
+		}
 	}
+	PackageUserWidget->OpenPackageUI();
+	FInputModeGameAndUI InputMode;
+	SetInputMode(InputMode);
+	bTogglePackage = true;
+	
 }
 
 void ADoubleHeroesPlayerController::Input_ClosePackage()

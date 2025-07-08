@@ -73,14 +73,7 @@ UAbilitySystemComponent* ADoubleHeroesBaseCharacter::GetAbilitySystemComponent()
 
 void ADoubleHeroesBaseCharacter::Server_SetRunning_Implementation(bool bNewRunning)
 {
-	if (bNewRunning)
-	{
-		Input_StartRun();
-	}
-	else
-	{
-		Input_StopRun();
-	}
+	bIsRunning = bNewRunning;
 }
 
 void ADoubleHeroesBaseCharacter::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const
@@ -222,33 +215,32 @@ void ADoubleHeroesBaseCharacter::Input_Look(const FInputActionValue& InputAction
 
 void ADoubleHeroesBaseCharacter::Input_StartRun()
 {
-	bIsRunning = true;
-	GetCharacterMovement()->MaxWalkSpeed = 1200;
-	
-	//如果在客户端，需要上服务器执行
+	if (bIsRunning) return; // 避免重复设置
+	//如果在客户端，需要上服务器执行再用Rep函数调用
 	if (!HasAuthority())
 	{
 		Server_SetRunning(true);
+		return;
 	}
+	GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
 }
 
 void ADoubleHeroesBaseCharacter::Input_StopRun()
 {
-	bIsRunning = false;
-	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-
+	if (!bIsRunning) return;
 	//如果在客户端，需要上服务器执行
 	if (!HasAuthority())
 	{
 		Server_SetRunning(false);
 	}
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
 
 void ADoubleHeroesBaseCharacter::OnRep_Run()
 {
 	if (bIsRunning)
 	{
-		GetCharacterMovement()->MaxWalkSpeed = 1200;
+		GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
 	}
 	else
 	{

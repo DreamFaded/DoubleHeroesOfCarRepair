@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "DoubleHeroesGameplayTags.h"
 #include "AbilitySystem/DoubleHeroesAbilitySystemLibrary.h"
+#include "AbilitySystem/DoubleHeroesAbilityTypes.h"
 #include "AbilitySystem/DoubleHeroesAttributeSet.h"
 #include "AbilitySystem/Abilities/DoubleHeroesGameplayAbility.h"
 #include "Data/CharacterClassInfo.h"
@@ -139,7 +140,6 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	}
 
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
-	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
 
 	const FGameplayTagContainer* SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();
 	const FGameplayTagContainer* TargetTags = Spec.CapturedTargetTags.GetAggregatedTags();
@@ -152,58 +152,11 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 
 	// Get Damage Set by Caller Magnitude
 	float Damage = 0.f;
-	/*for (const TTuple<FGameplayTag, FGameplayTag>& Pair  : FDoubleHeroesGameplayTags::Get().DamageTypesToResistances)
+	for (FGameplayTag DamageTypeTag : FDoubleHeroesGameplayTags::Get().DamageTypes)
 	{
-		const FGameplayTag DamageTypeTag = Pair.Key;
-		const FGameplayTag ResistanceTag = Pair.Value;
-		
-		checkf(TagsToCaptureDefs.Contains(ResistanceTag), TEXT("TagsToCaptureDefs doesn't contain Tag: [%s] in ExecCalc_Damage"), *ResistanceTag.ToString());
-		const FGameplayEffectAttributeCaptureDefinition CaptureDef = TagsToCaptureDefs[ResistanceTag];
-
-		float DamageTypeValue = Spec.GetSetByCallerMagnitude(Pair.Key, false);
-		if (DamageTypeValue <= 0.f)
-		{
-			continue;
-		}
-		
-		float Resistance = 0.f;
-		ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(CaptureDef, EvaluationParameters, Resistance);
-		Resistance = FMath::Clamp(Resistance, 0.f, 100.f);
-
-		DamageTypeValue *= ( 100.f - Resistance ) / 100.f;
-
-		if (UDoubleHeroesAbilitySystemLibrary::IsRadialDamage(EffectContextHandle))
-		{
-			// 1. override TakeDamage in DoubleHeroesCharacterBase. *
-			// 2. create delegate OnDamageDelegate, broadcast damage received in TakeDamage *
-			// 3. Bind lambda to OnDamageDelegate on the Victim here. *
-			// 4. Call UGameplayStatics::ApplyRadialDamageWithFalloff to cause damage (this will result in TakeDamage being called
-			//		on the Victim, which will then broadcast OnDamageDelegate)
-			// 5. In Lambda, set DamageTypeValue to the damage received from the broadcast *
-
-			if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(TargetAvatar))
-			{
-				CombatInterface->GetOnDamageSignature().AddLambda([&](float DamageAmount)
-				{
-					DamageTypeValue = DamageAmount;
-				});
-			}
-			UGameplayStatics::ApplyRadialDamageWithFalloff(
-				TargetAvatar,
-				DamageTypeValue,
-				0.f,
-				UDoubleHeroesAbilitySystemLibrary::GetRadialDamageOrigin(EffectContextHandle),
-				UDoubleHeroesAbilitySystemLibrary::GetRadialDamageInnerRadius(EffectContextHandle),
-				UDoubleHeroesAbilitySystemLibrary::GetRadialDamageOuterRadius(EffectContextHandle),
-				1.f,
-				UDamageType::StaticClass(),
-				TArray<AActor*>(),
-				SourceAvatar,
-				nullptr);
-		}
-		
+		const float DamageTypeValue = Spec.GetSetByCallerMagnitude(DamageTypeTag);
 		Damage += DamageTypeValue;
-	}*/
+	}
 
 	// Capture BlockChance on Target, and determine if there was a successful Block
 	
@@ -212,6 +165,8 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	TargetBlockChance = FMath::Max<float>(TargetBlockChance, 0.f);
 
 	const bool bBlocked = FMath::RandRange(1, 100) < TargetBlockChance;
+
+	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
 	
 	UDoubleHeroesAbilitySystemLibrary::SetIsBlockedHit(EffectContextHandle, bBlocked);
 

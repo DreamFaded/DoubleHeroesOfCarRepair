@@ -33,6 +33,7 @@ void ADoubleHeroesHUD::OpenPackageUI()
 	{
 		TSubclassOf<UPackageUserWidget> PackageClass = LoadClass<UPackageUserWidget>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Blueprints/UI/Wheel/WBP_PackageUserWidget.WBP_PackageUserWidget_C'"));
 		PackageUserWidget = CreateWidget<UPackageUserWidget>(GetOwningPlayerController(), PackageClass);
+		PackageUserWidget->AddItemWidgetToMap();
 	}
 		FInputModeGameAndUI InputMode;
 		GetOwningPlayerController()->SetInputMode(InputMode);
@@ -53,15 +54,23 @@ void ADoubleHeroesHUD::ClosePackageUI()
 	{
 		if (PackageUserWidget->IsInViewport())
 		{
-			TArray<UPackageItemUserWidget*> ItemArray = PackageUserWidget->PackageItemArray;
-			for(int32 i = 0; i < ItemArray.Num(); i++)
+			for (int i = 0; i < PackageUserWidget->PackageItemMap.Num(); i++)
 			{
-				if(ItemArray[i] && ItemArray[i]->CurrentItemId > 0)
+				if (PackageUserWidget->PackageItemMap[i]->bIsActiveSlot)
 				{
 					PackageUserWidget->OnPutOnItem(i);
 					return;
 				}
 			}
+			// TArray<UPackageItemUserWidget*> ItemArray = PackageUserWidget->PackageItemArray;
+			// for(int32 i = 0; i < ItemArray.Num(); i++)
+			// {
+			// 	if(ItemArray[i] && ItemArray[i]->CurrentItemId > 0)
+			// 	{
+			// 		PackageUserWidget->OnPutOnItem(i);
+			// 		return;
+			// 	}
+			// }
 			PackageUserWidget->RemoveFromParent();
 			GetOwningPlayerController()->bShowMouseCursor = false;
 		}

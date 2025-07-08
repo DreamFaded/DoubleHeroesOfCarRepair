@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "DoubleHeroesGameplayAbility.h"
+#include "DoubleHeroesDamageGameplayAbility.h"
 #include "DoubleHeroesProjectileSpell.generated.h"
 
 class UGameplayEffect;
@@ -12,7 +12,7 @@ class ADoubleHeroesProjectile;
  * 
  */
 UCLASS()
-class DOUBLEHEROES_API UDoubleHeroesProjectileSpell : public UDoubleHeroesGameplayAbility
+class DOUBLEHEROES_API UDoubleHeroesProjectileSpell : public UDoubleHeroesDamageGameplayAbility
 {
 	GENERATED_BODY()
 
@@ -26,6 +26,4 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<ADoubleHeroesProjectile> ProjectileClass;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<UGameplayEffect> DamageEffectClass;
 };

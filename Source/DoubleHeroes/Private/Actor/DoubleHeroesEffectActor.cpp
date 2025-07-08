@@ -35,6 +35,7 @@ void ADoubleHeroesEffectActor::ApplyEffectToTarget(AActor* TargetActor,
 	{
 		ASCInterface->GetAbilitySystemComponent();
 	}*/
+	if(TargetActor->ActorHasTag(FName("Enemy")) && !bApplyEffectsToEnemies) return;
 	//蓝图方式
 	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
 	// 使用蓝图库获取系统组件
@@ -53,10 +54,17 @@ void ADoubleHeroesEffectActor::ApplyEffectToTarget(AActor* TargetActor,
 	{
 		ActiveEffectHandles.Add(ActiveEffectHandle, TargetASC);
 	}
+
+	if (!bIsInfinite)
+	{
+		Destroy();
+	}
 }
 
 void ADoubleHeroesEffectActor::OnOverlap(AActor* TargetActor)
 {
+	if(TargetActor->ActorHasTag(FName("Enemy")) && !bApplyEffectsToEnemies) return;
+	
 	if (InstantEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnOverlap)
 	{
 		ApplyEffectToTarget(TargetActor, InstantGameplayEffectClass);
@@ -73,6 +81,8 @@ void ADoubleHeroesEffectActor::OnOverlap(AActor* TargetActor)
 
 void ADoubleHeroesEffectActor::OnEndOverlap(AActor* TargetActor)
 {
+	if(TargetActor->ActorHasTag(FName("Enemy")) && !bApplyEffectsToEnemies) return;
+	
 	if (InstantEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnEndOverlap)
 	{
 		ApplyEffectToTarget(TargetActor, InstantGameplayEffectClass);

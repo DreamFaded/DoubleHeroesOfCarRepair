@@ -8,15 +8,15 @@
 #include "EnhancedInputSubsystems.h"
 #include "AbilitySystem/DHAbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/DHCharacterMovementComponent.h"
 #include "Components/HeroCombatComponent.h"
 #include "Components/InputComponent.h"
+#include "Components/InteractionComponent.h"
 #include "DataAsset/DataAsset_StartUpDataBase.h"
-#include "DoubleHeroesComponent/CombatComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Input/DoubleHeroesInputComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Weapon/Weapon.h"
 
@@ -49,11 +49,16 @@ ABlueHeroCharacter::ABlueHeroCharacter(const FObjectInitializer& ObjectInitializ
 
 	HeroCombatComponent = CreateDefaultSubobject<UHeroCombatComponent>(TEXT("HeroCombatComponent"));
 	HeroCombatComponent->SetIsReplicated(true); // 如果需要网络复制
+
+
+	
 }
 
 void ABlueHeroCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(ABlueHeroCharacter, OverlappingWeapon, COND_OwnerOnly);
 
 	// DOREPLIFETIME_CONDITION(ABlueHeroCharacter, OverlappingWeapon, COND_OwnerOnly); //COND_OwnerOnly只在网络的所有者客户端上复制该变量
 }
@@ -71,6 +76,7 @@ void ABlueHeroCharacter::BeginPlay()
 	// 		Subsystem->AddMappingContext(SlashContext, 0);
 	// 	}
 	// }
+	
 }
 
 // Called every frame
@@ -195,6 +201,7 @@ void ABlueHeroCharacter::PostInitializeComponents()
 	// 	Combat->Character = this;
 	// }
 }
+
 
 // void ABlueHeroCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 // {

@@ -79,6 +79,15 @@ public:
 	FGameplayTag InputTag_4;
 
 	FGameplayTag Damage;
+	FGameplayTag Damage_Fire;
+	FGameplayTag Damage_Lightning;
+	FGameplayTag Damage_Arcane;
+	FGameplayTag Damage_Physical;
+
+	TArray<FGameplayTag> DamageTypes;
+	
+	FGameplayTag Abilities_Attack;
+
 
 	TMap<FGameplayTag, FGameplayTag> DamageTypesToResistances;
 	TMap<FGameplayTag, FGameplayTag> DamageTypesToDebuffs;

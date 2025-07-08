@@ -3,10 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Engine/DataAsset.h"
 #include "CharacterClassInfo.generated.h"
 
-struct FGameplayTag;
+
 class UGameplayAbility;
 class UGameplayEffect;
 

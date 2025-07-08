@@ -4,8 +4,10 @@
 #include "AbilitySystem/Abilities/DoubleHeroesGameplayAbility.h"
 
 #include "AbilitySystemComponent.h"
+#include "Character/DoubleHeroesBaseCharacter.h"
 #include "AbilitySystem/DHAbilitySystemComponent.h"
 #include "Components/PawnCombatComponent.h"
+#include "Player/DoubleHeroesPlayerController.h"
 
 void UDoubleHeroesGameplayAbility::OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo,
                                                  const FGameplayAbilitySpec& Spec)
@@ -36,6 +38,11 @@ void UDoubleHeroesGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle H
 	}
 }
 
+ADoubleHeroesBaseCharacter* UDoubleHeroesGameplayAbility::GetBaseCharacterFromActorInfo() const
+{
+	return (CurrentActorInfo ? Cast<ADoubleHeroesBaseCharacter>(CurrentActorInfo->AvatarActor.Get()) : nullptr);
+}
+
 UPawnCombatComponent* UDoubleHeroesGameplayAbility::GetPawnCombatComponentFromActorInfo() const
 {
 	return GetAvatarActorFromActorInfo()->FindComponentByClass<UPawnCombatComponent>();
@@ -44,4 +51,9 @@ UPawnCombatComponent* UDoubleHeroesGameplayAbility::GetPawnCombatComponentFromAc
 UDHAbilitySystemComponent* UDoubleHeroesGameplayAbility::GetDHAbilitySystemComponentFromActorInfo() const
 {
 	return Cast<UDHAbilitySystemComponent>(CurrentActorInfo->AbilitySystemComponent); 
+}
+
+ADoubleHeroesPlayerController* UDoubleHeroesGameplayAbility::GetDoubleHeroesPlayerControllerFromActorInfo() const
+{
+	return (CurrentActorInfo ? Cast<ADoubleHeroesPlayerController>(CurrentActorInfo->PlayerController.Get()) : nullptr);
 }

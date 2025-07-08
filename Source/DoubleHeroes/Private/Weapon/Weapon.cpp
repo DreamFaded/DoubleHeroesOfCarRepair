@@ -62,13 +62,13 @@ void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 
 	if (BaseCharacter)
 	{
-		if (ASceneItemActor* SceneItemActor = Cast<ASceneItemActor>(OtherActor))
-		{
-			if(PackageComponent)
-			{
-				PackageComponent->AddNearItem(SceneItemActor);
-			}
-		}
+		// if (ASceneItemActor* SceneItemActor = Cast<ASceneItemActor>(OtherActor))
+		// {
+		// 	if(PackageComponent)
+		// 	{
+		// 		PackageComponent->AddNearItem(SceneItemActor);
+		// 	}
+		// }
 		BaseCharacter->SetOverlappingWeapon(this);
 	}
 }

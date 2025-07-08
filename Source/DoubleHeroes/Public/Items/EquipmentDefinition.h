@@ -9,6 +9,7 @@
 
 class AEquipmentActor;
 
+///Game/Blueprints/Equipment/Definition/BP_Equipment_XXX
 USTRUCT()
 struct FEquipmentActorsToSpawn
 {
