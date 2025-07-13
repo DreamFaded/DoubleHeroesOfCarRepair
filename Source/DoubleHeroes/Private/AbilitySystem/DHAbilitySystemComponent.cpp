@@ -31,10 +31,10 @@ void UDHAbilitySystemComponent::OnAbilityInputPressed(const FGameplayTag& InputT
 
 	//GAS
 	if(!InputTag.IsValid()) return;
-
+	
 	ABILITYLIST_SCOPE_LOCK();
-
-
+	
+	
 	for (const FGameplayAbilitySpec& Spec : GetActivatableAbilities())
 	{
 		if (Spec.DynamicAbilityTags.HasTagExact(InputTag))
@@ -51,14 +51,27 @@ void UDHAbilitySystemComponent::OnAbilityInputPressed(const FGameplayTag& InputT
 		}
 	}
 	//GAS
+
+	//Lyra
+	// if (InputTag.IsValid())
+	// {
+	// 	for (const FGameplayAbilitySpec& AbilitySpec : ActivatableAbilities.Items)
+	// 	{
+	// 		if (AbilitySpec.Ability && (AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag)))
+	// 		{
+	// 			InputPressedSpecHandles.AddUnique(AbilitySpec.Handle);
+	// 			InputHeldSpecHandles.AddUnique(AbilitySpec.Handle);
+	// 		}
+	// 	}
+	// }
 }
 
 void UDHAbilitySystemComponent::OnAbilityInputReleased(const FGameplayTag& InputTag)
 {
 	if(!InputTag.IsValid()) return;
-
+	
 	ABILITYLIST_SCOPE_LOCK();
-
+	
 	for (const FGameplayAbilitySpec& Spec : GetActivatableAbilities())
 	{
 		if (Spec.DynamicAbilityTags.HasTagExact(InputTag))
@@ -67,6 +80,18 @@ void UDHAbilitySystemComponent::OnAbilityInputReleased(const FGameplayTag& Input
 				Spec.ActivationInfo.GetActivationPredictionKey());
 		}
 	}
+	
+	// if (InputTag.IsValid())
+	// {
+	// 	for (const FGameplayAbilitySpec& AbilitySpec : ActivatableAbilities.Items)
+	// 	{
+	// 		if (AbilitySpec.Ability && (AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag)))
+	// 		{
+	// 			InputReleasedSpecHandles.AddUnique(AbilitySpec.Handle);
+	// 			InputHeldSpecHandles.Remove(AbilitySpec.Handle);
+	// 		}
+	// 	}
+	// }
 }
 
 /*void UDHAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities)

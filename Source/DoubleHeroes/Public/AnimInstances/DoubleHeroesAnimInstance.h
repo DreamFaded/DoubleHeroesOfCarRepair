@@ -49,7 +49,7 @@ protected:
 	UPROPERTY()
 	bool bHoldWeapon;
 
-private:
+//private:
 
 	UPROPERTY(BlueprintReadOnly, Category = Character, meta = (AllowPrivateAccess = "true"))
 	float Speed;

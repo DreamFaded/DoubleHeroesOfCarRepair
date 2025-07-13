@@ -6,6 +6,7 @@
 #include "InputActionValue.h"
 #include "AbilitySystem/DHAbilitySystemComponent.h"
 #include "AbilitySystem/DoubleHeroesAttributeSet.h"
+#include "AnimInstances/DoubleHeroesAnimInstance.h"
 #include "Components/SkinComponent.h"
 #include "Data/CharacterClassInfo.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -71,11 +72,6 @@ UAbilitySystemComponent* ADoubleHeroesBaseCharacter::GetAbilitySystemComponent()
 	return GetDHAbilitySystemComponent();
 }
 
-void ADoubleHeroesBaseCharacter::Server_SetRunning_Implementation(bool bNewRunning)
-{
-	bIsRunning = bNewRunning;
-}
-
 void ADoubleHeroesBaseCharacter::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const
 {
 	check(IsValid(GetAbilitySystemComponent()));
@@ -93,6 +89,17 @@ void ADoubleHeroesBaseCharacter::InitializeDefaultAttributes() const
 	ApplyEffectToSelf(DefaultVitalAttributes, 1.f);
 }
 
+// void ADoubleHeroesBaseCharacter::Server_StartRunning_Implementation()
+// {
+// 	Input_StartRun();
+// }
+//
+//
+// void ADoubleHeroesBaseCharacter::Server_StopRunning_Implementation()
+// {
+// 	Input_StopRun();
+// }
+
 void ADoubleHeroesBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -100,6 +107,7 @@ void ADoubleHeroesBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProp
 	DOREPLIFETIME(ADoubleHeroesBaseCharacter, DHAbilitySystemComponent);
 	DOREPLIFETIME(ADoubleHeroesBaseCharacter, bIsRunning);
 	DOREPLIFETIME(ADoubleHeroesBaseCharacter, bEquipped);
+	DOREPLIFETIME(ADoubleHeroesBaseCharacter, bIsStabilizing);
 }
 
 
@@ -132,6 +140,11 @@ void ADoubleHeroesBaseCharacter::InitAbilityActorInfo()
 		if (IsValid(DHAbilitySystemComponent))
 		{
 			DHAbilitySystemComponent->InitAbilityActorInfo(DoubleHeroesPlayerState, this);
+		}
+		if (UDoubleHeroesAnimInstance* DoubleHeroesAnimInstance = Cast<UDoubleHeroesAnimInstance>(
+			GetMesh()->GetAnimInstance()))
+		{
+			DoubleHeroesAnimInstance->InitializeWithAbilitySystem(DHAbilitySystemComponent);
 		}
 	}
 }
@@ -183,6 +196,10 @@ void ADoubleHeroesBaseCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 
 void ADoubleHeroesBaseCharacter::Input_Move(const FInputActionValue& InputActionValue)
 {
+	// if (bIsStabilizing)
+	// {
+	// 	return; // 如果正处于站稳阶段，直接返回，不处理移动输入
+	// }
 	// find out which way is forward
 	MovementVector = InputActionValue.Get<FVector2D>();
 	MovementRotation = FRotator(0.f, GetControlRotation().Yaw, 0.f);
@@ -213,38 +230,47 @@ void ADoubleHeroesBaseCharacter::Input_Look(const FInputActionValue& InputAction
 	}
 }
 
-void ADoubleHeroesBaseCharacter::Input_StartRun()
-{
-	if (bIsRunning) return; // 避免重复设置
+// void ADoubleHeroesBaseCharacter::Landed(const FHitResult& Hit)
+// {
+// 	Super::Landed(Hit);
+//
+// 	if (!HasAuthority()) return;
+//
+// 	// 开启站稳状态
+// 	bIsStabilizing = true;
+//
+// 	// 设置站稳持续时间（比如 0.5 秒）
+// 	GetWorld()->GetTimerManager().SetTimer(StabilizeTimerHandle, [this]()
+// 	{
+// 		bIsStabilizing = false;
+// 	}, 0.3f, false);
+//
+// }
+
+// void ADoubleHeroesBaseCharacter::Input_StartRun()
+// {
+	// if (bIsRunning) return; // 避免重复设置
 	//如果在客户端，需要上服务器执行再用Rep函数调用
-	if (!HasAuthority())
-	{
-		Server_SetRunning(true);
-		return;
-	}
-	GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
-}
+	// if (!HasAuthority())
+	// {
+	// 	Server_StartRunning();
+	// 	return;
+	// }
+	// bIsRunning = true;
+	//速度在DHCharacterMovementComponent中设置了
+// }
 
-void ADoubleHeroesBaseCharacter::Input_StopRun()
-{
-	if (!bIsRunning) return;
+// void ADoubleHeroesBaseCharacter::Input_StopRun()
+// {
+	// if (!bIsRunning) return;
 	//如果在客户端，需要上服务器执行
-	if (!HasAuthority())
-	{
-		Server_SetRunning(false);
-	}
-	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-}
+	// if (!HasAuthority())
+	// {
+	// 	Server_StopRunning();
+	// 	return;
+	// }
+	// bIsRunning = false;
+	//速度在DHCharacterMovementComponent中设置了
+// }
 
-void ADoubleHeroesBaseCharacter::OnRep_Run()
-{
-	if (bIsRunning)
-	{
-		GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
-	}
-	else
-	{
-		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-	}
-}
 

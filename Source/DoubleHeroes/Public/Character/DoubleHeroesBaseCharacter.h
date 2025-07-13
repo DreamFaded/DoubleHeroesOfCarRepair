@@ -26,10 +26,12 @@ public:
 	// Sets default values for this character's properties
 	ADoubleHeroesBaseCharacter(const FObjectInitializer& ObjectInitializer);
 	
-	UPROPERTY(ReplicatedUsing=OnRep_Run, BlueprintReadOnly)
+	UPROPERTY(Replicated, BlueprintReadOnly)
 	bool bIsRunning = false;
 	UPROPERTY(Replicated)
 	bool bEquipped = false;
+	UPROPERTY(Replicated)
+	bool bIsStabilizing = false;
 
 	UPROPERTY(Replicated)
 	float MovementSpeedMultiplier;
@@ -43,10 +45,15 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	float RunSpeed = 1200.f;
+
+	UPROPERTY(EditAnywhere)
+	float stabilityTime = 0.3f;
 	
 	FKey PressedKey = EKeys::Invalid;
 
 	FKey LastPressedKey = EKeys::Invalid;
+
+	FTimerHandle StabilizeTimerHandle;
 	
 
 	// Begin IAbilitySystemInterface Interface
@@ -61,11 +68,16 @@ public:
 	
 	void Input_Move(const FInputActionValue& InputActionValue);
 	void Input_Look(const FInputActionValue& InputActionValue);
-	void Input_StartRun();
-	void Input_StopRun();
+
+	// virtual void Landed(const FHitResult& Hit) override;;
 	
-	UFUNCTION()
-	virtual void OnRep_Run();
+	// void Input_StartRun();
+	// void Input_StopRun();
+	// UFUNCTION(Server, Reliable)
+	// void Server_StartRunning();
+	// UFUNCTION(Server, Reliable)
+	// void Server_StopRunning();
+	
 	
 	AWeapon* GetHoldWeapon() const;
 
@@ -121,9 +133,6 @@ protected:
 
 
 	virtual void InitializeDefaultAttributes() const;
-
-	UFUNCTION(Server, Reliable)
-	void Server_SetRunning(bool bNewRunning);
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	

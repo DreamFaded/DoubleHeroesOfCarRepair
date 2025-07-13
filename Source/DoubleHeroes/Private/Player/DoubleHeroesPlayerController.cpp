@@ -386,8 +386,8 @@ void ADoubleHeroesPlayerController::SetupInputComponent()
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_Look, ETriggerEvent::Triggered, this, &ThisClass::Input_Look);
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_TogglePackage, ETriggerEvent::Started, this, &ThisClass::Input_OpenPackage);
 	DoubleHeroesInputComponent->BindNativeInputAction(InputConfigDataAsset, DoubleHeroesGameplayTags::InputTag_TogglePackage, ETriggerEvent::Completed, this, &ThisClass::Input_ClosePackage);
-	DoubleHeroesInputComponent->BindAbilityInputAction(InputConfigDataAsset, this, &ThisClass::Input_AbilityInputPressed, &ThisClass::Input_AbilityInputPressed);
-	DoubleHeroesInputComponent->BindAbilityInputAction(InputConfigDataAsset, this, &ThisClass::Input_AbilityInputReleased, &ThisClass::Input_AbilityInputReleased);
+	DoubleHeroesInputComponent->BindAbilityInputAction(InputConfigDataAsset, this, &ThisClass::Input_AbilityInputPressed, &ThisClass::Input_AbilityInputReleased);
+	// DoubleHeroesInputComponent->BindAbilityInputAction(InputConfigDataAsset, this, &ThisClass::Input_AbilityInputReleased, &ThisClass::Input_AbilityInputReleased);
 	// DoubleHeroesInputComponent->BindAbilityActions(DoubleHeroesInputConfig, this, &ThisClass::AbilityInputPressed, &ThisClass::AbilityInputPressed);
 }
 
@@ -491,7 +491,7 @@ void ADoubleHeroesPlayerController::Input_StartRun()
 {
 	if (BaseCharacter)
 	{
-		BaseCharacter->Input_StartRun();
+		BaseCharacter->bIsRunning = true;
 	}
 }
 
@@ -499,7 +499,7 @@ void ADoubleHeroesPlayerController::Input_StopRun()
 {
 	if (BaseCharacter)
 	{
-		BaseCharacter->Input_StopRun();
+		BaseCharacter->bIsRunning = false;
 	}
 }
 

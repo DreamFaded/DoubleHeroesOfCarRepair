@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
+#include "DoubleHeroes/Public/Items/DoubleHeroesItemDefinition.h"
 #include "DoubleHeroesItemInstance.generated.h"
 
 /**
