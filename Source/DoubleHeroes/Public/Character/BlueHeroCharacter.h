@@ -41,12 +41,13 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents() override;
-	// void SetOverlappingWeapon(AWeapon* Weapon);
+	
 	bool IsWeaponEquipped();
 
 	// class UCombatComponent* Combat;
 	// UPROPERTY(EditAnywhere, Category = input)
 	// class UInputMappingContext* SlashContext;
+	
 
 protected:
 	
@@ -96,14 +97,11 @@ private:
 	
 	// UInteractionComponent* InteractionComponent;
 
-	// UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
-	// class AWeapon* OverlappingWeapon;
+	
 
 	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CharacterData", meta = (AllowPrivateAccess = "true"))
 	// UDataAsset_InputConfig* InputConfigDataAsset;
 
-	// UFUNCTION()
-	// void OnRep_OverlappingWeapon(AWeapon* LastWeapon);
 
 	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 

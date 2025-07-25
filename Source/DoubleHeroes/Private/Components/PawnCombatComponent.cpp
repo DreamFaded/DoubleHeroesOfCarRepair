@@ -66,6 +66,30 @@ void UPawnCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 	EquippedWeapon->SetOwner(Character);
 }
 
+void UPawnCombatComponent::PickupItem(AItemBase* ItemToPickup)
+{
+	if(Character == nullptr || ItemToPickup == nullptr) return;
+	
+	EquippedItem = ItemToPickup;
+	EquippedItem->SetItemState(EItemState::EIS_Equipped);
+	const USkeletalMeshSocket* HandSocket = Character->GetMesh()->GetSocketByName(FName("RightHandSocket"));
+	if (HandSocket)
+	{
+		FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, true);
+		EquippedItem->AttachToComponent(Character->GetMesh(), TransformRules, FName("RightHandSocket"));
+		// HandSocket->AttachActor(EquippedItem, Character->GetMesh());
+	}
+	// 验证是否正确附加
+	if (EquippedItem->GetAttachParentSocketName() == FName("RightHandSocket"))
+	{
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to attach item"));
+	}
+	EquippedItem->SetOwner(Character);
+}
+
 void UPawnCombatComponent::OnRep_EquippedWeapon()
 {
 	if (EquippedWeapon && Character)
@@ -73,6 +97,10 @@ void UPawnCombatComponent::OnRep_EquippedWeapon()
 		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
 		Character->bUseControllerRotationYaw = true;
 	}
+}
+
+void UPawnCombatComponent::OnRep_EquippedItem()
+{
 }
 
 void UPawnCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

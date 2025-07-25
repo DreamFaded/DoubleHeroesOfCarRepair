@@ -43,7 +43,7 @@ void ASceneItemActor::Init()
 		return;
 	}
 
-	if(FItemBase* ItemBase = GetWorld()->GetGameInstance()->GetSubsystem<UItemSubsystem>()->GetItemData(ItemID))
+	if(FItemData* ItemBase = GetWorld()->GetGameInstance()->GetSubsystem<UItemSubsystem>()->GetItemData(ItemID))
 	{
 		if (ItemBase->Type == EItemType::EPT_Weapon)
 		{

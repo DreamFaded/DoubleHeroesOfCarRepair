@@ -11,6 +11,7 @@
 #include "Interface/ISkinInterface.h"
 #include "DoubleHeroesBaseCharacter.generated.h"
 
+class AItemBase;
 class UDataAsset_StartUpDataBase;
 class UDoubleHeroesAttributeSet;
 class UDHAbilitySystemComponent;
@@ -54,6 +55,10 @@ public:
 	FKey LastPressedKey = EKeys::Invalid;
 
 	FTimerHandle StabilizeTimerHandle;
+
+	UPROPERTY(ReplicatedUsing = OnRep_OverlappingItem)
+	AItemBase* OverlappingItem;
+	
 	
 
 	// Begin IAbilitySystemInterface Interface
@@ -62,7 +67,7 @@ public:
 
 	bool IsRunning();
 
-	void SetOverlappingWeapon(AWeapon* Weapon);
+	// void SetOverlappingItem(AItemBase* Item);
 
 	UPackageComponent* GetPackageComponent() const {return PackageComponent;}
 	
@@ -79,7 +84,7 @@ public:
 	// void Server_StopRunning();
 	
 	
-	AWeapon* GetHoldWeapon() const;
+	AItemBase* GetHoldItem() const;
 
 	FORCEINLINE UDHAbilitySystemComponent* GetDHAbilitySystemComponent() const { return DHAbilitySystemComponent; }
 
@@ -90,6 +95,8 @@ public:
 	
 	virtual void OnRep_PlayerState() override;
 
+	void SetOverlappingItem(AItemBase* Item);
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UPackageComponent* PackageComponent;
@@ -97,8 +104,6 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	USkinComponent* SkinComponent;
 
-	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
-	class AWeapon* OverlappingWeapon;
 	
 
 
@@ -151,6 +156,6 @@ private:
 
 	
 	UFUNCTION()
-	void OnRep_OverlappingWeapon(AWeapon* LastWeapon);
+	void OnRep_OverlappingItem(AItemBase* LastItem);
 
 };

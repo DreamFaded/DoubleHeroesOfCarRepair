@@ -37,7 +37,7 @@ enum class ESkinPartType : uint8
 };
 
 USTRUCT()
-struct FItemBase : public FTableRowBase
+struct FItemData : public FTableRowBase
 {
 	GENERATED_BODY()
 
@@ -53,7 +53,7 @@ struct FItemBase : public FTableRowBase
 };
 
 USTRUCT()
-struct FSkinPart : public FItemBase
+struct FSkinPart : public FItemData
 {
 	GENERATED_BODY()
 	
@@ -68,7 +68,7 @@ struct FSkinPart : public FItemBase
 };
 
 USTRUCT()
-struct FWeaponInfo : public FItemBase
+struct FWeaponInfo : public FItemData
 {
 	GENERATED_BODY()
 	FWeaponInfo()
@@ -91,7 +91,7 @@ class DOUBLEHEROES_API UItemSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
-	FItemBase* GetItemData(int32 ID) const;
+	FItemData* GetItemData(int32 ID) const;
 
 protected:
 
@@ -101,7 +101,7 @@ protected:
 	UPROPERTY()
 	UDataTable* WeaponData;
 
-	TMap<int32, FItemBase*> ItemMap;
+	TMap<int32, FItemData*> ItemMap;
 
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 };

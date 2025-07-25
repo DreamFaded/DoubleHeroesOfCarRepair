@@ -11,6 +11,7 @@
 class ADoubleHeroesWeaponBase;
 struct FGameplayTag;
 class AWeapon;
+class AItemBase;
 
 UCLASS()
 class DOUBLEHEROES_API UPawnCombatComponent : public UPawnExtensionComponentBase
@@ -33,14 +34,23 @@ public:
 	UFUNCTION(Category = "DoubleHeroes|Combat")
 	void EquipWeapon(AWeapon* WeaponToEquip);
 
+	UFUNCTION(Category = "DoubleHeroes|Combat")
+	void PickupItem(AItemBase* ItemToPickup);
+
 	UPROPERTY()
 	class ADoubleHeroesBaseCharacter* Character;
 
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
-	class AWeapon* EquippedWeapon;
+	AWeapon* EquippedWeapon;
+
+	UPROPERTY(ReplicatedUsing = OnRep_EquippedItem)
+	AItemBase* EquippedItem;
 
 	UFUNCTION()
 	void OnRep_EquippedWeapon();
+
+	UFUNCTION()
+	void OnRep_EquippedItem();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

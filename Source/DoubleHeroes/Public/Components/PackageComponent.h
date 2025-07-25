@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Subsystem/ItemSubsystem.h"
+#include "Items/ItemBase.h"
 #include "PackageComponent.generated.h"
 
 
@@ -58,7 +59,7 @@ public:
 	//怪物掉落道具
 	void SpawnNearSceneItem(int32 ItemID);
 
-	AWeapon* GetHoldWeapon() const;
+	AItemBase* GetHoldWeapon() const;
 	
 protected:
 	// Called when the game starts
@@ -68,7 +69,7 @@ protected:
 	TArray<ASceneItemActor*> NearItems;
 
 	UPROPERTY()
-	AWeapon* HoldWeapon;
+	AItemBase* HoldItem;
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_AddItemToPackage(ASceneItemActor* SceneItemActor);

@@ -78,6 +78,8 @@ struct FDoubleHeroesInventoryEntry : public FFastArraySerializerItem
 DECLARE_MULTICAST_DELEGATE_OneParam(FDirtyInventoryItemSignature, const FDoubleHeroesInventoryEntry& /* Dirty Item */);
 DECLARE_MULTICAST_DELEGATE_OneParam(FInventoryItemRemovedSignature, const int64 /* ItemID */);
 
+
+
 USTRUCT()
 struct FDoubleHeroesInventoryList : public FFastArraySerializer
 {

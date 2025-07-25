@@ -15,7 +15,7 @@ void UPackageItemUserWidget::InitPanel(ASceneItemActor* SceneItemActor)
 {
 	if (SceneItemActor)
 	{
-		if(FItemBase* ItemBase = GetWorld()->GetGameInstance()->GetSubsystem<UItemSubsystem>()->GetItemData(SceneItemActor->GetItemID()))
+		if(FItemData* ItemBase = GetWorld()->GetGameInstance()->GetSubsystem<UItemSubsystem>()->GetItemData(SceneItemActor->GetItemID()))
 		{
 			// NameTextBlock->SetText(ItemBase->Name);
 			IconImage->SetBrushFromTexture(ItemBase->Icon);

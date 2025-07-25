@@ -57,12 +57,12 @@ USkeletalMeshComponent* ADoubleHeroesBaseCharacter::GetSkeletalMeshComponent()
 	return GetMesh();
 }
 
-AWeapon* ADoubleHeroesBaseCharacter::GetHoldWeapon() const
+AItemBase* ADoubleHeroesBaseCharacter::GetHoldItem() const
 {
-	if (PackageComponent)
-	{
-		return PackageComponent->GetHoldWeapon();
-	}
+	// if (PackageComponent)
+	// {
+	// 	return PackageComponent->GetHoldItem();
+	// }
 	return nullptr;
 }
 
@@ -103,7 +103,7 @@ void ADoubleHeroesBaseCharacter::InitializeDefaultAttributes() const
 void ADoubleHeroesBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME_CONDITION(ThisClass, OverlappingWeapon, COND_OwnerOnly); //COND_OwnerOnly只在网络的所有者客户端上复制该变量
+	DOREPLIFETIME_CONDITION(ThisClass, OverlappingItem, COND_OwnerOnly); //COND_OwnerOnly只在网络的所有者客户端上复制该变量
 	DOREPLIFETIME(ADoubleHeroesBaseCharacter, DHAbilitySystemComponent);
 	DOREPLIFETIME(ADoubleHeroesBaseCharacter, bIsRunning);
 	DOREPLIFETIME(ADoubleHeroesBaseCharacter, bEquipped);
@@ -169,8 +169,16 @@ void ADoubleHeroesBaseCharacter::InitClassDefaults()
 	}
 }
 
-void ADoubleHeroesBaseCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
+void ADoubleHeroesBaseCharacter::OnRep_OverlappingItem(AItemBase* LastItem)
 {
+	// if (OverlappingItem)
+	// {
+	// 	OverlappingItem->ShowPickupWidget(true);
+	// }
+	// if (LastItem)
+	// {
+	// 	LastItem->ShowPickupWidget(false);
+	// }
 }
 
 bool ADoubleHeroesBaseCharacter::IsRunning()
@@ -178,18 +186,18 @@ bool ADoubleHeroesBaseCharacter::IsRunning()
 	return bIsRunning;
 }
 
-void ADoubleHeroesBaseCharacter::SetOverlappingWeapon(AWeapon* Weapon)
+void ADoubleHeroesBaseCharacter::SetOverlappingItem(AItemBase* Item)
 {
-	if (OverlappingWeapon)
+	if (OverlappingItem)
 	{
-		// OverlappingWeapon->ShowPickupWidget(false);
+		// OverlappingItem->ShowPickupWidget(false);
 	}
-	OverlappingWeapon = Weapon;
+	OverlappingItem = Item;
 	if (IsLocallyControlled())
 	{
-		if (OverlappingWeapon)
+		if (OverlappingItem)
 		{
-			// OverlappingWeapon->ShowPickupWidget(true);
+			// OverlappingItem->ShowPickupWidget(true);
 		}
 	}
 }

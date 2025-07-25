@@ -3,7 +3,7 @@
 
 #include "Subsystem/ItemSubsystem.h"
 
-FItemBase* UItemSubsystem::GetItemData(int32 ID) const
+FItemData* UItemSubsystem::GetItemData(int32 ID) const
 {
 	if (ItemMap.Contains(ID))
 	{
@@ -24,7 +24,7 @@ void UItemSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 		TArray<FName> RowNames = ItemData->GetRowNames();
 		for (auto Key : RowNames)
 		{
-			FItemBase* ItemBase = reinterpret_cast<FItemBase*>(ItemData->GetRowMap()[Key]);
+			FItemData* ItemBase = reinterpret_cast<FItemData*>(ItemData->GetRowMap()[Key]);
 			FString Sign = Key.ToString();
 			FString LeftStr;
 			FString RightStr;
@@ -50,7 +50,7 @@ void UItemSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 		TArray<FName> RowNames = WeaponData->GetRowNames();
 		for (auto Key : RowNames)
 		{
-			FItemBase* ItemBase = reinterpret_cast<FItemBase*>(WeaponData->GetRowMap()[Key]);
+			FItemData* ItemBase = reinterpret_cast<FItemData*>(WeaponData->GetRowMap()[Key]);
 			FString Sign = Key.ToString();
 			FString LeftStr;
 			FString RightStr;

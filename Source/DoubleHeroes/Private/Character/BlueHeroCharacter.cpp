@@ -49,6 +49,7 @@ ABlueHeroCharacter::ABlueHeroCharacter(const FObjectInitializer& ObjectInitializ
 
 	HeroCombatComponent = CreateDefaultSubobject<UHeroCombatComponent>(TEXT("HeroCombatComponent"));
 	HeroCombatComponent->SetIsReplicated(true); // 如果需要网络复制
+	HeroCombatComponent->Character = this;
 
 
 	
@@ -58,9 +59,9 @@ void ABlueHeroCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(ABlueHeroCharacter, OverlappingWeapon, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(ABlueHeroCharacter, OverlappingItem, COND_OwnerOnly);
 
-	// DOREPLIFETIME_CONDITION(ABlueHeroCharacter, OverlappingWeapon, COND_OwnerOnly); //COND_OwnerOnly只在网络的所有者客户端上复制该变量
+	// DOREPLIFETIME_CONDITION(ABlueHeroCharacter, OverlappingItem, COND_OwnerOnly); //COND_OwnerOnly只在网络的所有者客户端上复制该变量
 }
 
 // Called when the game starts or when spawned
@@ -84,9 +85,7 @@ void ABlueHeroCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (OverlappingWeapon)
-	{
-	}
+	
 }
 
 /*void ABlueHeroCharacter::MoveForward(float Value)
@@ -101,10 +100,6 @@ void ABlueHeroCharacter::Tick(float DeltaTime)
 
 	if(ActionState != EActionState::EAS_Unoccupied) return;
 }*/
-
-// void ABlueHeroCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
-// {
-// }
 
 void ABlueHeroCharacter::PossessedBy(AController* NewController)
 {
@@ -202,23 +197,6 @@ void ABlueHeroCharacter::PostInitializeComponents()
 	// }
 }
 
-
-// void ABlueHeroCharacter::SetOverlappingWeapon(AWeapon* Weapon)
-// {
-// 	if (OverlappingWeapon)
-// 	{
-// 		// OverlappingWeapon->ShowPickupWidget(false);
-// 	}
-// 	OverlappingWeapon = Weapon;
-// 	if (IsLocallyControlled())
-// 	{
-// 		if (OverlappingWeapon)
-// 		{
-// 			// OverlappingWeapon->ShowPickupWidget(true);
-// 		}
-// 	}
-// }
-
 bool ABlueHeroCharacter::IsWeaponEquipped()
 {
 	return (HeroCombatComponent && HeroCombatComponent->EquippedWeapon);
@@ -250,7 +228,7 @@ void ABlueHeroCharacter::Interact()
 	// {
 	// 	if (HasAuthority())
 	// 	{
-	// 		Combat->EquipWeapon(OverlappingWeapon);
+	// 		Combat->EquipWeapon(OverlappingItem);
 	// 	}
 	// 	else
 	// 	{
@@ -262,7 +240,7 @@ void ABlueHeroCharacter::Interact()
 	{
 		if (HasAuthority())
 		{
-			HeroCombatComponent->EquipWeapon(OverlappingWeapon);
+			// HeroCombatComponent->EquipWeapon(OverlappingItem);
 		}
 	}
 }
@@ -271,6 +249,6 @@ void ABlueHeroCharacter::ServerEquipButtonPressed_Implementation()
 {
 	if (HeroCombatComponent)
 	{
-		HeroCombatComponent->EquipWeapon(OverlappingWeapon);
+		// HeroCombatComponent->EquipWeapon(OverlappingItem);
 	}
 }

@@ -19,7 +19,7 @@ USkinComponent::USkinComponent()
 void USkinComponent::OnPutOnItem(ESkinPartType PartType, int32 ItemID)
 {
 	//如果道具数据存在
-	if (FItemBase* ItemBase = GetWorld()->GetGameInstance()->GetSubsystem<UItemSubsystem>()->GetItemData(ItemID))
+	if (FItemData* ItemBase = GetWorld()->GetGameInstance()->GetSubsystem<UItemSubsystem>()->GetItemData(ItemID))
 	{
 		//检测道具类型
 		if (ItemBase->Type != EItemType::EPT_SkinPart)

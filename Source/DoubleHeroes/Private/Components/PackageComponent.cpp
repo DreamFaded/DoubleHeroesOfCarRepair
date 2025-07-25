@@ -129,7 +129,7 @@ void UPackageComponent::PutOnItemFromPackage(int32 PackageSign, ESkinPartType Sk
 bool UPackageComponent::PutOnItem(int32 ItemID, ESkinPartType SkinPart)
 {
 	//获取数据
-	FItemBase* ItemBase = GetWorld()->GetGameInstance()->GetSubsystem<UItemSubsystem>()->GetItemData(ItemID);
+	FItemData* ItemBase = GetWorld()->GetGameInstance()->GetSubsystem<UItemSubsystem>()->GetItemData(ItemID);
 	//如果穿戴不在数据表或者不是皮肤组件
 	if (!ItemBase || ItemBase->Type == EItemType::EPT_Weapon)
 	{
@@ -226,9 +226,9 @@ void UPackageComponent::SpawnNearSceneItem(int32 ItemID)
 	
 }
 
-AWeapon* UPackageComponent::GetHoldWeapon() const
+AItemBase* UPackageComponent::GetHoldWeapon() const
 {
-	return HoldWeapon;
+	return nullptr;
 }
 
 int32 UPackageComponent::GetPackageMapSign()

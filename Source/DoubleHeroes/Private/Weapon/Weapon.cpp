@@ -44,7 +44,8 @@ void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (GetLocalRole() == ROLE_Authority)
+	// if (GetLocalRole() == ROLE_Authority)
+	if(HasAuthority())
 	{
 		AreaSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly); //只启用查询模式
 		AreaSphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap); //当碰撞体与 “Pawn” 类型的对象发生重叠时，会产生重叠事件
@@ -60,8 +61,8 @@ void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 {
 	ADoubleHeroesBaseCharacter* BaseCharacter = Cast<ADoubleHeroesBaseCharacter>(OtherActor);
 
-	if (BaseCharacter)
-	{
+	// if (BaseCharacter)
+	// {
 		// if (ASceneItemActor* SceneItemActor = Cast<ASceneItemActor>(OtherActor))
 		// {
 		// 	if(PackageComponent)
@@ -69,8 +70,8 @@ void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 		// 		PackageComponent->AddNearItem(SceneItemActor);
 		// 	}
 		// }
-		BaseCharacter->SetOverlappingWeapon(this);
-	}
+	// 	BaseCharacter->SetOverlappingItem(this);
+	// }
 }
 
 void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -80,14 +81,14 @@ void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 
 	if (BaseCharacter)
 	{
-		if (ASceneItemActor* SceneItemActor = Cast<ASceneItemActor>(OtherActor))
-		{
-			if(PackageComponent)
-			{
-				PackageComponent->RemoveNearItem(SceneItemActor);
-			}
-		}
-		BaseCharacter->SetOverlappingWeapon(nullptr);
+		// if (ASceneItemActor* SceneItemActor = Cast<ASceneItemActor>(OtherActor))
+		// {
+		// 	if(PackageComponent)
+		// 	{
+		// 		PackageComponent->RemoveNearItem(SceneItemActor);
+		// 	}
+		// }
+		BaseCharacter->SetOverlappingItem(nullptr);
 	}
 }
 

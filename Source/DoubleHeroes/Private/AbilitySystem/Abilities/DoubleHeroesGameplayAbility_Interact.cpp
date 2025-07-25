@@ -4,6 +4,8 @@
 #include "AbilitySystem/Abilities/DoubleHeroesGameplayAbility_Interact.h"
 
 #include "AbilitySystem/AbilityTasks/AbilityTask_GrantNearbyInteraction.h"
+#include "Character/BlueHeroCharacter.h"
+#include "Components/HeroCombatComponent.h"
 #include "IndicatorSystem/DoubleHeroesIndicatorManagerComponent.h"
 #include "IndicatorSystem/IndicatorDescriptor.h"
 #include "Interaction/InteractionOption.h"
@@ -18,19 +20,20 @@ UDoubleHeroesGameplayAbility_Interact::UDoubleHeroesGameplayAbility_Interact(
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
 }
 
-void UDoubleHeroesGameplayAbility_Interact::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
-	const FGameplayEventData* TriggerEventData)
-{
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	UAbilitySystemComponent* AbilitySystem = GetAbilitySystemComponentFromActorInfo();
-	if (AbilitySystem && AbilitySystem->GetOwnerRole() == ROLE_Authority)
-	{
-		UAbilityTask_GrantNearbyInteraction* Task = UAbilityTask_GrantNearbyInteraction::GrantAbilitiesForNearbyInteractors(this, InteractionScanRange, InteractionScanRate);
-		Task->ReadyForActivation();
-	}
-}
+// void UDoubleHeroesGameplayAbility_Interact::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
+// 	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
+// 	const FGameplayEventData* TriggerEventData)
+// {
+// 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+//
+// 	UAbilitySystemComponent* AbilitySystem = GetAbilitySystemComponentFromActorInfo();
+// 	if (AbilitySystem && AbilitySystem->GetOwnerRole() == ROLE_Authority)
+// 	{
+// 		// UAbilityTask_GrantNearbyInteraction* Task = UAbilityTask_GrantNearbyInteraction::GrantAbilitiesForNearbyInteractors(this, InteractionScanRange, InteractionScanRate);
+// 		// Task->ReadyForActivation();
+// 		TriggerInteraction();
+// 	}
+// }
 
 void UDoubleHeroesGameplayAbility_Interact::UpdateInteractions(const TArray<FInteractionOption>& InteractiveOptions)
 {
@@ -71,4 +74,12 @@ void UDoubleHeroesGameplayAbility_Interact::UpdateInteractions(const TArray<FInt
 
 void UDoubleHeroesGameplayAbility_Interact::TriggerInteraction()
 {
+	// 当玩家按下交互键时触发
+	if (ABlueHeroCharacter* BlueHeroCharacter = GetHeroCharacterFromActorInfo())
+	{
+		if (BlueHeroCharacter->IsLocallyControlled() && BlueHeroCharacter->OverlappingItem)
+		{
+			BlueHeroCharacter->GetHeroCombatComponent()->PickupItem(BlueHeroCharacter->OverlappingItem);
+		}
+	}
 }
