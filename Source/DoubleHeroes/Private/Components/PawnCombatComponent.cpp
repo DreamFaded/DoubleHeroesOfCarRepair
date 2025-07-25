@@ -8,6 +8,7 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Items/Weapons/DoubleHeroesWeaponBase.h"
+#include "Net/UnrealNetwork.h"
 #include "Weapon/Weapon.h"
 
 void UPawnCombatComponent::RegisterSpawnedWeapon(FGameplayTag InWeaponTagToRegister,
@@ -79,14 +80,7 @@ void UPawnCombatComponent::PickupItem(AItemBase* ItemToPickup)
 		EquippedItem->AttachToComponent(Character->GetMesh(), TransformRules, FName("RightHandSocket"));
 		// HandSocket->AttachActor(EquippedItem, Character->GetMesh());
 	}
-	// 验证是否正确附加
-	if (EquippedItem->GetAttachParentSocketName() == FName("RightHandSocket"))
-	{
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Failed to attach item"));
-	}
+	
 	EquippedItem->SetOwner(Character);
 }
 
@@ -106,4 +100,6 @@ void UPawnCombatComponent::OnRep_EquippedItem()
 void UPawnCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UPawnCombatComponent, EquippedItem);
 }
