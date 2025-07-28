@@ -12,6 +12,7 @@
 #include "DoubleHeroesBaseCharacter.generated.h"
 
 class AItemBase;
+class AItemWeapon;
 class UDataAsset_StartUpDataBase;
 class UDoubleHeroesAttributeSet;
 class UDHAbilitySystemComponent;
@@ -26,6 +27,9 @@ class DOUBLEHEROES_API ADoubleHeroesBaseCharacter : public ACharacter, public IA
 public:
 	// Sets default values for this character's properties
 	ADoubleHeroesBaseCharacter(const FObjectInitializer& ObjectInitializer);
+	
+	UPROPERTY(EditAnywhere, Category = "Custom Values|Character Info")
+	FGameplayTag CharacterTag;
 	
 	UPROPERTY(Replicated, BlueprintReadOnly)
 	bool bIsRunning = false;
@@ -58,6 +62,9 @@ public:
 
 	UPROPERTY(ReplicatedUsing = OnRep_OverlappingItem)
 	AItemBase* OverlappingItem;
+
+	UPROPERTY()
+	AItemWeapon* OverlappingWeapon;
 	
 	
 
@@ -95,7 +102,7 @@ public:
 	
 	virtual void OnRep_PlayerState() override;
 
-	void SetOverlappingItem(AItemBase* Item);
+	virtual void SetOverlappingItem(AItemBase* Item);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -116,8 +123,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AbilitySystem")
 	UDoubleHeroesAttributeSet* DoubleHeroesAttributeSet;
 
-	UPROPERTY(EditAnywhere, Category = "Custom Values|Character Info")
-	FGameplayTag CharacterTag;
+	
 	
 	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = true))
 	TObjectPtr<USceneComponent> DynamicProjectileSpawnPoint;

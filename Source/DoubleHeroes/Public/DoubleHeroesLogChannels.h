@@ -7,6 +7,7 @@ DOUBLEHEROES_API DECLARE_LOG_CATEGORY_EXTERN(LogDoubleHeroesExperience, Log, All
 DOUBLEHEROES_API DECLARE_LOG_CATEGORY_EXTERN(LogDoubleHeroesAbilitySystem, Log, All);
 DOUBLEHEROES_API DECLARE_LOG_CATEGORY_EXTERN(LogDoubleHeroesTeams, Log, All);
 
+
 /**
  * 
  */

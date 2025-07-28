@@ -4,6 +4,7 @@
 #include "AbilitySystem/DHAbilitySystemComponent.h"
 
 #include "DoubleHeroesGameplayTags.h"
+#include "DoubleHeroesLogChannels.h"
 #include "AbilitySystem/Abilities/DoubleHeroesGameplayAbility.h"
 #include "AbilitySystem/Abilities/ProjectileAbility.h"
 #include "DoubleHeroesTypes/DoubleHeroesStructTypes.h"
@@ -154,6 +155,45 @@ void UDHAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& Inpu
 	}
 }
 
+void UDHAbilitySystemComponent::ForEachAbility(const FForEachAbility& Delegate)
+{
+	FScopedAbilityListLock ActiveScopeLockk(*this);
+	for (const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		if(!Delegate.ExecuteIfBound(AbilitySpec))
+		{
+			UE_LOG(LogDoubleHeroes, Error, TEXT("Failed to execute delegate in %hs"), __FUNCTION__)
+		}
+	}
+}
+
+FGameplayTag UDHAbilitySystemComponent::GetAbilityTagFromSpec(const FGameplayAbilitySpec& AbilitySpec)
+{
+	if (AbilitySpec.Ability)
+	{
+		for (FGameplayTag Tag : AbilitySpec.Ability.Get()->AbilityTags)
+		{
+			if(Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Abilities"))))
+			{
+				return Tag;
+			}
+		}
+	}
+	return FGameplayTag();
+}
+
+FGameplayTag UDHAbilitySystemComponent::GetInputTagFromSpec(const FGameplayAbilitySpec& AbilitySpec)
+{
+	for (FGameplayTag Tag : AbilitySpec.DynamicAbilityTags)
+	{
+		if(Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("InputTag"))))
+		{
+			return Tag;
+		}
+	}
+	return FGameplayTag();
+}
+
 void UDHAbilitySystemComponent::SetDynamicProjectile(const FGameplayTag& ProjectileTag, int32 AbilityLevel)
 {
 	if(!ProjectileTag.IsValid()) return;
@@ -245,7 +285,7 @@ void UDHAbilitySystemComponent::RemoveEquipmentAbility(const FDoubleHeroesEquipm
 	ClearAbility(EquipmentEntry->GrantedHandles.GrantedAbility);
 }
 
-void UDHAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& AbilitiesToGrant)
+void UDHAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities)
 {
 	// for (const TSubclassOf<UGameplayAbility>& Ability : AbilitiesToGrant)
 	// {
@@ -255,7 +295,7 @@ void UDHAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<U
 
 
 	//GAS
-	for (const TSubclassOf<UGameplayAbility>& Ability : AbilitiesToGrant)
+	for (const TSubclassOf<UGameplayAbility>& Ability : StartupAbilities)
 	{
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(Ability, 1.f);
 	
@@ -267,25 +307,35 @@ void UDHAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<U
 		}
 	}
 
+	bStartupAbilitiesGiven = true;
+	AbilitiesGivenDelegate.Broadcast(this);
+
 	//GAS
 }
 
 void UDHAbilitySystemComponent::AddCharacterPassiveAbilities(
 	const TArray<TSubclassOf<UGameplayAbility>>& PassivesToGrant)
 {
+	if (PassivesToGrant.Num()>0)
+	{
+		
 	for (const TSubclassOf<UGameplayAbility>& Ability : PassivesToGrant)
 	{
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(Ability, 1.f);
 		GiveAbilityAndActivateOnce(AbilitySpec);
 	}
+	}
 }
 
 void UDHAbilitySystemComponent::InitializeDefaultAttributes(const TSubclassOf<UGameplayEffect>& AttributeEffect)
 {
+	if(AttributeEffect)
+	{
 	checkf(AttributeEffect, TEXT("No valid default attributes for this character %s"), *GetAvatarActor()->GetName());
 	const FGameplayEffectContextHandle ContextHandle = MakeEffectContext();
 	const FGameplayEffectSpecHandle SpecHandle = MakeOutgoingSpec(AttributeEffect, 1.f, ContextHandle);
 	ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+	}
 }
 
 void UDHAbilitySystemComponent::GrantHeroWeaponAbilities(const TArray<FBlueHeroAbilitySet>& InDefaultWeaponAbilities,

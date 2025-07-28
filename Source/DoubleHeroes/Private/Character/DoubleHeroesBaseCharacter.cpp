@@ -103,7 +103,7 @@ void ADoubleHeroesBaseCharacter::InitializeDefaultAttributes() const
 void ADoubleHeroesBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME_CONDITION(ThisClass, OverlappingItem, COND_OwnerOnly); //COND_OwnerOnly只在网络的所有者客户端上复制该变量
+	// DOREPLIFETIME_CONDITION(ThisClass, OverlappingItem, COND_OwnerOnly); //COND_OwnerOnly只在网络的所有者客户端上复制该变量
 	DOREPLIFETIME(ADoubleHeroesBaseCharacter, DHAbilitySystemComponent);
 	DOREPLIFETIME(ADoubleHeroesBaseCharacter, bIsRunning);
 	DOREPLIFETIME(ADoubleHeroesBaseCharacter, bEquipped);
@@ -140,6 +140,10 @@ void ADoubleHeroesBaseCharacter::InitAbilityActorInfo()
 		if (IsValid(DHAbilitySystemComponent))
 		{
 			DHAbilitySystemComponent->InitAbilityActorInfo(DoubleHeroesPlayerState, this);
+		}
+		if (HasAuthority())
+		{
+			InitClassDefaults();
 		}
 		if (UDoubleHeroesAnimInstance* DoubleHeroesAnimInstance = Cast<UDoubleHeroesAnimInstance>(
 			GetMesh()->GetAnimInstance()))

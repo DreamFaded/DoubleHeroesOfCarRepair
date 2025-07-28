@@ -34,6 +34,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void TriggerInteraction();
 
+
 protected:
 	
 	UPROPERTY(BlueprintReadWrite)

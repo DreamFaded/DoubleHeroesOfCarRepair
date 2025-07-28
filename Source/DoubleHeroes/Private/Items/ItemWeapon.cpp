@@ -68,7 +68,7 @@ void AItemWeapon::OnBoxEndOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 		// 		PackageComponent->AddNearItem(SceneItemActor);
 		// 	}
 		// }
-		// BaseCharacter->SetOverlappingItem(nullptr);
+		BaseCharacter->SetOverlappingItem(nullptr);
 	}
 }
 

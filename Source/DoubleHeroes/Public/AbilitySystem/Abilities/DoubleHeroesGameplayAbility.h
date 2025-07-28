@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
+#include "DoubleHeroesTypes/DoubleHeroesStructTypes.h"
 #include "DoubleHeroesGameplayAbility.generated.h"
 
 class ADoubleHeroesPlayerController;
@@ -49,11 +50,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "DoubleHeroes|Ability")
 	ADoubleHeroesPlayerController* GetDoubleHeroesPlayerControllerFromActorInfo() const;
 
-	UPROPERTY(EditDefaultsOnly, Category="Input")
-	FGameplayTag StartupInputTag;
+	// UPROPERTY(EditDefaultsOnly, Category="Input")
+	// FGameplayTag StartupInputTag;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
 	FScalableFloat Damage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
+	FDoubleHeroesItemData DoubleHeroesItemData;
 
 protected:
 

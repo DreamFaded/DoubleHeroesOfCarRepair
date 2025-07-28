@@ -47,7 +47,7 @@ public:
 	// class UCombatComponent* Combat;
 	// UPROPERTY(EditAnywhere, Category = input)
 	// class UInputMappingContext* SlashContext;
-	
+
 
 protected:
 	
@@ -80,6 +80,8 @@ protected:
 	void Dodge();
 	void Interact();
 	void CrouchPressed();
+
+	
 
 
 

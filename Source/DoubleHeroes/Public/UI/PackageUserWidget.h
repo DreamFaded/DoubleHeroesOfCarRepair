@@ -35,9 +35,10 @@ public:
 	// UPackageItemUserWidget* PackageItem_2;
 	// UPROPERTY(meta = (BindWidget))
 	// UPackageItemUserWidget* PackageItem_3;
-
+	UPROPERTY(meta = (BindWidget))
 	TMap<int32, UPackageItemUserWidget*> PackageItemMap;
 
+	UPROPERTY(meta = (BindWidget))
 	TArray<UPackageItemUserWidget*> PackageItemArray;
 
 	int32 ActiveSlotIndex = -1;

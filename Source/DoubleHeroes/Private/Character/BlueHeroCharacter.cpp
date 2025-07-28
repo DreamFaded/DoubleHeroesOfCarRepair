@@ -4,15 +4,11 @@
 #include "Character/BlueHeroCharacter.h"
 
 #include "DoubleHeroesGameplayTags.h"
-#include "EnhancedInputComponent.h"
-#include "EnhancedInputSubsystems.h"
 #include "AbilitySystem/DHAbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
 #include "Components/DHCharacterMovementComponent.h"
 #include "Components/HeroCombatComponent.h"
 #include "Components/InputComponent.h"
-#include "Components/InteractionComponent.h"
 #include "DataAsset/DataAsset_StartUpDataBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
@@ -48,10 +44,10 @@ ABlueHeroCharacter::ABlueHeroCharacter(const FObjectInitializer& ObjectInitializ
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 
 	HeroCombatComponent = CreateDefaultSubobject<UHeroCombatComponent>(TEXT("HeroCombatComponent"));
-	HeroCombatComponent->SetIsReplicated(true); // 如果需要网络复制
-	HeroCombatComponent->Character = this;
+	
 
-
+	// 不要在构造函数中设置这些指针，而是在PostInitializeComponents中设置
+	// 因为这时对象还没有完全构造完成
 	
 }
 
@@ -105,13 +101,13 @@ void ABlueHeroCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	if (!CharacterStartUpData.IsNull())
-	{
-		if (UDataAsset_StartUpDataBase* LoadedData = CharacterStartUpData.LoadSynchronous())
-		{
-			LoadedData->GiveToAbilitySystemComponent(DHAbilitySystemComponent);
-		}
-	}
+	// if (!CharacterStartUpData.IsNull())
+	// {
+	// 	if (UDataAsset_StartUpDataBase* LoadedData = CharacterStartUpData.LoadSynchronous())
+	// 	{
+	// 		LoadedData->GiveToAbilitySystemComponent(DHAbilitySystemComponent);
+	// 	}
+	// }
 }
 
 // void ABlueHeroCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -195,12 +191,21 @@ void ABlueHeroCharacter::PostInitializeComponents()
 	// {
 	// 	Combat->Character = this;
 	// }
+	if (HeroCombatComponent)
+	{
+		HeroCombatComponent->SetIsReplicated(true); // 如果需要网络复制
+		HeroCombatComponent->Character = this;
+	}
+
+	
 }
 
 bool ABlueHeroCharacter::IsWeaponEquipped()
 {
 	return (HeroCombatComponent && HeroCombatComponent->EquippedWeapon);
 }
+
+
 
 void ABlueHeroCharacter::Punch()
 {

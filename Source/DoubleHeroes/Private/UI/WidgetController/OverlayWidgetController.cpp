@@ -5,6 +5,7 @@
 
 #include "AbilitySystem/DHAbilitySystemComponent.h"
 #include "AbilitySystem/DoubleHeroesAttributeSet.h"
+#include "Data/AbilityInfo.h"
 
 void UOverlayWidgetController::BroadcastInitialValues()
 {
@@ -43,7 +44,18 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 		                        OnMaxEnduranceChanged.Broadcast(Data.NewValue);
 	                        });
 
-	Cast<UDHAbilitySystemComponent>(AbilitySystemComponent)->EffectAssetTags.AddLambda(
+	if (UDHAbilitySystemComponent* DoubleHeroesASC = Cast<UDHAbilitySystemComponent>(AbilitySystemComponent))
+	{
+		if (DoubleHeroesASC->bStartupAbilitiesGiven)
+		{
+			OnInitializeStartupAbilities(DoubleHeroesASC);
+		}
+		else
+		{
+			DoubleHeroesASC->AbilitiesGivenDelegate.AddUObject(this, &UOverlayWidgetController::OnInitializeStartupAbilities);
+		}
+		
+		DoubleHeroesASC->EffectAssetTags.AddLambda(
 		[this](const FGameplayTagContainer& AssetTags)
 		{
 			for (const FGameplayTag& Tag : AssetTags)
@@ -58,5 +70,26 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 				}
 			}
 		});
+	}
+
+	
+
+	
+}
+
+void UOverlayWidgetController::OnInitializeStartupAbilities(UDHAbilitySystemComponent* DoubleHeroesASC)
+{
+	//Get information about all given abilities, look up their Ability Info, and broadcast it to widgets.
+	if(!DoubleHeroesASC->bStartupAbilitiesGiven) return;
+
+	FForEachAbility BroadcastDelegate;
+	BroadcastDelegate.BindLambda([this, DoubleHeroesASC](const FGameplayAbilitySpec& AbilitySpec)
+	{
+		//Need a way to figure out the ability tag for a given ability spec.
+		FDoubleHeroesAbilityInfo Info = AbilityInfo->FindAbilityInfoByTag(DoubleHeroesASC->GetAbilityTagFromSpec(AbilitySpec));
+		Info.InputTag = DoubleHeroesASC->GetInputTagFromSpec(AbilitySpec);
+		AbilityInfoDelegate.Broadcast(Info);
+	});
+	DoubleHeroesASC->ForEachAbility(BroadcastDelegate);
 }
 

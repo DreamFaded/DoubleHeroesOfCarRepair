@@ -15,7 +15,7 @@
 UDoubleHeroesGameplayAbility_Interact::UDoubleHeroesGameplayAbility_Interact(
 	const FObjectInitializer& ObjectInitializer)
 {
-	ActivationPolicy = EDoubleHeroesAbilityActivationPolicy::OnSpawn;
+	// ActivationPolicy = EDoubleHeroesAbilityActivationPolicy::OnSpawn;
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
 }
@@ -77,9 +77,16 @@ void UDoubleHeroesGameplayAbility_Interact::TriggerInteraction()
 	// 当玩家按下交互键时触发
 	if (ABlueHeroCharacter* BlueHeroCharacter = GetHeroCharacterFromActorInfo())
 	{
-		if (BlueHeroCharacter->IsLocallyControlled() && BlueHeroCharacter->OverlappingItem)
+		if (IsValid(BlueHeroCharacter->OverlappingItem))
 		{
-			BlueHeroCharacter->GetHeroCombatComponent()->PickupItem(BlueHeroCharacter->OverlappingItem);
+			if (BlueHeroCharacter->GetHeroCombatComponent() && BlueHeroCharacter->HasAuthority())
+			{
+				BlueHeroCharacter->GetHeroCombatComponent()->PickupItem(BlueHeroCharacter->OverlappingItem);
+			}
+		}
+		else
+		{
+			
 		}
 	}
 }

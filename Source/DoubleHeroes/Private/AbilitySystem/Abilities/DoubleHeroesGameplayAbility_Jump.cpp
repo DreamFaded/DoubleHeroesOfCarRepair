@@ -74,7 +74,6 @@ void UDoubleHeroesGameplayAbility_Jump::CharacterJumpStart()
 	{
 		if (BlueHeroCharacter->IsLocallyControlled() && !BlueHeroCharacter->bPressedJump)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("CharacterJumpStart")));
 			BlueHeroCharacter->UnCrouch();
 			BlueHeroCharacter->Jump();
 		}

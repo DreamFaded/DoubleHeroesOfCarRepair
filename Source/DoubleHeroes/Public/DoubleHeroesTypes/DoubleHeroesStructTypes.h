@@ -38,3 +38,18 @@ struct FDoubleHeroesWeaponData
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (TitleProperty = "InputTag"))
 	TArray<FBlueHeroAbilitySet> DefaultWeaponAbilities;
 };
+
+USTRUCT(BlueprintType)
+struct FDoubleHeroesItemData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UAnimInstance> ItemAnimLayerToLink;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UInputMappingContext* ItemInputMappingContext;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (TitleProperty = "InputTag"))
+	TArray<FBlueHeroAbilitySet> ItemAbilities;
+};

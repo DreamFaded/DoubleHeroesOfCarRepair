@@ -339,7 +339,6 @@ void ADoubleHeroesPlayerController::BeginPlay()
 	{
 		Subsystem->AddMappingContext(InputConfigDataAsset->DefaultMappingContext, 0);
 	}
-	// SetupInputComponent();
 }
 
 

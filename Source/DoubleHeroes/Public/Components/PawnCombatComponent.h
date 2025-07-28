@@ -4,10 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "Character/BlueHeroCharacter.h"
 #include "PawnExtensionComponentBase.h"
 #include "PawnCombatComponent.generated.h"
 
 
+class ABlueHeroCharacter;
+class ADoubleHeroesBaseCharacter;
+class AItemWeapon;
 class ADoubleHeroesWeaponBase;
 struct FGameplayTag;
 class AWeapon;
@@ -35,16 +39,21 @@ public:
 	void EquipWeapon(AWeapon* WeaponToEquip);
 
 	UFUNCTION(Category = "DoubleHeroes|Combat")
-	void PickupItem(AItemBase* ItemToPickup);
+	virtual void PickupItem(AItemBase* ItemToPickup);
 
 	UPROPERTY()
-	class ADoubleHeroesBaseCharacter* Character;
+	ADoubleHeroesBaseCharacter* Character;
 
+	UPROPERTY()
+	ABlueHeroCharacter* BlueHeroCharacter;
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	AWeapon* EquippedWeapon;
 
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedItem)
 	AItemBase* EquippedItem;
+
+	UPROPERTY()
+	AItemWeapon* Equippeda;
 
 	UFUNCTION()
 	void OnRep_EquippedWeapon();

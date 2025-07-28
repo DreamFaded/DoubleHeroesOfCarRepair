@@ -4,8 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "DoubleHeroesTypes/DoubleHeroesStructTypes.h"
 #include "GameFramework/Actor.h"
 #include "ItemBase.generated.h"
+
+class UInputMappingContext;
 
 UENUM(BlueprintType)
 enum class EItemState : uint8
@@ -42,6 +45,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
 	FGameplayTag ItemTag;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
+	TMap<FGameplayTag, FDoubleHeroesItemData> TagItemDataMap;
 
 	// 网络同步
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -64,6 +69,9 @@ public:
 
 	UFUNCTION()
 	void OnRep_ItemState();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UAnimInstance> ItemAnimLayerToLink;
 
 protected:
 	virtual void BeginPlay() override;
@@ -90,6 +98,9 @@ protected:
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex
 	);
+
+	
+
 
 public:
 	virtual void Tick(float DeltaTime) override;

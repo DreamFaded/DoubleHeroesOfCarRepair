@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "ItemBase.h"
+#include "DoubleHeroesTypes/DoubleHeroesStructTypes.h"
 #include "ItemWeapon.generated.h"
 
 UCLASS()
@@ -17,10 +18,6 @@ public:
 	// 攻击力
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	float AttackPower = 20;
-
-	// 攻击动画
-	UPROPERTY(EditAnywhere, Category = "Weapon")
-	UAnimationAsset* AttackAnimation;
 	
 	virtual void UseItem() override;
 

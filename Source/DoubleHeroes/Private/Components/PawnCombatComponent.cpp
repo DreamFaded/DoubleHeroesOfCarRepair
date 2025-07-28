@@ -3,11 +3,17 @@
 
 #include "Components/PawnCombatComponent.h"
 
+#include "EnhancedInputSubsystems.h"
+#include "Character/BlueHeroCharacter.h"
 #include "Character/DoubleHeroesBaseCharacter.h"
+#include "Data/CharacterClassInfo.h"
 #include "DoubleHeroesComponent/DoubleHeroesDebugHelper.h"
+#include "DoubleHeroesTypes/DoubleHeroesStructTypes.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Items/ItemWeapon.h"
 #include "Items/Weapons/DoubleHeroesWeaponBase.h"
+#include "Libraries/DHAbilitySystemLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Weapon/Weapon.h"
 
@@ -73,16 +79,33 @@ void UPawnCombatComponent::PickupItem(AItemBase* ItemToPickup)
 	
 	EquippedItem = ItemToPickup;
 	EquippedItem->SetItemState(EItemState::EIS_Equipped);
-	const USkeletalMeshSocket* HandSocket = Character->GetMesh()->GetSocketByName(FName("RightHandSocket"));
-	if (HandSocket)
-	{
-		FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, true);
-		EquippedItem->AttachToComponent(Character->GetMesh(), TransformRules, FName("RightHandSocket"));
+	FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, true);
+	EquippedItem->AttachToComponent(Character->GetMesh(), TransformRules, TEXT("RightHandSocket"));
+	// const USkeletalMeshSocket* HandSocket = Character->GetMesh()->GetSocketByName(FName("RightHandSocket"));
+	// if (HandSocket)
+	// {
+		// ItemToPickup->AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, HandSocket->SocketName);
 		// HandSocket->AttachActor(EquippedItem, Character->GetMesh());
-	}
+	// }
 	
 	EquippedItem->SetOwner(Character);
+	
+	// 获取玩家控制器
+	if (APlayerController* PC = Cast<APlayerController>(Character->GetController()))
+	{
+		// 获取增强输入本地玩家子系统
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
+		{
+			if (FDoubleHeroesItemData* ItemData = ItemToPickup->TagItemDataMap.Find(Character->CharacterTag))
+			{
+				Character->GetMesh()->LinkAnimClassLayers(ItemData->ItemAnimLayerToLink);
+				Subsystem->AddMappingContext(ItemData->ItemInputMappingContext, 1);
+			}
+			
+		}
+	}
 }
+
 
 void UPawnCombatComponent::OnRep_EquippedWeapon()
 {

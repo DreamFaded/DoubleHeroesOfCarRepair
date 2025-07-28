@@ -19,6 +19,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "DoubleHeroes|Combat")
 	ADoubleHeroesWeapon* GetHeroCarriedWeaponByTag(FGameplayTag InWeaponTag) const;
 
+	virtual void PickupItem(AItemBase* ItemToPickup) override;
 
+	void ApplyInputMappingForItem(AItemBase* Item);
 	
 };
