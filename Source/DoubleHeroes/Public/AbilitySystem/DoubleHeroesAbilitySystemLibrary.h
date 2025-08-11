@@ -6,6 +6,7 @@
 #include "Data/CharacterClassInfo.h"
 #include "DoubleHeroesAbilitySystemLibrary.generated.h"
 
+class USkillMenuWidgetController;
 struct FGameplayEffectContextHandle;
 /**
  * 
@@ -16,20 +17,34 @@ class DOUBLEHEROES_API UDoubleHeroesAbilitySystemLibrary : public UBlueprintFunc
 	GENERATED_BODY()
 
 public:
+
+	UFUNCTION(BlueprintPure, Category="DoubleHeroesAbilitySystemLibrary|WidgetController", meta = (DefaultToSelf = "WorldContextObject"))
+	static bool MakeWidgetControllerParams(const UObject* WorldContextObject, FWidgetControllerParams& OutWCParams, ADoubleHeroesHUD*& OutDoubleHeroesHUD);
+	
 	UFUNCTION(BlueprintPure, Category = "DoubleHeroesAbilitySystemLibrary|WidgetController")
 	static UOverlayWidgetController* GetOverlayWidgetController(const UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintPure, Category = "DoubleHeroesAbilitySystemLibrary|WidgetController")
 	static UAttributeMenuWidgetController* GetAttributeMenuWidgetController(const UObject* WorldContextObject);
 
+	UFUNCTION(BlueprintPure, Category = "DoubleHeroesAbilitySystemLibrary|WidgetController")
+	static USkillMenuWidgetController* GetSkillMenuWidgetController(const UObject* WorldContextObject);
+
 	UFUNCTION(BlueprintCallable, Category = "DoubleHeroesAbilitySystemLibrary|CharacterClassDefaults")
 	static void InitializeDefaultAttributes(const UObject* WorldContextObject, ECharacterClass CharacterClass, float Level, UAbilitySystemComponent* ASC);
 
+	UFUNCTION(BlueprintCallable, Category="DoubleHeroesAbilitySystemLibrary|CharacterClassDefaults")
+	static void InitializeDefaultAttributesFromSaveData(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, ULoadScreenSaveGame* SaveGame);
+	
+
 	UFUNCTION(BlueprintCallable, Category = "DoubleHeroesAbilitySystemLibrary|CharacterClassDefaults")
-	static void GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC);
+	static void GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, ECharacterClass CharacterClass);
 	
 	UFUNCTION(BlueprintCallable, Category = "DoubleHeroesAbilitySystemLibrary|CharacterClassDefaults")
 	static UCharacterClassInfo* GetCharacterClassInfo(const UObject* WorldContextObject);
+
+	UFUNCTION(BlueprintCallable, Category="DoubleHeroesAbilitySystemLibrary|CharacterClassDefaults")
+	static UAbilityInfo* GetAbilityInfo(const UObject* WorldContextObject);
 	
 
 	/*

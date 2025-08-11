@@ -47,6 +47,17 @@ UDoubleHeroesAttributeSet* ADoubleHeroesPlayerState::GetDoubleHeroesAttributes()
 	return Cast<UDoubleHeroesAttributeSet>(AttributeSet);
 }
 
+void ADoubleHeroesPlayerState::SetSkillPoints(int32 InPoints)
+{
+	SkillPoints = InPoints;
+	OnSkillPointsChangedDelegate.Broadcast(SkillPoints);
+}
+
 void ADoubleHeroesPlayerState::OnRep_Level(int32 OldLevel)
 {
+}
+
+void ADoubleHeroesPlayerState::OnRep_SkillPoints(int32 OldSkillPoints)
+{
+	OnSkillPointsChangedDelegate.Broadcast(SkillPoints);
 }

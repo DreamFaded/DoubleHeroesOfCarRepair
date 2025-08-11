@@ -6,10 +6,12 @@
 #include "AbilitySystemComponent.h"
 #include "DHAbilitySystemComponent.generated.h"
 
+class ULoadScreenSaveGame;
 struct FDoubleHeroesEquipmentEntry;
 DECLARE_MULTICAST_DELEGATE_OneParam(FEffectAssetTags, const FGameplayTagContainer& /*AssetTags*/);
-DECLARE_MULTICAST_DELEGATE_OneParam(FAbilitiesGiven, UDHAbilitySystemComponent*);
+DECLARE_MULTICAST_DELEGATE(FAbilitiesGiven);
 DECLARE_DELEGATE_OneParam(FForEachAbility, const FGameplayAbilitySpec&);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FActivatePassiveEffect, const FGameplayTag& /*AbilityTag*/, bool /*bActivate*/);
 
 /**
  * 
@@ -22,12 +24,17 @@ class DOUBLEHEROES_API UDHAbilitySystemComponent : public UAbilitySystemComponen
 public:
 	void AbilityActorInfoSet();
 
-	void OnAbilityInputPressed(const FGameplayTag& InInputTag);
-	void OnAbilityInputReleased(const FGameplayTag& InInputTag);
-
 	FEffectAssetTags EffectAssetTags;
 	FAbilitiesGiven AbilitiesGivenDelegate;
 	bool bStartupAbilitiesGiven = false;
+	FActivatePassiveEffect ActivatePassiveEffect;
+
+	void AddCharacterAbilitiesFromSaveData(ULoadScreenSaveGame* SaveData);
+
+	void OnAbilityInputPressed(const FGameplayTag& InInputTag);
+	void OnAbilityInputReleased(const FGameplayTag& InInputTag);
+
+	
 
 	// void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities);
 
@@ -36,7 +43,12 @@ public:
 	void ForEachAbility(const FForEachAbility& Delegate);
 
 	static FGameplayTag GetAbilityTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
-	static FGameplayTag GetInputTagFromSpec(const FGameplayAbilitySpec& AbilitySpec)；
+	static FGameplayTag GetInputTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
+	static FGameplayTag GetStatusFromSpec(const FGameplayAbilitySpec& AbilitySpec);
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastActivatePassiveEffect(const FGameplayTag& AbilityTag, bool bActivate);
+	FGameplayAbilitySpec* GetSpecFromAbilityTag(const FGameplayTag& AbilityTag);
 
 	void SetDynamicProjectile(const FGameplayTag& ProjectileTag, int32 AbilityLevel = 1);
 	
@@ -48,6 +60,8 @@ public:
 	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& AbilitiesToGrant);
 	void AddCharacterPassiveAbilities(const TArray<TSubclassOf<UGameplayAbility>>& PassivesToGrant);
 	void InitializeDefaultAttributes(const TSubclassOf<UGameplayEffect>& AttributeEffect);
+
+	void UpdateAbilityStatuses(int32 Level);
 
 protected:
 	// Handles to abilities that had their input pressed this frame.
@@ -67,6 +81,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "DoubleHeroes|Ability")
 	void RemovedGrantedHeroWeaponAbilities(UPARAM(ref)TArray<FGameplayAbilitySpecHandle>& InSpecHandlesToRemove);
+
+	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayMechanics")
+	static bool IsNotFriend(AActor* FirstActor, AActor* SecondActor);
 
 private:
 	FGameplayAbilitySpecHandle ActiveProjectileAbility;

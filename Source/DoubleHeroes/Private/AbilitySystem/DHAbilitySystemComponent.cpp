@@ -5,8 +5,11 @@
 
 #include "DoubleHeroesGameplayTags.h"
 #include "DoubleHeroesLogChannels.h"
+#include "LoadScreenSaveGame.h"
+#include "AbilitySystem/DoubleHeroesAbilitySystemLibrary.h"
 #include "AbilitySystem/Abilities/DoubleHeroesGameplayAbility.h"
 #include "AbilitySystem/Abilities/ProjectileAbility.h"
+#include "Data/AbilityInfo.h"
 #include "DoubleHeroesTypes/DoubleHeroesStructTypes.h"
 #include "Engine/AssetManager.h"
 #include "Engine/StreamableManager.h"
@@ -15,6 +18,37 @@
 void UDHAbilitySystemComponent::AbilityActorInfoSet()
 {
 	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &UDHAbilitySystemComponent::ClientEffectApplied);
+}
+
+void UDHAbilitySystemComponent::AddCharacterAbilitiesFromSaveData(ULoadScreenSaveGame* SaveData)
+{
+	for (const FSavedAbility& Data : SaveData->SavedAbilities)
+	{
+		const TSubclassOf<UGameplayAbility> LoadedAbilityClass = Data.GameplayAbility;
+
+		FGameplayAbilitySpec LoadedAbilitySpec = FGameplayAbilitySpec(LoadedAbilityClass, Data.AbilityLevel);
+
+		LoadedAbilitySpec.DynamicAbilityTags.AddTag(Data.AbilitySlot);
+		LoadedAbilitySpec.DynamicAbilityTags.AddTag(Data.AbilityStatus);
+		if (Data.AbilityType == FDoubleHeroesGameplayTags::Get().Abilities_Type_Offensive)
+		{
+			GiveAbility(LoadedAbilitySpec);
+		}
+		else if (Data.AbilityType == FDoubleHeroesGameplayTags::Get().Abilities_Type_Passive)
+		{
+			if (Data.AbilityStatus.MatchesTagExact(FDoubleHeroesGameplayTags::Get().Abilities_Status_Equipped))
+			{
+				GiveAbilityAndActivateOnce(LoadedAbilitySpec);
+				MulticastActivatePassiveEffect(Data.AbilityTag, true);
+			}
+			else
+			{
+				GiveAbility(LoadedAbilitySpec);
+			}
+		}
+	}
+	bStartupAbilitiesGiven = true;
+	AbilitiesGivenDelegate.Broadcast();
 }
 
 void UDHAbilitySystemComponent::OnAbilityInputPressed(const FGameplayTag& InputTag)
@@ -194,6 +228,40 @@ FGameplayTag UDHAbilitySystemComponent::GetInputTagFromSpec(const FGameplayAbili
 	return FGameplayTag();
 }
 
+FGameplayTag UDHAbilitySystemComponent::GetStatusFromSpec(const FGameplayAbilitySpec& AbilitySpec)
+{
+	for (FGameplayTag StatusTag : AbilitySpec.DynamicAbilityTags)
+	{
+		if (StatusTag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Abilities.Status"))))
+		{
+			return StatusTag;
+		}
+	}
+	return FGameplayTag();
+}
+
+void UDHAbilitySystemComponent::MulticastActivatePassiveEffect_Implementation(const FGameplayTag& AbilityTag,
+	bool bActivate)
+{
+	ActivatePassiveEffect.Broadcast(AbilityTag, bActivate);
+}
+
+FGameplayAbilitySpec* UDHAbilitySystemComponent::GetSpecFromAbilityTag(const FGameplayTag& AbilityTag)
+{
+	FScopedAbilityListLock ActiveScopeLoc(*this);
+	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		for (FGameplayTag Tag : AbilitySpec.Ability.Get()->AbilityTags)
+		{
+			if (Tag.MatchesTag(AbilityTag))
+			{
+				return &AbilitySpec;
+			}
+		}
+	}
+	return nullptr;
+}
+
 void UDHAbilitySystemComponent::SetDynamicProjectile(const FGameplayTag& ProjectileTag, int32 AbilityLevel)
 {
 	if(!ProjectileTag.IsValid()) return;
@@ -308,7 +376,7 @@ void UDHAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<U
 	}
 
 	bStartupAbilitiesGiven = true;
-	AbilitiesGivenDelegate.Broadcast(this);
+	AbilitiesGivenDelegate.Broadcast();
 
 	//GAS
 }
@@ -336,6 +404,11 @@ void UDHAbilitySystemComponent::InitializeDefaultAttributes(const TSubclassOf<UG
 	const FGameplayEffectSpecHandle SpecHandle = MakeOutgoingSpec(AttributeEffect, 1.f, ContextHandle);
 	ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 	}
+}
+
+void UDHAbilitySystemComponent::UpdateAbilityStatuses(int32 Level)
+{
+	UAbilityInfo* AbilityInfo = UDoubleHeroesAbilitySystemLibrary::GetAbilityInfo(GetAvatarActor());
 }
 
 void UDHAbilitySystemComponent::GrantHeroWeaponAbilities(const TArray<FBlueHeroAbilitySet>& InDefaultWeaponAbilities,
@@ -374,6 +447,14 @@ void UDHAbilitySystemComponent::RemovedGrantedHeroWeaponAbilities(
 	}
 
 	InSpecHandlesToRemove.Empty();
+}
+
+bool UDHAbilitySystemComponent::IsNotFriend(AActor* FirstActor, AActor* SecondActor)
+{
+	const bool bBothArePlayers = FirstActor->ActorHasTag(FName("Player")) && SecondActor->ActorHasTag(FName("Player"));
+	const bool bBothAreEnemies = FirstActor->ActorHasTag(FName("Enemy")) && SecondActor->ActorHasTag(FName("Enemy"));
+	const bool bFriends = bBothArePlayers || bBothAreEnemies;
+	return !bFriends;
 }
 
 FGameplayAbilitySpecHandle UDHAbilitySystemComponent::GrantEquipmentAbility(

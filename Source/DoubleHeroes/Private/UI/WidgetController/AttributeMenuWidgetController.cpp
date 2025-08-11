@@ -8,9 +8,8 @@
 //获取标签名和参数并回调
 void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 {
-	UDoubleHeroesAttributeSet* AS = CastChecked<UDoubleHeroesAttributeSet>(AttributeSet);
 	check(AttributeInfo);
-	for(auto& Pair : AS->TagsToAttributes)
+	for(auto& Pair : GetDoubleHeroesAS()->TagsToAttributes)
 	{
 			AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Pair.Value()).AddLambda(
 			[this, Pair](const FOnAttributeChangeData& Data)
@@ -19,6 +18,12 @@ void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 			}
 		);
 	}
+	// GetDoubleHeroesPS()->OnAttributePointsChangedDelegate.AddLambda(
+	// 	[this](int32 Points)
+	// 	{
+	// 		AttributePointsChangedDelegate.Broadcast(Points);
+	// 	}
+	// );
 }
 
 void UAttributeMenuWidgetController::BroadcastInitialValues()

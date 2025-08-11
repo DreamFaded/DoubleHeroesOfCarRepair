@@ -189,7 +189,7 @@ void ADoubleHeroesCharacter::InitClassDefaults()
 		{
 			if (IsValid(DHAbilitySystemComponent))
 			{
-				DHAbilitySystemComponent->AddCharacterAbilities(SelectedClassInfo->StartingAbilities);
+				DHAbilitySystemComponent->AddCharacterAbilities(SelectedClassInfo->StartupAbilities);
 				DHAbilitySystemComponent->AddCharacterPassiveAbilities(SelectedClassInfo->StartingPassives);
 				DHAbilitySystemComponent->InitializeDefaultAttributes(SelectedClassInfo->DefaultAttributes);
 			}

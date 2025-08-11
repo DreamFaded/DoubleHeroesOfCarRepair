@@ -18,6 +18,7 @@ class UDoubleHeroesAttributeSet;
 class UDHAbilitySystemComponent;
 class USkinComponent;
 class UGameplayEffect;
+class UGameplayAbility;
 
 UCLASS()
 class DOUBLEHEROES_API ADoubleHeroesBaseCharacter : public ACharacter, public IAbilitySystemInterface, public IISkinInterface
@@ -66,7 +67,8 @@ public:
 	UPROPERTY()
 	AItemWeapon* OverlappingWeapon;
 	
-	
+	UPROPERTY()
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
 	// Begin IAbilitySystemInterface Interface
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
@@ -103,6 +105,8 @@ public:
 	virtual void OnRep_PlayerState() override;
 
 	virtual void SetOverlappingItem(AItemBase* Item);
+
+	void AddCharacterAbilities();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -153,8 +157,12 @@ protected:
 
 private:
 
-	// UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	// TObjectPtr<UDHAbilitySystemComponent> DHAbilitySystemComponent;
+
+	UPROPERTY(EditAnywhere, Category = "Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+
+	UPROPERTY(EditAnywhere, Category = "Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> StartupPassiveAbilities;
 
 	void InitAbilityActorInfo();
 

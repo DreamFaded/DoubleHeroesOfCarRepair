@@ -11,6 +11,10 @@
 
 class UDoubleHeroesAttributeSet;
 class UDHAbilitySystemComponent;
+
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerStatChanged, int32 /*StatValue*/)
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnLevelChanged, int32 /*StatValue*/, bool /*bLevelUp*/)
 /**
  * 
  */
@@ -26,12 +30,16 @@ public:
 	void BindCallbacksToDependencies();
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; };
 
+	FOnPlayerStatChanged OnXPChangedDelegate;
+	FOnLevelChanged OnLevelChangedDelegate;
+	FOnPlayerStatChanged OnSkillPointsChangedDelegate;
+	
 	FORCEINLINE int32 GetPlayerLevel() const {return Level;}
 
 	UFUNCTION(BlueprintPure)
 	UDoubleHeroesAttributeSet* GetDoubleHeroesAttributes() const;
 
-	
+	void SetSkillPoints(int32 InPoints);
 
 protected:
 	UPROPERTY(VisibleAnywhere, Replicated)
@@ -44,6 +52,9 @@ private:
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Level)
 	int32 Level = 1;
 
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing=OnRep_SkillPoints)
+	int32 SkillPoints = 0;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	TObjectPtr<UDHAbilitySystemComponent> DHAbilitySystemComp;
 	
@@ -52,4 +63,7 @@ private:
 
 	UFUNCTION()
 	void OnRep_Level(int32 OldLevel);
+	
+	UFUNCTION()
+	void OnRep_SkillPoints(int32 OldSkillPoints);
 };

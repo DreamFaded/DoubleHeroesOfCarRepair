@@ -6,6 +6,7 @@
 #include "AbilitySystem/DHAbilitySystemComponent.h"
 #include "AbilitySystem/DoubleHeroesAttributeSet.h"
 #include "Data/AbilityInfo.h"
+#include "Player/DoubleHeroesPlayerState.h"
 
 void UOverlayWidgetController::BroadcastInitialValues()
 {
@@ -18,6 +19,11 @@ void UOverlayWidgetController::BroadcastInitialValues()
 
 void UOverlayWidgetController::BindCallbacksToDependencies()
 {
+	GetDoubleHeroesPS()->OnXPChangedDelegate.AddUObject(this, &UOverlayWidgetController::OnXPChanged);
+	GetDoubleHeroesPS()->OnLevelChangedDelegate.AddLambda([this](int32 NewLevel, bool bLevelUp)
+	{
+		OnPlayerLevelChangedDelegate.Broadcast(NewLevel, bLevelUp);
+	});
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(GetDoubleHeroesAS()->GetHealthAttribute()).
 	                        AddLambda([this](const FOnAttributeChangeData& Data)
@@ -44,15 +50,15 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 		                        OnMaxEnduranceChanged.Broadcast(Data.NewValue);
 	                        });
 
-	if (UDHAbilitySystemComponent* DoubleHeroesASC = Cast<UDHAbilitySystemComponent>(AbilitySystemComponent))
+	if (GetDoubleHeroesASC())
 	{
-		if (DoubleHeroesASC->bStartupAbilitiesGiven)
+		if (GetDoubleHeroesASC()->bStartupAbilitiesGiven)
 		{
-			OnInitializeStartupAbilities(DoubleHeroesASC);
+			BroadcastAbilityInfo();
 		}
 		else
 		{
-			DoubleHeroesASC->AbilitiesGivenDelegate.AddUObject(this, &UOverlayWidgetController::OnInitializeStartupAbilities);
+			GetDoubleHeroesASC()->AbilitiesGivenDelegate.AddUObject(this, &UOverlayWidgetController::BroadcastAbilityInfo);
 		}
 		
 		DoubleHeroesASC->EffectAssetTags.AddLambda(
@@ -77,19 +83,57 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 	
 }
 
-void UOverlayWidgetController::OnInitializeStartupAbilities(UDHAbilitySystemComponent* DoubleHeroesASC)
+void UOverlayWidgetController::OnInitializeStartupAbilities(UDHAbilitySystemComponent* InDHAbilitySystemComponent)
+{
+	if(!GetDoubleHeroesASC()->bStartupAbilitiesGiven) return;
+
+	FForEachAbility BroadcastDelegate;
+	BroadcastDelegate.BindLambda([this](const FGameplayAbilitySpec& AbilitySpec)
+	{
+		//Need a way to figure out the ability tag for a given ability spec.
+		FDoubleHeroesAbilityInfo Info = AbilityInfo->FindAbilityInfoForTag(DoubleHeroesASC->GetAbilityTagFromSpec(AbilitySpec));
+		Info.InputTag = DoubleHeroesASC->GetInputTagFromSpec(AbilitySpec);
+		AbilityInfoDelegate.Broadcast(Info);
+	});
+	GetDoubleHeroesASC()->ForEachAbility(BroadcastDelegate);
+}
+
+void UOverlayWidgetController::BroadcastAbilityInfo()
 {
 	//Get information about all given abilities, look up their Ability Info, and broadcast it to widgets.
 	if(!DoubleHeroesASC->bStartupAbilitiesGiven) return;
 
 	FForEachAbility BroadcastDelegate;
-	BroadcastDelegate.BindLambda([this, DoubleHeroesASC](const FGameplayAbilitySpec& AbilitySpec)
+	BroadcastDelegate.BindLambda([this](const FGameplayAbilitySpec& AbilitySpec)
 	{
 		//Need a way to figure out the ability tag for a given ability spec.
-		FDoubleHeroesAbilityInfo Info = AbilityInfo->FindAbilityInfoByTag(DoubleHeroesASC->GetAbilityTagFromSpec(AbilitySpec));
+		FDoubleHeroesAbilityInfo Info = AbilityInfo->FindAbilityInfoForTag(DoubleHeroesASC->GetAbilityTagFromSpec(AbilitySpec));
 		Info.InputTag = DoubleHeroesASC->GetInputTagFromSpec(AbilitySpec);
+		Info.StatusTag = DoubleHeroesASC->GetStatusFromSpec(AbilitySpec);
 		AbilityInfoDelegate.Broadcast(Info);
 	});
-	DoubleHeroesASC->ForEachAbility(BroadcastDelegate);
+	GetDoubleHeroesASC()->ForEachAbility(BroadcastDelegate);
+}
+
+void UOverlayWidgetController::OnXPChanged(int32 NewXP)
+{
+	// const ULevelUpInfo* LevelUpInfo = GetDoubleHeroesPS()->LevelUpInfo;
+	// checkf(LevelUpInfo, TEXT("Unabled to find LevelUpInfo. Please fill out AuraPlayerState Blueprint"));
+	//
+	// const int32 Level = LevelUpInfo->FindLevelForXP(NewXP);
+	// const int32 MaxLevel = LevelUpInfo->LevelUpInformation.Num();
+	//
+	// if (Level <= MaxLevel && Level > 0)
+	// {
+	// 	const int32 LevelUpRequirement = LevelUpInfo->LevelUpInformation[Level].LevelUpRequirement;
+	// 	const int32 PreviousLevelUpRequirement = LevelUpInfo->LevelUpInformation[Level - 1].LevelUpRequirement;
+	//
+	// 	const int32 DeltaLevelRequirement = LevelUpRequirement - PreviousLevelUpRequirement;
+	// 	const int32 XPForThisLevel = NewXP - PreviousLevelUpRequirement;
+	//
+	// 	const float XPBarPercent = static_cast<float>(XPForThisLevel) / static_cast<float>(DeltaLevelRequirement);
+	//
+	// 	OnXPPercentChangedDelegate.Broadcast(XPBarPercent);
+	// }
 }
 

@@ -35,14 +35,14 @@ void FGlobalAppliedAbilityList::RemoveFromASC(UDHAbilitySystemComponent* ASC)
 
 void FGlobalAppliedAbilityList::RemoveFromAll()
 {
-	for (auto& KVP : Handles)
-	{
-		if (KVP.Key != nullptr)
-		{
-			KVP.Key->ClearAbility(KVP.Value);
-		}
-	}
-	Handles.Empty();
+	// for (auto& KVP : Handles)
+	// {
+	// 	if (KVP.Key != nullptr)
+	// 	{
+	// 		KVP.Key->ClearAbility(KVP.Value);
+	// 	}
+	// }
+	// Handles.Empty();
 }
 
 void FGlobalAppliedEffectList::AddToASC(TSubclassOf<UGameplayEffect> Effect, UDHAbilitySystemComponent* ASC)

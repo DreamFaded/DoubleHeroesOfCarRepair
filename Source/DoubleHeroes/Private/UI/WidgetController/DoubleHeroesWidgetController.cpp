@@ -3,7 +3,10 @@
 
 #include "UI/WidgetController/DoubleHeroesWidgetController.h"
 
+#include "AbilitySystem/DHAbilitySystemComponent.h"
 #include "AbilitySystem/DoubleHeroesAttributeSet.h"
+#include "Data/AbilityInfo.h"
+#include "Player/DoubleHeroesPlayerState.h"
 
 void UDoubleHeroesWidgetController::SetWidgetControllerParams(const FWidgetControllerParams& WCParams)
 {
@@ -21,14 +24,38 @@ void UDoubleHeroesWidgetController::BindCallbacksToDependencies()
 {
 }
 
-/*UDHAbilitySystemComponent* UDoubleHeroesWidgetController::GetDoubleHeroesASC()
+void UDoubleHeroesWidgetController::BroadcastAbilityInfo()
 {
-	if (DHAbilitySystemComponent == nullptr)
+	if (!GetDoubleHeroesASC()->bStartupAbilitiesGiven) return;
+
+	FForEachAbility BroadcastDelegate;
+	BroadcastDelegate.BindLambda([this](const FGameplayAbilitySpec& AbilitySpec)
 	{
-		DHAbilitySystemComponent = Cast<UDHAbilitySystemComponent>(AbilitySystemComponent);
+		FDoubleHeroesAbilityInfo Info = AbilityInfo->FindAbilityInfoForTag(DoubleHeroesASC->GetAbilityTagFromSpec(AbilitySpec));
+		Info.InputTag = DoubleHeroesASC->GetInputTagFromSpec(AbilitySpec);
+		Info.StatusTag = DoubleHeroesASC->GetStatusFromSpec(AbilitySpec);
+		AbilityInfoDelegate.Broadcast(Info);
+	});
+	GetDoubleHeroesASC()->ForEachAbility(BroadcastDelegate);
+}
+
+ADoubleHeroesPlayerState* UDoubleHeroesWidgetController::GetDoubleHeroesPS()
+{
+	if (DoubleHeroesPlayerState == nullptr)
+	{
+		DoubleHeroesPlayerState = Cast<ADoubleHeroesPlayerState>(PlayerState);
 	}
-	return DHAbilitySystemComponent;
-}*/
+	return DoubleHeroesPlayerState;
+}
+
+UDHAbilitySystemComponent* UDoubleHeroesWidgetController::GetDoubleHeroesASC()
+{
+	if(DoubleHeroesASC == nullptr)
+	{
+		DoubleHeroesASC = Cast<UDHAbilitySystemComponent>(AbilitySystemComponent);
+	}
+	return DoubleHeroesASC;
+}
 
 UDoubleHeroesAttributeSet* UDoubleHeroesWidgetController::GetDoubleHeroesAS()
 {

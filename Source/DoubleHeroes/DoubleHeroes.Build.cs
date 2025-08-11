@@ -8,7 +8,7 @@ public class DoubleHeroes : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "OnlineSubsystem", "OnlineSubsystemSteam", "GameplayAbilities", "UMG", "ModularGameplay" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "OnlineSubsystem", "OnlineSubsystemSteam", "GameplayAbilities", "UMG", "ModularGameplay", "ModelViewViewModel" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {"GameplayTags", "GameplayTasks", "NavigationSystem", "Niagara", "NetCore", "AIModule", "SlateCore" });
 

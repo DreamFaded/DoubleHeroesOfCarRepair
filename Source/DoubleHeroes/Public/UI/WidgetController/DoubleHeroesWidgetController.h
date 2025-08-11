@@ -6,12 +6,16 @@
 #include "UObject/Object.h"
 #include "DoubleHeroesWidgetController.generated.h"
 
+class ADoubleHeroesPlayerState;
 class UAttributeSet;
 class UDHAbilitySystemComponent;
 class UAbilitySystemComponent;
 class UDoubleHeroesAttributeSet;
 class UAttributeInfo;
+class UAbilityInfo;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStatChangedSignature, int32, NewValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityInfoSignature, const FDoubleHeroesAbilityInfo&, Info);
 
 USTRUCT(BlueprintType)
 struct FWidgetControllerParams
@@ -53,7 +57,15 @@ public:
 	virtual void BroadcastInitialValues();
 	virtual void BindCallbacksToDependencies();
 
+	UPROPERTY(BlueprintAssignable, Category="GAS|Messages")
+	FAbilityInfoSignature AbilityInfoDelegate;
+
+	
+	void BroadcastAbilityInfo();
 protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data")
+	TObjectPtr<UAbilityInfo> AbilityInfo;
+	
 	UPROPERTY(BlueprintReadOnly, Category = "WidgetController")
 	TObjectPtr<APlayerController> PlayerController;
 
@@ -64,13 +76,18 @@ protected:
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
 	UPROPERTY(BlueprintReadOnly, Category = "WidgetController")
-	TObjectPtr<UAttributeSet> AttributeSet;
+	TObjectPtr<ADoubleHeroesPlayerState> DoubleHeroesPlayerState;
 
-	// UPROPERTY(BlueprintReadOnly, Category="WidgetController")
-	// TObjectPtr<UDHAbilitySystemComponent> DHAbilitySystemComponent;
+	UPROPERTY(BlueprintReadOnly, Category = "WidgetController")
+	TObjectPtr<UDHAbilitySystemComponent> DoubleHeroesASC;
+
+	UPROPERTY(BlueprintReadOnly, Category = "WidgetController")
+	TObjectPtr<UAttributeSet> AttributeSet;
 
 	UPROPERTY(BlueprintReadOnly, Category="WidgetController")
 	TObjectPtr<UDoubleHeroesAttributeSet> DoubleHeroesAttributeSet;
 
+	ADoubleHeroesPlayerState* GetDoubleHeroesPS();
+	UDHAbilitySystemComponent* GetDoubleHeroesASC();
 	UDoubleHeroesAttributeSet* GetDoubleHeroesAS();
 };

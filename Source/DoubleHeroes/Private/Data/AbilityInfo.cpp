@@ -5,7 +5,7 @@
 
 #include "DoubleHeroesLogChannels.h"
 
-FDoubleHeroesAbilityInfo UAbilityInfo::FindAbilityInfoByTag(const FGameplayTag& AbilityTag, bool bLogNotFound) const
+FDoubleHeroesAbilityInfo UAbilityInfo::FindAbilityInfoForTag(const FGameplayTag& AbilityTag, bool bLogNotFound) const
 {
 	for (const FDoubleHeroesAbilityInfo& AbilityInfo : AbilityInformation)
 	{
@@ -17,7 +17,7 @@ FDoubleHeroesAbilityInfo UAbilityInfo::FindAbilityInfoByTag(const FGameplayTag& 
 
 	if (bLogNotFound)
 	{
-		UE_LOG(LogDoubleHeroes, Error, TEXT("Could not find ability info for AbilityTag [%s] on AbilityInfo [%s]"), *AbilityTag.ToString(), GetNameSafe(this));
+		UE_LOG(LogDoubleHeroes, Error, TEXT("Could not find ability info for AbilityTag [%s] on AbilityInfo [%s]"), *AbilityTag.ToString(), *GetNameSafe(this));
 	}
 	return FDoubleHeroesAbilityInfo();
 }

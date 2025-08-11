@@ -81,7 +81,7 @@ protected:
 	void Interact();
 	void CrouchPressed();
 
-	
+	void LoadProgress();
 
 
 

@@ -4,16 +4,21 @@
 #include "Character/BlueHeroCharacter.h"
 
 #include "DoubleHeroesGameplayTags.h"
+#include "LoadScreenSaveGame.h"
 #include "AbilitySystem/DHAbilitySystemComponent.h"
+#include "AbilitySystem/DoubleHeroesAbilitySystemLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "Components/DHCharacterMovementComponent.h"
 #include "Components/HeroCombatComponent.h"
 #include "Components/InputComponent.h"
 #include "DataAsset/DataAsset_StartUpDataBase.h"
+#include "Game/DoubleHeroesGameModeBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/DoubleHeroesPlayerState.h"
 #include "Weapon/Weapon.h"
 
 
@@ -224,6 +229,37 @@ void ABlueHeroCharacter::CrouchPressed()
 	else
 	{
 		Crouch();
+	}
+}
+
+void ABlueHeroCharacter::LoadProgress()
+{
+	ADoubleHeroesGameModeBase* DoubleHeroesGameMode = Cast<ADoubleHeroesGameModeBase>(UGameplayStatics::GetGameMode(this));
+	if (DoubleHeroesGameMode)
+	{
+		ULoadScreenSaveGame* SaveData = DoubleHeroesGameMode->RetrieveInGameSaveData();
+		if (SaveData == nullptr) return;
+
+		if (SaveData->bFirstTimeLoadIn)
+		{
+			InitializeDefaultAttributes();
+			AddCharacterAbilities();
+		}
+		else
+		{
+			if (UDHAbilitySystemComponent* AuraASC = Cast<UDHAbilitySystemComponent>(AbilitySystemComponent))
+			{
+				AuraASC->AddCharacterAbilitiesFromSaveData(SaveData);
+			}
+			
+			if (ADoubleHeroesPlayerState* DoubleHeroesPlayerState = Cast<ADoubleHeroesPlayerState>(GetPlayerState()))
+			{
+				
+				DoubleHeroesPlayerState->SetSkillPoints(SaveData->SkillPoints);
+			}
+			
+			UDoubleHeroesAbilitySystemLibrary::InitializeDefaultAttributesFromSaveData(this, AbilitySystemComponent, SaveData);
+		}
 	}
 }
 

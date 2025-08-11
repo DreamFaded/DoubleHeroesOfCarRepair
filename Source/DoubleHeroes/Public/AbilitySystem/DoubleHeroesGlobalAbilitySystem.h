@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ActiveGameplayEffectHandle.h"
+#include "GameplayAbilitySpecHandle.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "DoubleHeroesGlobalAbilitySystem.generated.h"
 
@@ -10,9 +12,6 @@ class UGameplayAbility;
 class UGameplayEffect;
 class UDHAbilitySystemComponent;
 class UObject;
-struct FActiveGameplayEffectHandle;
-struct FFrame;
-struct FGameplayAbilitySpecHandle;
 
 USTRUCT()
 struct FGlobalAppliedAbilityList

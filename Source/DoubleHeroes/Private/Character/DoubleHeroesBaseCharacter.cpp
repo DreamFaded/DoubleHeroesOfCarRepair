@@ -165,7 +165,7 @@ void ADoubleHeroesBaseCharacter::InitClassDefaults()
 		{
 			if (IsValid(DHAbilitySystemComponent))
 			{
-				DHAbilitySystemComponent->AddCharacterAbilities(SelectedClassInfo->StartingAbilities);
+				DHAbilitySystemComponent->AddCharacterAbilities(SelectedClassInfo->StartupAbilities);
 				DHAbilitySystemComponent->AddCharacterPassiveAbilities(SelectedClassInfo->StartingPassives);
 				DHAbilitySystemComponent->InitializeDefaultAttributes(SelectedClassInfo->DefaultAttributes);
 			}
@@ -204,6 +204,15 @@ void ADoubleHeroesBaseCharacter::SetOverlappingItem(AItemBase* Item)
 			// OverlappingItem->ShowPickupWidget(true);
 		}
 	}
+}
+
+void ADoubleHeroesBaseCharacter::AddCharacterAbilities()
+{
+	UDHAbilitySystemComponent* AuraASC = CastChecked<UDHAbilitySystemComponent>(AbilitySystemComponent);
+	if (!HasAuthority()) return;
+
+	AuraASC->AddCharacterAbilities(StartupAbilities);
+	AuraASC->AddCharacterPassiveAbilities(StartupPassiveAbilities);
 }
 
 void ADoubleHeroesBaseCharacter::Input_Move(const FInputActionValue& InputActionValue)
